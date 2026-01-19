@@ -109,7 +109,7 @@ export const DoctorLogin = (data) => async (dispatch) => {
 export const AdminLogin = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.LOGIN_ADMIN_REQUEST });
-    const res = await axios.post("http://localhost:3007/admin/login", data);
+    const res = await axios.post("https://aastu-shms.vercel.app/admin/login", data);
     console.log("here", res.data.user);
     dispatch({
       type: types.LOGIN_ADMIN_SUCCESS,
