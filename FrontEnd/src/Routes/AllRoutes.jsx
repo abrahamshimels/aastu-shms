@@ -19,6 +19,12 @@ import AdminAnalytics from "../Pages/Dashboard/Main-Dashboard/AllPages/Admin/Adm
 import SignupDetails from "../Pages/Dashboard/Dashboard-Login/Signup/SignupDetails";
 import MainPortal from "../Pages/MainPortal/MainPortal";
 import QueueScreen from "../Pages/MainPortal/QueueScreen";
+import Registration from "../Pages/Dashboard/Main-Dashboard/AllPages/Nurse/Registration";
+import Queue from "../Pages/Dashboard/Main-Dashboard/AllPages/Nurse/Queue";
+import CertificatesPage from "../Pages/Dashboard/Main-Dashboard/AllPages/Nurse/CertificatesPage";
+
+import Pending_Tests from "../Pages/Dashboard/Main-Dashboard/AllPages/Laboratory/Pending_Tests";
+import Lab_History from "../Pages/Dashboard/Main-Dashboard/AllPages/Laboratory/Lab_History";
 const AllRoutes = () => {
   return (
     <>
@@ -44,6 +50,13 @@ const AllRoutes = () => {
         {/* ******************** Patient Part ************************* */}
         <Route path="/bookappointment" element={<Book_Appointment />} />
         <Route path="/patientprofile" element={<Patient_Profile />} />
+        {/* ******************** Nurse Part ************************* */}
+        <Route path="/registration" element={<Registration />} />
+        <Route path="/queue" element={<Queue />} />
+        <Route path="/certificates" element={<CertificatesPage />} />
+        ******************** Laboratory Part *************************
+        <Route path="/lab/pending" element={<Pending_Tests />} />
+        <Route path="/lab/history" element={<Lab_History />} />
       </Routes>
     </>
   );

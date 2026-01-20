@@ -8,8 +8,10 @@ import { useNavigate } from "react-router-dom";
 import {
   AdminLogin,
   DoctorLogin,
+  LabTechLogin,
   forgetPassword,
   patientLogin,
+  NurseLogin,
 } from "../../../Redux/auth/action";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -33,7 +35,7 @@ const DLogin = () => {
 
   // ************************************************
   const [Loading, setLoading] = useState(false);
-  const [placement, setPlacement] = useState("Patient");
+  const [placement, setPlacement] = useState("Nurse");
   const [formValue, setFormValue] = useState({
     ID: "",
     password: "",

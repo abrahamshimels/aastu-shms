@@ -10,6 +10,8 @@ import { ImMenu } from "react-icons/im";
 import { FiLogOut } from "react-icons/fi";
 import { RiAdminLine } from "react-icons/ri";
 import { MdDashboard, MdSettings, MdAnalytics } from "react-icons/md";
+import { MdDashboardCustomize, MdOutlineAssignment } from "react-icons/md";
+import { GiMicroscope } from "react-icons/gi";
 import { useDispatch, useSelector } from "react-redux";
 import { authLogout } from "../../../../Redux/auth/action";
 import { HistoryOutlined } from "@ant-design/icons";
@@ -215,10 +217,93 @@ const Sidebar = () => {
                     Patients
                   </div>
                 </Link>
+                <Link
+                  className="link"
+                  activeclassname="active"
+                  to={"/lab/history"}
+                >
+                  <div className="icon">
+                    <GiMicroscope className="mainIcon" />
+                  </div>
+                  <div
+                    style={{ display: isOpen ? "block" : "none" }}
+                    className="link_text"
+                  >
+                    Lab History
+                  </div>
+                </Link>
+              </>
+            ) : null}
+            {user?.userType === "lab_technologist" ? (
+              <>
+                <Link
+                  className="link"
+                  activeclassname="active"
+                  to={"/lab/pending"}
+                >
+                  <div className="icon">
+                    <MdOutlineAssignment className="mainIcon" />
+                  </div>
+                  <div
+                    style={{ display: isOpen ? "block" : "none" }}
+                    className="link_text"
+                  >
+                    Pending Tests
+                  </div>
+                </Link>
+                <Link
+                  className="link"
+                  activeclassname="active"
+                  to={"/lab/history"}
+                >
+                  <div className="icon">
+                    <GiMicroscope className="mainIcon" />
+                  </div>
+                  <div
+                    style={{ display: isOpen ? "block" : "none" }}
+                    className="link_text"
+                  >
+                    Lab History
+                  </div>
+                </Link>
+              </>
+            ) : null}
+            {user?.userType === "nurse" ? (
+              <>
+                <Link
+                  className="link"
+                  activeclassname="active"
+                  to={"/registration"}
+                >
+                  <div className="icon">
+                    <AiOutlineUserAdd className="mainIcon" />
+                  </div>
+                  <div
+                    style={{ display: isOpen ? "block" : "none" }}
+                    className="link_text"
+                  >
+                    Registration
+                  </div>
+                </Link>
+                <Link
+                  className="link"
+                  activeclassname="active"
+                  to={"/queue"}
+                >
+                  <div className="icon">
+                    <FaUsers className="mainIcon" />
+                  </div>
+                  <div
+                    style={{ display: isOpen ? "block" : "none" }}
+                    className="link_text"
+                  >
+                    Queue
+                  </div>
+                </Link>
               </>
             ) : null}
 
-            {user?.userType !== "admin" ? (
+            {user?.userType !== "admin" && user?.userType !== "lab_technologist" ? (
               <>
                 <Link
                   className="link"
@@ -235,7 +320,11 @@ const Sidebar = () => {
                     My Appointments
                   </div>
                 </Link>
-                <Link className="link" activeclassname="active" to={"/reports"}>
+                <Link
+                  className="link"
+                  activeclassname="active"
+                  to={"/certificates"}
+                >
                   <div className="icon">
                     <TbReportMedical className="mainIcon" />
                   </div>
@@ -243,7 +332,7 @@ const Sidebar = () => {
                     style={{ display: isOpen ? "block" : "none" }}
                     className="link_text"
                   >
-                    Reports
+                    Certificates
                   </div>
                 </Link>
               </>

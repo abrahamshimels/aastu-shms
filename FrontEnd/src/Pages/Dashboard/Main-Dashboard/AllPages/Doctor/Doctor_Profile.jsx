@@ -24,9 +24,9 @@ const Doctor_Profile = () => {
   console.log("user state", data);
 
   console.log("DATA JANAB ", data);
-  const { doctors } = useSelector((store) => store.data.doctors);
+  const { doctors: doctorsObj, loading } = useSelector((store) => store.data);
+  const doctors = doctorsObj?.doctors || [];
 
-  console.log("doctors", doctors);
   const doctor = doctors.find((doctor) => data.user.email === doctor.email);
   console.log(doctor);
   useEffect(() => {
@@ -98,21 +98,21 @@ const Doctor_Profile = () => {
       ? data.user.password !== formData.newPass
         ? formData.confirmNewPass === formData.newPass
           ? (() => {
-              dispatch(
-                UpdateDoctor(
-                  data.user.id,
-                  { password: formData.newPass },
-                  data.token
-                )
-              ).then((res) => {
-                if (res.message === "password updated") {
-                  success("User updated");
-                  handleOk();
-                } else {
-                  error("Something went wrong.");
-                }
-              });
-            })()
+            dispatch(
+              UpdateDoctor(
+                data.user.id,
+                { password: formData.newPass },
+                data.token
+              )
+            ).then((res) => {
+              if (res.message === "password updated") {
+                success("User updated");
+                handleOk();
+              } else {
+                error("Something went wrong.");
+              }
+            });
+          })()
           : error("Passwords do not match")
         : error("New password same as old")
       : error("Incorrect Old Password");
@@ -134,14 +134,14 @@ const Doctor_Profile = () => {
 
   console.log("newPass", formData.newPass);
 
-  const dobString = doctor.dob;
+  const dobString = doctor?.dob;
   const dobDate = new Date(dobString);
 
-  const formattedDob = dobDate.toLocaleDateString("en-US", {
+  const formattedDob = dobString ? dobDate.toLocaleDateString("en-US", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  });
+  }) : "N/A";
 
   function filterAvailability(availability) {
     const result = [];
@@ -170,6 +170,30 @@ const Doctor_Profile = () => {
 
   if (data?.user.userType !== "doctor") {
     return <Navigate to={"/dashboard"} />;
+  }
+
+  if (loading) {
+    return (
+      <div className="container">
+        <Sidebar />
+        <div className="AfterSideBar" style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+          <h1>Loading...</h1>
+        </div>
+      </div>
+    );
+  }
+
+  if (!doctor) {
+    return (
+      <div className="container">
+        <Sidebar />
+        <div className="AfterSideBar" style={{ padding: "2rem" }}>
+          <h1>Doctor Profile Not Found</h1>
+          <p>This might be because the database is empty or registration is incomplete.</p>
+          <p>Please run <code>node seed_doctor.js</code> in the Backend folder.</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -287,10 +311,6 @@ const Doctor_Profile = () => {
                 <h2 style={{ textAlign: "center", marginTop: "10px" }}>
                   Other Info
                 </h2>
-                <div className="singleitemdiv">
-                  <BiMoney className="singledivicons" />
-                  <p>{doctor.fees}</p>
-                </div>
                 <div className="singleitemdiv">
                   <AiFillClockCircle className="singledivicons" />
                   {/* <p>{`${doctor.availability[0]} - ${

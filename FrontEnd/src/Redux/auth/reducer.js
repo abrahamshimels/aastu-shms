@@ -11,16 +11,21 @@ const initialState = {
 };
 export default function authReducer(state = initialState, { type, payload }) {
   switch (type) {
-    case types.LOGIN_PATIENT_REQUEST ||
-      types.LOGIN_ADMIN_REQUEST ||
-      types.LOGIN_DOCTOR_REQUEST:
+    case types.LOGIN_PATIENT_REQUEST:
+    case types.LOGIN_ADMIN_REQUEST:
+    case types.LOGIN_DOCTOR_REQUEST:
+    case types.LOGIN_NURSE_REQUEST:
+    case types.LOGIN_LABTECH_REQUEST:
       return {
         ...state,
         userLogin: { loading: true, error: false },
       };
-    case types.LOGIN_PATIENT_SUCCESS ||
-      types.LOGIN_ADMIN_SUCCESS ||
-      types.LOGIN_DOCTOR_SUCCESS:
+
+    case types.LOGIN_PATIENT_SUCCESS:
+    case types.LOGIN_ADMIN_SUCCESS:
+    case types.LOGIN_DOCTOR_SUCCESS:
+    case types.LOGIN_NURSE_SUCCESS:
+    case types.LOGIN_LABTECH_SUCCESS:
       localStorage.setItem("token", payload.token);
       return {
         ...state,
@@ -31,24 +36,18 @@ export default function authReducer(state = initialState, { type, payload }) {
           user: payload.user,
         },
       };
+
+    case types.LOGIN_PATIENT_ERROR:
+    case types.LOGIN_ADMIN_ERROR:
+    case types.LOGIN_DOCTOR_ERROR:
+    case types.LOGIN_NURSE_ERROR:
+      return {
+        ...state,
+        userLogin: { loading: false, error: true, message: payload.message },
+      };
+
     case types.EDIT_DOCTOR_REQUEST:
-      return {
-        ...state,
-        data: {
-          isAuthenticated: true,
-          token: null,
-          user: null,
-        },
-      };
     case types.EDIT_PATIENT_REQUEST:
-      return {
-        ...state,
-        data: {
-          isAuthenticated: true,
-          token: null,
-          user: null,
-        },
-      };
     case types.EDIT_ADMIN_REQUEST:
       return {
         ...state,
@@ -58,68 +57,10 @@ export default function authReducer(state = initialState, { type, payload }) {
           user: null,
         },
       };
-    case types.LOGIN_PATIENT_ERROR ||
-      types.LOGIN_ADMIN_ERROR ||
-      types.LOGIN_DOCTOR_ERROR:
-      return {
-        ...state,
-        userLogin: { loading: false, error: true, message: payload.message },
-      };
-    case types.LOGIN_DOCTOR_REQUEST:
-      return {
-        ...state,
-        userLogin: { loading: true, error: false },
-      };
-    case types.LOGIN_DOCTOR_SUCCESS:
-      localStorage.setItem("token", payload.token);
-      return {
-        ...state,
-        userLogin: { loading: false, error: false, message: payload.message },
-        data: {
-          isAuthenticated: payload.token ? true : false,
-          token: payload.token,
-          user: payload.user,
-        },
-      };
-    case types.LOGIN_DOCTOR_ERROR:
-      return {
-        ...state,
-        userLogin: { loading: false, error: true, message: payload.message },
-      };
-    case types.LOGIN_ADMIN_REQUEST:
-      return {
-        ...state,
-        userLogin: { loading: true, error: false },
-      };
-    case types.LOGIN_ADMIN_SUCCESS:
-      localStorage.setItem("token", payload.token);
-      return {
-        ...state,
-        userLogin: { loading: false, error: false, message: payload.message },
-        data: {
-          isAuthenticated: payload.token ? true : false,
-          token: payload.token,
-          user: payload.user,
-        },
-      };
+
+
     case types.EDIT_DOCTOR_SUCCESS:
-      return {
-        ...state,
-        data: {
-          isAuthenticated: payload.token ? true : false,
-          token: payload.token,
-          user: payload.user,
-        },
-      };
     case types.EDIT_PATIENT_SUCCESS:
-      return {
-        ...state,
-        data: {
-          isAuthenticated: payload.token ? true : false,
-          token: payload.token,
-          user: payload.user,
-        },
-      };
     case types.EDIT_ADMIN_SUCCESS:
       return {
         ...state,
@@ -128,11 +69,6 @@ export default function authReducer(state = initialState, { type, payload }) {
           token: payload.token,
           user: payload.user,
         },
-      };
-    case types.LOGIN_ADMIN_ERROR:
-      return {
-        ...state,
-        userLogin: { loading: false, error: true, message: payload.message },
       };
 
     case "AUTH_LOGIN_RESET":

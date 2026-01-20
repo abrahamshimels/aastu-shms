@@ -31,11 +31,11 @@ function Row(props) {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell component="th" scope="row">
-          {row.name}
-        </TableCell>
-        <TableCell align="right">{row.date}</TableCell>
-        <TableCell align="right">{row.time}</TableCell>
+        {props.columns.filter(c => c.label !== "Details" && c.label !== "Status" && c.label !== "Cancel Appointment" && c.label !== "Generate Report").map((col, i) => (
+          <TableCell key={i} align={col.align} component={i === 0 ? "th" : "td"} scope={i === 0 ? "row" : ""}>
+            {row[col.key] || row[col.label.toLowerCase().replace(" ", "_")] || row[col.label.toLowerCase()]}
+          </TableCell>
+        ))}
         <TableCell align="right">
           <Button
             type="primary"
@@ -61,7 +61,6 @@ function Row(props) {
                     <TableCell>Phone Number</TableCell>
                     <TableCell>Department</TableCell>
                     <TableCell align="right">Problem</TableCell>
-                    <TableCell align="right">Fees ($)</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -72,7 +71,6 @@ function Row(props) {
                       </TableCell>
                       <TableCell>{detailsRow.department}</TableCell>
                       <TableCell align="right">{detailsRow.problem}</TableCell>
-                      <TableCell align="right">{detailsRow.fees}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -127,7 +125,7 @@ const CollapsibleTable = (props) => {
         </TableHead>
         <TableBody>
           {data.map((row, index) => (
-            <Row row={row} onDelete={onDelete} rowIndex={row.id} />
+            <Row row={row} onDelete={onDelete} rowIndex={row.id} columns={columns} />
           ))}
         </TableBody>
       </Table>

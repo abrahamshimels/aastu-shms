@@ -8,9 +8,13 @@ import "react-toastify/dist/ReactToastify.css";
 import {
   DeleteAppointment,
   GetAppointments,
+  GetPatients,
+  GetDoctorDetails,
 } from "../../../../../Redux/Datas/action";
 import Sidebar from "../../GlobalFiles/Sidebar";
+
 const notify = (text) => toast(text);
+
 const Check_Appointment = () => {
   const { data } = useSelector((store) => store.auth);
   const { patients } = useSelector((store) => store.data.patients);
@@ -21,54 +25,67 @@ const Check_Appointment = () => {
     data.user.userType === "patient"
       ? patients.find((patient) => patient.id === appointments.patientid)
       : appointments.map((appointment) => {
-          return patients.find(
-            (patient) => patient.id === appointment.patientid
-          );
-        });
+        return patients.find(
+          (patient) => patient.id === appointment.patientid
+        );
+      });
 
   const doctor =
     data.user.userType === "patient"
       ? appointments.map((appointment) => {
-          return doctors.find((doctor) => doctor.id === appointment.doctorid);
-        })
+        return doctors.find((doctor) => doctor.id === appointment.doctorid);
+      })
       : doctors.find((doctor) => doctor.id === data.user.id);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (data.user?.userType) {
+      dispatch(GetAppointments(data.user.userType, data.user.id));
+      dispatch(GetPatients());
+      dispatch(GetDoctorDetails());
+    }
+  }, [data.user]);
+
   const createData = (
     id,
-    name,
+    patient_name,
+    doctor_name,
     date,
     time,
     phonenum,
     department,
-    fees,
     problem,
     buttonText
   ) => {
     return {
       id,
-      name,
+      patient_name,
+      doctor_name,
       date,
       time,
       buttonText,
-      details: [{ phonenum, department, problem, fees }],
+      details: [{ phonenum, department, problem }],
     };
   };
 
   const columns = [
     {
-      userType: data.user.userType,
-      label: "Name",
+      userType: data.user?.userType,
+      label: data.user?.userType === "patient" ? "Doctor Name" : "Patient Name",
+      key: data.user?.userType === "patient" ? "doctor_name" : "patient_name",
       align: "left",
     },
-    { label: "Date", align: "right" },
-    { label: "Time", align: "right" },
+    { label: "Date", key: "date", align: "right" },
+    { label: "Time", key: "time", align: "right" },
     {
       label:
-        data.user.userType === "patient"
+        data.user?.userType === "patient"
           ? "Cancel Appointment"
-          : "Generate Report",
+          : data.user?.userType === "nurse"
+            ? "Status"
+            : "Generate Report",
       align: "right",
     },
   ];
@@ -76,40 +93,41 @@ const Check_Appointment = () => {
   const datas = appointments.map((appointment, index) => {
     return data.user.userType === "patient"
       ? createData(
-          appointment.id,
-          doctor[index].name,
-          appointment.date,
-          appointment.time,
-          doctor[index].phonenum,
-          doctor[index].department,
-          doctor[index].fees,
-          appointment.problem,
-          "Cancel"
-        )
+        appointment.id,
+        doctor[index].name,
+        appointment.date,
+        appointment.time,
+        doctor[index].phonenum,
+        doctor[index].department,
+        doctor[index].fees,
+        appointment.problem,
+        "Cancel"
+      )
       : createData(
-          appointment.id,
-          patient[index].name,
-          appointment.date,
-          appointment.time,
-          patient[index].phonenum,
-          doctor.department,
-          doctor.fees,
-          appointment.problem,
-          "Generate Report"
-        );
+        appointment.id,
+        patient[index].name,
+        appointment.date,
+        appointment.time,
+        patient[index].phonenum,
+        doctor.department,
+        doctor.fees,
+        appointment.problem,
+        "Generate Report"
+      );
   });
+
   const clicked = (index) => {
     let appointment;
     data.user.userType === "patient"
       ? dispatch(DeleteAppointment(index)).then((res) => {
-          console.log(res);
-          if (res.message === "successful") {
-            notify("Appointment Cancelled");
-          }
-        })
+        console.log(res);
+        if (res.message === "successful") {
+          notify("Appointment Cancelled");
+        }
+      })
       : (appointment = appointments.find(
-          (appointment) => appointment.id === index
-        ));
+        (appointment) => appointment.id === index
+      ));
     console.log(appointment);
     if (appointment !== undefined) {
       return navigate("/createreport", { state: appointment });
@@ -136,11 +154,19 @@ const Check_Appointment = () => {
           <div className="Payment_Page">
             <h1 style={{ marginBottom: "2rem" }}>Appointment Details</h1>
             <div className="patientBox">
-              <CollapsibleTable
-                data={datas}
-                columns={columns}
-                onDelete={clicked}
-              />
+              {appointments.length > 0 ? (
+                <CollapsibleTable
+                  data={datas}
+                  columns={columns}
+                  onDelete={clicked}
+                />
+              ) : (
+                <div style={{ padding: "2rem", textAlign: "center" }}>
+                  <h3>No Appointments Found</h3>
+                  <p>You need an active appointment to generate a lab request.</p>
+                  <p>Please run <code>node seed_full_workflow.js</code> in the Backend folder to set up test data.</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
