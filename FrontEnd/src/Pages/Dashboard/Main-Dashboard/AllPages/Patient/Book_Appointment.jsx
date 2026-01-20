@@ -124,19 +124,6 @@ const Book_Appointment = () => {
                   </select>
                 </div>
               </div>
-              {/* Fees PlaceHolder */}
-              <div>
-                <label>Fees</label>
-                <div className="inputdiv">
-                  <input
-                    type="number"
-                    placeholder="Fees"
-                    name="fees"
-                    value={chosenDoctor?.fees || ""}
-                    readOnly
-                  />
-                </div>
-              </div>
 
               {/* Problem PlaceHolder */}
               <div>
