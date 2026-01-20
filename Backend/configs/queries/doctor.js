@@ -31,7 +31,7 @@ const updatePassQuery = ` UPDATE doctors SET password = $1 WHERE id = $2;`;
 
 const getCredsWithEmailQuery = `SELECT id,password FROM doctors WHERE email = $1;`;
 
-const getAllQuery = `SELECT * FROM doctor_details;`;
+const getAllQuery = `SELECT * FROM doctors;`;
 
 const findIfExistsQuery = `SELECT email FROM doctors WHERE email = $1;`;
 

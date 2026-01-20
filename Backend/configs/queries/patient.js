@@ -43,7 +43,7 @@ VALUES (
 
 const findIfExistsQuery = `SELECT email FROM patients WHERE email = $1;`;
 
-const getAllQuery = `SELECT * FROM patient_details;`;
+const getAllQuery = `SELECT * FROM patients;`;
 
 const countPatientQuery = `SELECT COUNT(*) FROM patients;`;
 

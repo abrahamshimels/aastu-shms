@@ -15,6 +15,8 @@ import Patient_Profile from "../Pages/Dashboard/Main-Dashboard/AllPages/Patient/
 import FrontPage from "../Pages/Dashboard/Main-Dashboard/GlobalFiles/FrontPage";
 import Admin_Profile from "../Pages/Dashboard/Main-Dashboard/AllPages/Admin/Admin_Profile";
 import SignupDetails from "../Pages/Dashboard/Dashboard-Login/Signup/SignupDetails";
+import Pending_Tests from "../Pages/Dashboard/Main-Dashboard/AllPages/Laboratory/Pending_Tests";
+import Lab_History from "../Pages/Dashboard/Main-Dashboard/AllPages/Laboratory/Lab_History";
 const AllRoutes = () => {
   return (
     <>
@@ -36,6 +38,9 @@ const AllRoutes = () => {
         ******************** Patient Part *************************
         <Route path="/bookappointment" element={<Book_Appointment />} />
         <Route path="/patientprofile" element={<Patient_Profile />} />
+        ******************** Laboratory Part *************************
+        <Route path="/lab/pending" element={<Pending_Tests />} />
+        <Route path="/lab/history" element={<Lab_History />} />
       </Routes>
     </>
   );

@@ -49,8 +49,8 @@ router.post("/login", async (req, res) => {
   const { docID, password } = req.body;
   try {
     const doctor = await findById(docID);
-    if (docID == doctor[0].id && password == doctor[0].password) {
-      const token = jwt.sign({ foo: "bar" }, process.env.KEY, {
+    if (doctor && doctor.length > 0 && docID == doctor[0].id && password == doctor[0].password) {
+      const token = jwt.sign({ doctorID: doctor[0].id }, process.env.KEY, {
         expiresIn: "24h",
       });
       res.send({

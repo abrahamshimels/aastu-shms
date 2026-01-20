@@ -1,15 +1,14 @@
 import * as types from "./types";
 import axios from "axios";
 
+const baseURL = "http://localhost:3007";
+
 //login user
 export const patientLogin = (data) => async (dispatch) => {
   try {
     console.log("this is data given by redux", data);
     dispatch({ type: types.LOGIN_PATIENT_REQUEST });
-    const res = await axios.post(
-      "https://aastu-shms.onrender.com/patients/login",
-      data,
-    );
+    const res = await axios.post(`${baseURL}/patients/login`, data);
     dispatch({
       type: types.LOGIN_PATIENT_SUCCESS,
       payload: {
@@ -31,10 +30,7 @@ export const patientLogin = (data) => async (dispatch) => {
 
 export const CheckPatientExists = (data) => async (dispatch) => {
   try {
-    const res = await axios.post(
-      "https://aastu-shms.onrender.com/patients/check",
-      data,
-    );
+    const res = await axios.post(`${baseURL}/patients/check`, data);
     dispatch({
       type: types.LOGIN_PATIENT_SUCCESS,
       payload: {
@@ -54,10 +50,7 @@ export const CheckPatientExists = (data) => async (dispatch) => {
 export const PatientSignup = (data) => async (dispatch) => {
   try {
     console.log("data given by redux", data);
-    const res = await axios.post(
-      "https://aastu-shms.onrender.com/patients/signup",
-      data,
-    );
+    const res = await axios.post(`${baseURL}/patients/signup`, data);
     dispatch({
       type: types.LOGIN_PATIENT_SUCCESS,
       payload: {
@@ -81,10 +74,7 @@ export const PatientSignup = (data) => async (dispatch) => {
 export const DoctorLogin = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.LOGIN_DOCTOR_REQUEST });
-    const res = await axios.post(
-      "https://aastu-shms.onrender.com/doctors/login",
-      data,
-    );
+    const res = await axios.post(`${baseURL}/doctors/login`, data);
     console.log("doctor", res.data);
     dispatch({
       type: types.LOGIN_DOCTOR_SUCCESS,
@@ -109,10 +99,7 @@ export const DoctorLogin = (data) => async (dispatch) => {
 export const AdminLogin = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.LOGIN_ADMIN_REQUEST });
-    const res = await axios.post(
-      "https://aastu-shms.onrender.com/admin/login",
-      data,
-    );
+    const res = await axios.post(`${baseURL}/admin/login`, data);
     console.log("here", res.data.user);
     dispatch({
       type: types.LOGIN_ADMIN_SUCCESS,
@@ -133,15 +120,36 @@ export const AdminLogin = (data) => async (dispatch) => {
   }
 };
 
+//login laboratory technologist
+export const LabTechLogin = (data) => async (dispatch) => {
+  try {
+    dispatch({ type: types.LOGIN_LABTECH_REQUEST });
+    const res = await axios.post(`${baseURL}/labtechs/login`, data);
+    dispatch({
+      type: types.LOGIN_LABTECH_SUCCESS,
+      payload: {
+        message: res.data.message,
+        user: res.data.user,
+        token: res.data.token,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    dispatch({
+      type: types.LOGIN_LABTECH_ERROR,
+      payload: {
+        message: error,
+      },
+    });
+  }
+};
+
 // REGISTER DOCTOR
 export const DoctorRegister = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.REGISTER_DOCTOR_REQUEST });
     console.log("here", data);
-    const res = await axios.post(
-      "https://aastu-shms.onrender.com/doctors/register",
-      data,
-    );
+    const res = await axios.post(`${baseURL}/doctors/register`, data);
     return res.data;
   } catch (error) {
     dispatch({
@@ -158,10 +166,7 @@ export const AdminRegister = (data) => async (dispatch) => {
   try {
     console.log(data);
     dispatch({ type: types.REGISTER_ADMIN_REQUEST });
-    const res = await axios.post(
-      "https://aastu-shms.onrender.com/admin/register",
-      data,
-    );
+    const res = await axios.post(`${baseURL}/admin/register`, data);
     return res.data;
   } catch (error) {
     dispatch({
@@ -178,10 +183,7 @@ export const AmbulanceRegister = (data) => async (dispatch) => {
   try {
     console.log("Data", data);
     dispatch({ type: types.REGISTER_AMBULANCE_REQUEST });
-    const res = await axios.post(
-      "https://aastu-shms.onrender.com/ambulances/add",
-      data,
-    );
+    const res = await axios.post(`${baseURL}/ambulances/add`, data);
     console.log(res);
     return res.data;
   } catch (error) {
@@ -198,10 +200,7 @@ export const availabilityRegister = (data) => async (dispatch) => {
   try {
     console.log("ava data", data);
     dispatch({ type: types.ADD_AVAILABLETIMES_REQUEST });
-    const res = await axios.post(
-      "https://aastu-shms.onrender.com/doctors/availability",
-      data,
-    );
+    const res = await axios.post(`${baseURL}/doctors/availability`, data);
     console.log(data);
     console.log(res);
     return res.data;
@@ -229,10 +228,7 @@ export const authLogout = () => async (dispatch) => {
 //update patient
 export const updatePatient = (id, data, token) => async (dispatch) => {
   try {
-    const res = await axios.patch(
-      `https://aastu-shms.onrender.com/patients/${id}`,
-      data,
-    );
+    const res = await axios.patch(`${baseURL}/patients/${id}`, data);
     res.status === 200
       ? dispatch({ type: types.EDIT_PATIENT_REQUEST, payload: { token } })
       : console.log("passing");
@@ -254,10 +250,7 @@ export const updatePatient = (id, data, token) => async (dispatch) => {
 //update doctor
 export const UpdateDoctor = (id, data, token) => async (dispatch) => {
   try {
-    const res = await axios.patch(
-      `https://aastu-shms.onrender.com/doctors/${id}`,
-      data,
-    );
+    const res = await axios.patch(`${baseURL}/doctors/${id}`, data);
     res.status === 200
       ? dispatch({ type: types.EDIT_DOCTOR_REQUEST, payload: { token } })
       : console.log("passing");
@@ -278,10 +271,7 @@ export const UpdateDoctor = (id, data, token) => async (dispatch) => {
 
 export const UpdateAdmin = (id, data, token) => async (dispatch) => {
   try {
-    const res = await axios.patch(
-      `https://aastu-shms.onrender.com/admin/${id}`,
-      data,
-    );
+    const res = await axios.patch(`${baseURL}/admin/${id}`, data);
     res.status === 200
       ? dispatch({ type: types.EDIT_ADMIN_REQUEST, payload: { token } })
       : console.log("passing");
@@ -304,10 +294,7 @@ export const UpdateAdmin = (id, data, token) => async (dispatch) => {
 export const sendVerification = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.EDIT_DOCTOR_REQUEST });
-    const res = await axios.post(
-      `https://aastu-shms.onrender.com/admin/verification`,
-      data,
-    );
+    const res = await axios.post(`${baseURL}/admin/verification`, data);
     // console.log(res);
     return res.data;
   } catch (error) {
@@ -318,10 +305,7 @@ export const sendVerification = (data) => async (dispatch) => {
 export const mailCreds = (data) => async (dispatch) => {
   try {
     //dispatch({ type: types.EDIT_DOCTOR_REQUEST });
-    const res = await axios.post(
-      `https://aastu-shms.onrender.com/admin/mailCreds`,
-      data,
-    );
+    const res = await axios.post(`${baseURL}/admin/mailCreds`, data);
     console.log(res);
     return res.data;
   } catch (error) {
@@ -332,10 +316,7 @@ export const mailCreds = (data) => async (dispatch) => {
 export const forgetPassword = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.FORGET_PASSWORD_REQUEST });
-    const res = await axios.post(
-      `https://zany-gray-clam-gear.cyclic.app/admin/forgot`,
-      data,
-    );
+    const res = await axios.post(`${baseURL}/admin/forgot`, data);
     // console.log(res);
     return res.data;
   } catch (error) {
