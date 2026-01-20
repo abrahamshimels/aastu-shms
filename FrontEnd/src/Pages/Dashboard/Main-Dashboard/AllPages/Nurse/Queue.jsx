@@ -47,23 +47,23 @@ const Queue = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const studentRes = await axios.get(`http://localhost:3007/nurses/student?studentID=${encodeURIComponent(checkInData.studentID.trim())}`);
-      const student = studentRes.data;
+      const patientRes = await axios.get(`http://localhost:3007/nurses/patient?studentID=${encodeURIComponent(checkInData.studentID.trim())}`);
+      const patient = patientRes.data;
 
       const res = await axios.post("http://localhost:3007/nurses/check-in", {
-        student_id: student.id,
+        student_id: patient.id,
         chief_complaint: checkInData.chief_complaint,
         priority: checkInData.priority,
       });
 
       if (res.data.message === "Checked-in") {
-        notify("Student added to queue");
+        notify("Patient added to queue");
         fetchQueue();
         setShowCheckIn(false);
         setCheckInData({ studentID: "", chief_complaint: "", priority: "Normal" });
       }
     } catch (error) {
-      notify("Error: Student not found or system error");
+      notify("Error: Patient not found or system error");
     } finally {
       setLoading(false);
     }
@@ -108,9 +108,9 @@ const Queue = () => {
         <div className="queue-layout">
           {/* Active Queue Section */}
           <div className="queue-section">
-            <h3>Active Queue (Drag student to doctor)</h3>
+            <h3>Active Queue (Drag patient to doctor)</h3>
             <div className="queue-list">
-              {queue.filter(q => q.status === 'Checked-In').length === 0 && <p className="empty-msg">No students waiting</p>}
+              {queue.filter(q => q.status === 'Checked-In').length === 0 && <p className="empty-msg">No patients waiting</p>}
               {queue.filter(q => q.status === 'Checked-In').map((item) => (
                 <div 
                   key={item.id} 
@@ -119,13 +119,13 @@ const Queue = () => {
                   onDragStart={(e) => onDragStart(e, item)}
                 >
                   <div className="card-header">
-                    <span className="student-name">{item.student_name}</span>
+                    <span className="student-name">{item.patient_name}</span>
                     <span className={`priority-badge ${item.priority.toLowerCase()}`}>{item.priority}</span>
                   </div>
                   <div className="card-body">
                     <p><strong>ID:</strong> {item.studentid}</p>
                     <p><strong>Complaint:</strong> {item.chief_complaint}</p>
-                    <p className="card-meta">{item.student_dept} | Year {item.student_year}</p>
+                    <p className="card-meta">{item.patient_dept} | Year {item.patient_year}</p>
                   </div>
                 </div>
               ))}
@@ -134,7 +134,7 @@ const Queue = () => {
             {/* In-Consultation / Assigned Section */}
             <h3 style={{marginTop: '30px'}}>In-Consultation (Re-assign by dragging)</h3>
             <div className="queue-list">
-               {queue.filter(q => q.status === 'Assigned').length === 0 && <p className="empty-msg">No students in consultation</p>}
+               {queue.filter(q => q.status === 'Assigned').length === 0 && <p className="empty-msg">No patients in consultation</p>}
                {queue.filter(q => q.status === 'Assigned').map((item) => (
                 <div 
                   key={item.id} 
@@ -143,7 +143,7 @@ const Queue = () => {
                   onDragStart={(e) => onDragStart(e, item)}
                 >
                   <div className="card-header">
-                    <span className="student-name">{item.student_name}</span>
+                    <span className="student-name">{item.patient_name}</span>
                     <span className="status-badge assigned">Assigned</span>
                   </div>
                   <div className="card-body">
@@ -180,7 +180,7 @@ const Queue = () => {
         {showCheckIn && (
           <div className="modal-overlay">
             <div className="modal-content-new">
-              <h2>Student Check-In</h2>
+              <h2>Patient Check-In</h2>
               <form onSubmit={handleCheckIn}>
                 <div className="input-group">
                   <label>AASTU Student ID</label>
@@ -194,7 +194,7 @@ const Queue = () => {
                 <div className="input-group">
                   <label>Chief Complaint</label>
                   <textarea 
-                    placeholder="Explain the student's symptoms..." 
+                    placeholder="Explain the patient's symptoms..." 
                     value={checkInData.chief_complaint}
                     onChange={(e) => setCheckInData({...checkInData, chief_complaint: e.target.value})}
                     required 
@@ -222,7 +222,7 @@ const Queue = () => {
                 </div>
                 <div className="modal-actions">
                   <button type="submit" className="submit-btn" disabled={loading}>
-                    {loading ? "Checking In..." : "Check-In Student"}
+                    {loading ? "Checking In..." : "Check-In Patient"}
                   </button>
                   <button type="button" className="cancel-btn" onClick={() => setShowCheckIn(false)}>Cancel</button>
                 </div>

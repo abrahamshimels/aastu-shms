@@ -6,7 +6,7 @@ import "./CSS/Registration.css";
 
 const Registration = () => {
   const [searchID, setSearchID] = useState("");
-  const [student, setStudent] = useState(null);
+  const [patient, setPatient] = useState(null);
   const [isNew, setIsNew] = useState(false);
   const [formData, setFormData] = useState({
     studentID: "",
@@ -27,13 +27,13 @@ const Registration = () => {
 
   const handleSearch = async () => {
     try {
-      const res = await axios.get(`http://localhost:3007/nurses/student?studentID=${encodeURIComponent(searchID.trim())}`);
-      setStudent(res.data);
+      const res = await axios.get(`http://localhost:3007/nurses/patient?studentID=${encodeURIComponent(searchID.trim())}`);
+      setPatient(res.data);
       setIsNew(false);
-      notify("Student found");
+      notify("Patient found");
     } catch (error) {
-      notify("Student not found");
-      setStudent(null);
+      notify("Patient not found");
+      setPatient(null);
     }
   };
 
@@ -44,9 +44,9 @@ const Registration = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:3007/nurses/register-student", formData);
+      const res = await axios.post("http://localhost:3007/nurses/register-patient", formData);
       if (res.data.message === "Registered") {
-        notify("Student registered successfully");
+        notify("Patient registered successfully");
         setFormData({
           studentID: "",
           name: "",
@@ -66,15 +66,15 @@ const Registration = () => {
         notify(res.data.message);
       }
     } catch (error) {
-      notify("Error registering student");
+      notify("Error registering patient");
     }
   };
 
   const handleUpdatePhone = async () => {
     try {
-      await axios.patch(`http://localhost:3007/nurses/student/phone`, {
-        studentID: student.studentid,
-        phoneNum: student.phonenum,
+      await axios.patch(`http://localhost:3007/nurses/patient/phone`, {
+        studentID: patient.studentid,
+        phoneNum: patient.phonenum,
       });
       notify("Phone number updated");
     } catch (error) {
@@ -87,16 +87,16 @@ const Registration = () => {
       <Sidebar />
       <div className="AfterSideBar">
         <ToastContainer />
-        <h1>Student Registration</h1>
+        <h1>Patient Registration</h1>
         
         <div className="registration-actions">
-          <button onClick={() => { setIsNew(true); setStudent(null); }}>New Student</button>
-          <button onClick={() => { setIsNew(false); setStudent(null); }}>Existing Student</button>
+          <button onClick={() => { setIsNew(true); setPatient(null); }}>New Patient</button>
+          <button onClick={() => { setIsNew(false); setPatient(null); }}>Existing Patient</button>
         </div>
 
         {isNew ? (
           <form className="registration-form" onSubmit={handleRegister}>
-            <h3>New Student Registration</h3>
+            <h3>New Patient Registration</h3>
             <div className="form-grid">
               <input name="studentID" placeholder="AASTU Student ID" onChange={handleInputChange} required />
               <input name="name" placeholder="Full Name" onChange={handleInputChange} required />
@@ -111,11 +111,11 @@ const Registration = () => {
               <input name="email" type="email" placeholder="Email" onChange={handleInputChange} required />
               <input name="address" placeholder="Address" onChange={handleInputChange} required />
             </div>
-            <button type="submit">Register Student</button>
+            <button type="submit">Register Patient</button>
           </form>
         ) : (
           <div className="search-section">
-            <h3>Search Student</h3>
+            <h3>Search Patient</h3>
             <div className="search-bar">
               <input 
                 placeholder="Enter Student ID" 
@@ -125,16 +125,16 @@ const Registration = () => {
               <button onClick={handleSearch}>Search</button>
             </div>
 
-            {student && (
+            {patient && (
               <div className="student-details-card">
-                <h3>Student Found: {student.name}</h3>
-                <p><strong>Department:</strong> {student.department}</p>
-                <p><strong>Year:</strong> {student.year}</p>
+                <h3>Patient Found: {patient.name}</h3>
+                <p><strong>Department:</strong> {patient.department}</p>
+                <p><strong>Year:</strong> {patient.year}</p>
                 <div className="update-phone">
                   <label>Update Phone:</label>
                   <input 
-                    value={student.phonenum} 
-                    onChange={(e) => setStudent({...student, phonenum: e.target.value})} 
+                    value={patient.phonenum} 
+                    onChange={(e) => setPatient({...patient, phonenum: e.target.value})} 
                   />
                   <button onClick={handleUpdatePhone}>Update</button>
                 </div>

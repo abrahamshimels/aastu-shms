@@ -53,7 +53,7 @@ const CertificatesPage = () => {
         </head>
         <body>
           <div class="header">
-            <h1>AASTU STUDENT HEALTH CENTER</h1>
+            <h1>AASTU PATIENT HEALTH CENTER</h1>
             <p>Official Medical Certificate</p>
           </div>
           <div class="content">
@@ -61,8 +61,8 @@ const CertificatesPage = () => {
             <div class="meta">
               <p><strong>Date:</strong> ${new Date(record.issue_date).toLocaleDateString()}</p>
               <p><strong>Certificate ID:</strong> #CERT-${record.id}</p>
-              <p><strong>Student Name:</strong> ${record.student_name}</p>
-              <p><strong>Student ID:</strong> ${record.student_display_id || record.student_id}</p>
+              <p><strong>Patient Name:</strong> ${record.patient_name}</p>
+              <p><strong>Patient ID:</strong> ${record.patient_display_id || record.student_id}</p>
               <p><strong>Doctor:</strong> ${record.doctor_name}</p>
             </div>
             <div style="border: 1px dashed #ccc; padding: 20px; background: #fafafa;">
@@ -86,9 +86,9 @@ const CertificatesPage = () => {
 
   const columns = [
     { 
-      title: "Student Name", 
-      dataIndex: "student_name", 
-      key: "student_name" 
+      title: "Patient Name", 
+      dataIndex: "patient_name", 
+      key: "patient_name" 
     },
     { 
       title: "Type", 
@@ -164,7 +164,7 @@ const CertificatesPage = () => {
       >
         {selectedCert && (
           <div style={{ padding: '10px' }}>
-            <p><strong>Student:</strong> {selectedCert.student_name}</p>
+            <p><strong>Patient:</strong> {selectedCert.patient_name}</p>
             <p><strong>Doctor:</strong> {selectedCert.doctor_name}</p>
             <p><strong>Type:</strong> {selectedCert.type}</p>
             <p><strong>Date:</strong> {new Date(selectedCert.issue_date).toLocaleDateString()}</p>
