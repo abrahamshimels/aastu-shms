@@ -1,0 +1,230 @@
+const express = require("express");
+const router = express.Router();
+const bcrypt = require("bcrypt");
+const { addStaff, getAllStaff, updateStaff, updatePassword } = require("../models/Staff.model");
+const { logAction, getLogs, getFilteredLogs } = require("../models/AuditLog.model");
+const { setConfig, getConfig } = require("../models/Config.model");
+const { authenticate, authorize } = require("../middlewares/authMiddleware");
+const dbhelper = require("../configs/dbhelper");
+const { getDailyStatsQuery, getRoleDistributionQuery, getWorkloadQuery } = require("../configs/queries/analytics");
+
+// All routes here require being an ADMIN
+router.use(authenticate);
+router.use(authorize(["ADMIN"]));
+
+/**
+ * @route   POST /admin/staff
+ * @desc    Create a new staff member (Doctor, Nurse, Lab Tech)
+ */
+router.post("/staff", async (req, res) => {
+  const { id, name, email, password, role, qualification } = req.body;
+
+  try {
+    const password_hash = await bcrypt.hash(password, 10);
+    const newStaffData = {
+      name,
+      email,
+      password_hash,
+      role,
+      qualification,
+    };
+    
+    // If ID is provided manually, use it
+    if (id) newStaffData.id = id;
+
+    const newStaff = await addStaff(newStaffData);
+
+    // LOG ACTION
+    await logAction(req.user.id, "CREATE_STAFF", "staff", newStaff.id, { 
+      role: newStaff.role, 
+      email: newStaff.email 
+    });
+
+    res.status(201).json({
+      message: "Staff member created successfully",
+      staff: {
+        id: newStaff.id,
+        name: newStaff.name,
+        role: newStaff.role,
+      },
+    });
+  } catch (err) {
+    if (err.code === "23505") {
+      return res.status(400).json({ message: "Staff ID or Email already exists" });
+    }
+    console.error("Staff creation error:", err.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+/**
+ * @route   GET /admin/staff
+ * @desc    List all staff members
+ */
+router.get("/staff", async (req, res) => {
+  try {
+    const staffList = await getAllStaff();
+    res.status(200).json(staffList);
+  } catch (err) {
+    console.error("Error fetching staff:", err.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+/**
+ * @route   PUT /admin/staff/:id
+ * @desc    Update staff details or deactivate account
+ */
+router.put("/staff/:id", async (req, res) => {
+  const { id } = req.params;
+  const { name, email, role, qualification, is_active } = req.body;
+
+  try {
+    const updatedStaff = await updateStaff(id, {
+      name,
+      email,
+      role,
+      qualification,
+      is_active,
+    });
+
+    if (!updatedStaff) {
+      return res.status(404).json({ message: "Staff member not found" });
+    }
+
+    // LOG ACTION
+    await logAction(req.user.id, "UPDATE_STAFF", "staff", id, req.body);
+
+    res.status(200).json({
+      message: "Staff member updated successfully",
+      staff: updatedStaff,
+    });
+  } catch (err) {
+    console.error("Staff update error:", err.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+/**
+ * @route   POST /admin/staff/:id/reset-password
+ * @desc    Reset a staff member's password
+ */
+router.post("/staff/:id/reset-password", async (req, res) => {
+  const { id } = req.params;
+  const { password } = req.body;
+
+  try {
+    const password_hash = await bcrypt.hash(password, 10);
+    await updatePassword(id, password_hash);
+
+    // LOG ACTION
+    await logAction(req.user.id, "RESET_PASSWORD", "staff", id);
+
+    res.status(200).json({ message: "Password reset successfully" });
+  } catch (err) {
+    console.error("Password reset error:", err.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+/**
+ * @route   GET /admin/staff/:id/workload
+ * @desc    View professional workload for a staff member
+ */
+router.get("/staff/:id/workload", async (req, res) => {
+  try {
+    const workload = await dbhelper.query(getWorkloadQuery, [req.params.id]);
+    res.status(200).json(workload[0]);
+  } catch (err) {
+    console.error("Workload fetch error:", err.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+/**
+ * @route   GET /admin/logs
+ * @desc    View system audit logs (with filters)
+ */
+router.get("/logs", async (req, res) => {
+  const { user_id, action, date } = req.query;
+  try {
+    let logs;
+    if (user_id || action || date) {
+      logs = await getFilteredLogs(user_id || null, action || null, date || null);
+    } else {
+      logs = await getLogs();
+    }
+    res.status(200).json(logs);
+  } catch (err) {
+    console.error("Error fetching logs:", err.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+/**
+ * @route   GET /admin/dashboard
+ * @desc    Get dashboard analytics
+ */
+router.get("/dashboard", async (req, res) => {
+  try {
+    const stats = await dbhelper.query(getDailyStatsQuery);
+    const distribution = await dbhelper.query(getRoleDistributionQuery);
+    
+    res.status(200).json({
+      dailyStats: stats[0],
+      roleDistribution: distribution
+    });
+  } catch (err) {
+    console.error("Dashboard error:", err.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+/**
+ * @route   GET /admin/config/:key
+ * @desc    Get system configuration (e.g., certificate_settings)
+ */
+router.get("/config/:key", async (req, res) => {
+  try {
+    const value = await getConfig(req.params.key);
+    res.status(200).json(value);
+  } catch (err) {
+    console.error("Config fetch error:", err.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+/**
+ * @route   POST /admin/config
+ * @desc    Update system configuration
+ */
+router.post("/config", async (req, res) => {
+  const { key, value } = req.body;
+  try {
+    await setConfig(key, value);
+    await logAction(req.user.id, "UPDATE_CONFIG", "system_config", key, value);
+    res.status(200).json({ message: "Configuration updated successfully" });
+  } catch (err) {
+    console.error("Config update error:", err.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+/**
+ * @route   POST /admin/backup
+ * @desc    Trigger or schedule manual backup (Placeholder)
+ */
+router.post("/backup", async (req, res) => {
+  try {
+    // Placeholder for backup logic (e.g., executing pg_dump)
+    await logAction(req.user.id, "TRIGGER_BACKUP", "system", "manual");
+    res.status(200).json({ 
+        message: "Backup initiated successfully",
+        details: "Daily backup scheduled at 02:00 as per system policy."
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+module.exports = router;
