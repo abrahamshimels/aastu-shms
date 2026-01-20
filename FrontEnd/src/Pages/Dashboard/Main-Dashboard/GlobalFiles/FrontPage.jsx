@@ -26,19 +26,11 @@ const FrontPage = () => {
 
   const patientColumns = [
     { title: "Name", dataIndex: "name", key: "name" },
-    { title: "Age", dataIndex: "age", key: "age" },
-    { title: "Disease", dataIndex: "disease", key: "disease" },
-    { title: "Blood Group", dataIndex: "bloodgroup", key: "bloodgroup" },
-    { title: "Gender", dataIndex: "gender", key: "gender" },
     { title: "Email", dataIndex: "email", key: "email" },
   ];
 
   const doctorColumns = [
     { title: "Name", dataIndex: "name", key: "name" },
-    { title: "Age", dataIndex: "age", key: "age" },
-    { title: "Gender", dataIndex: "gender", key: "gender" },
-    { title: "Phone Number", dataIndex: "phonenum", key: "phonenum" },
-    { title: "Department", dataIndex: "department", key: "department" },
     { title: "Email", dataIndex: "email", key: "email" },
   ];
 
@@ -69,20 +61,14 @@ const FrontPage = () => {
     data: { user },
   } = useSelector((state) => state.auth);
 
+  const { dashboard } = useSelector((store) => store.data);
+  const data = dashboard?.data || {};
+
   const { patients } = useSelector((store) => store.data.patients);
   const { doctors } = useSelector((store) => store.data.doctors);
   const { medicines } = useSelector((store) => store.data.medicines);
   const reportCount = useSelector((store) => store.data.reports)?.reports
     ?.length;
-  const {
-    dashboard: { data },
-  } = useSelector((store) => store.data);
-
-  console.log(data);
-  console.log("patients", patients);
-  console.log("doctors", doctors);
-  console.log("medicies", medicines);
-  console.log("reports Count", reportCount);
   console.log(user);
   console.log(user?.id);
   console.log("userType", user?.userType);
@@ -205,7 +191,7 @@ const FrontPage = () => {
         <div>
           {user?.userType === "admin" ? (
             <div className="patientDetails">
-              <h1>Doctor Details</h1>
+              <h1>Staff Details</h1>
               <div className="patientBox">
                 <Table columns={doctorColumns} dataSource={doctors} />
               </div>

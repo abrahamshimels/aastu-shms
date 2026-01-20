@@ -2,11 +2,13 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const { addStaff, getAllStaff, updateStaff, updatePassword } = require("../models/Staff.model");
+const { createReport } = require("../models/Report.model");
 const { logAction, getLogs, getFilteredLogs } = require("../models/AuditLog.model");
 const { setConfig, getConfig } = require("../models/Config.model");
 const { authenticate, authorize } = require("../middlewares/authMiddleware");
 const dbhelper = require("../configs/dbhelper");
-const { getDailyStatsQuery, getRoleDistributionQuery, getWorkloadQuery } = require("../configs/queries/analytics");
+const { getDailyStatsQuery, getRoleDistributionQuery, getWorkloadQuery, getOverviewCountsQuery } = require("../configs/queries/analytics");
+const { getIllnessTrendsQuery, getMonthlyTrendsQuery } = require("../configs/queries/reports");
 
 // All routes here require being an ADMIN
 router.use(authenticate);
@@ -17,7 +19,7 @@ router.use(authorize(["ADMIN"]));
  * @desc    Create a new staff member (Doctor, Nurse, Lab Tech)
  */
 router.post("/staff", async (req, res) => {
-  const { id, name, email, password, role, qualification } = req.body;
+  const { id, name, email, password, role, qualification, phonenum, dob, gender, age, address, bloodgroup, department, fees } = req.body;
 
   try {
     const password_hash = await bcrypt.hash(password, 10);
@@ -25,8 +27,17 @@ router.post("/staff", async (req, res) => {
       name,
       email,
       password_hash,
+      password, // Plain password for sync if needed
       role,
       qualification,
+      phonenum,
+      dob,
+      gender,
+      age,
+      address,
+      bloodgroup,
+      department,
+      fees
     };
     
     // If ID is provided manually, use it
@@ -80,6 +91,7 @@ router.put("/staff/:id", async (req, res) => {
   const { name, email, role, qualification, is_active } = req.body;
 
   try {
+    console.log(`Updating staff ${id}:`, req.body);
     const updatedStaff = await updateStaff(id, {
       name,
       email,
@@ -167,12 +179,10 @@ router.get("/logs", async (req, res) => {
  */
 router.get("/dashboard", async (req, res) => {
   try {
-    const stats = await dbhelper.query(getDailyStatsQuery);
-    const distribution = await dbhelper.query(getRoleDistributionQuery);
+    const counts = await dbhelper.query(getOverviewCountsQuery);
     
     res.status(200).json({
-      dailyStats: stats[0],
-      roleDistribution: distribution
+      data: counts[0]
     });
   } catch (err) {
     console.error("Dashboard error:", err.message);
@@ -224,6 +234,108 @@ router.post("/backup", async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+/**
+ * @route   GET /admin/stats
+ * @desc    Get general system statistics
+ */
+router.get("/stats", async (req, res) => {
+  try {
+    const dailyStats = await dbhelper.query(getDailyStatsQuery);
+    const roleDist = await dbhelper.query(getRoleDistributionQuery);
+    const workload = await dbhelper.query(getWorkloadQuery);
+    
+    res.status(200).json({
+      daily: dailyStats[0],
+      roles: roleDist,
+      workload: workload
+    });
+  } catch (err) {
+    console.error("Stats fetch error:", err.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+/**
+ * @route   GET /admin/analytics/trends
+ * @desc    Get illness and monthly trends
+ */
+router.get("/analytics/trends", async (req, res) => {
+  try {
+    const illnessTrends = await dbhelper.query(getIllnessTrendsQuery);
+    const monthlyTrends = await dbhelper.query(getMonthlyTrendsQuery);
+    
+    res.status(200).json({
+      illness: illnessTrends,
+      monthly: monthlyTrends
+    });
+  } catch (err) {
+    console.error("Trends fetch error:", err.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+router.post("/seed-testing-data", async (req, res) => {
+  try {
+    // 1. Seed Staff & Doctors (via dual-write)
+    const password_hash = await bcrypt.hash("12345678", 10);
+    const sampleStaff = [
+      { id: "DOC-999", name: "Dr. Seeder", email: "seeder@aastu.edu.et", password_hash, password: "12345678", role: "DOCTOR", qualification: "PhD", phonenum: 251912345678, age: 45, gender: "M", bloodgroup: "O+", dob: "1980-01-01", address: "AASTU Campus", department: "Pediatrics", fees: 200 },
+      { id: "NRS-999", name: "Nurse Joy", email: "joy@aastu.edu.et", password_hash, password: "12345678", role: "NURSE", qualification: "BSc", phonenum: 251911111111, age: 30, gender: "F", dob: "1995-05-05", address: "AASTU Campus" }
+    ];
+
+    for (const s of sampleStaff) {
+      // addStaff already handles dual-write for DOCTOR role
+      await addStaff(s);
+    }
+
+    // 2. Seed Patients (Exclusively in its own table)
+    const PatientsModel = require("../models/Patients.model");
+    const samplePatients = [
+      { studentid: "ETS/123/15", name: "Student Patient", department: "Software Engineering", year: 3, phonenum: 251900000000, emergencycontact: "Parent", email: "student@aastu.edu.et", password: "password_hash", age: 21, gender: "M", bloodgroup: "A+", allergies: "Pollen", dob: "2003-10-10", address: "Dorm 5" }
+    ];
+
+    for (const p of samplePatients) {
+      // Patients are no longer dual-written to Staff
+      await PatientsModel.addPatient(p);
+    }
+
+    // 3. Seed Reports
+    const sampleReports = [
+      { patientid: "ETS/123/15", doctorid: "DOC-999", appointmentid: 999, date: "2026-01-20", time: "10:30", disease: "Flu", temperature: 38.0, weight: 70, bp: "120/80", glucose: 90, info: "Sample seed report", medicines: [{name: "Aspirin", dosage: "100mg"}] },
+    ];
+
+    for (const data of sampleReports) {
+      await createReport({
+        patient_id: data.patientid,
+        doctor_id: data.doctorid,
+        appointment_id: data.appointmentid,
+        date: data.date,
+        time: data.time,
+        disease: data.disease,
+        temperature: data.temperature,
+        weight: data.weight,
+        bp: data.bp,
+        glucose: data.glucose,
+        info: data.info,
+        medicines: data.medicines
+      });
+    }
+
+    // 4. Add queue items
+    await dbhelper.query(`INSERT INTO queue (patient_name, department, status, created_at) VALUES ('Student Patient', 'Software Engineering', 'Visited', CURRENT_TIMESTAMP - INTERVAL '1 hour')`);
+
+    await logAction(req.user.id, "SEED_TEST_DATA", "system", "clinical");
+    res.status(200).json({ message: "Role-independent and staff data seeded successfully" });
+  } catch (err) {
+    console.error("DEBUG: Seeding error details:", err);
+    res.status(500).json({ 
+      message: "Internal server error during seeding", 
+      error: err.message,
+      detail: err.detail || err.hint || "No further details"
+    });
   }
 });
 

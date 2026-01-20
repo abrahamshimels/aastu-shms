@@ -1,0 +1,145 @@
+.portal-container {
+  display: flex;
+  height: 100vh;
+  background-color: rgba(255, 243, 243, 0.874);
+  font-family: "Poppins", sans-serif;
+}
+
+.portal-left {
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+}
+
+.portal-left img {
+  width: 80%;
+}
+
+.portal-right {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+}
+
+.portal-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.portal-header h1 {
+  font-size: 2.8rem;
+  color: #333;
+  font-weight: 700;
+}
+
+.portal-header p {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.portal-options {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+  max-width: 800px;
+}
+
+.option-card {
+  flex: 1;
+  background-color: white;
+  border-radius: 15px;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.option-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+.icon-wrapper {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.queue-icon {
+  background-color: #e3f2fd;
+  color: #2196f3;
+}
+
+.login-icon {
+  background-color: #fce4ec;
+  color: #e91e63;
+}
+
+.option-card h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.option-card p {
+  color: #777;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+}
+
+.portal-btn {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 2rem;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  background-color: #2196f3;
+  color: white;
+}
+
+.login-btn {
+  background-color: #e91e63;
+}
+
+.portal-footer {
+  margin-top: 4rem;
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+@media only screen and (max-width: 1024px) {
+  .portal-left {
+    display: none;
+  }
+  .portal-right {
+    width: 100%;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .portal-options {
+    flex-direction: column;
+  }
+  .portal-header h1 {
+    font-size: 2rem;
+  }
+}

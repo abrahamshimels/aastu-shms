@@ -22,16 +22,18 @@ const Admin_Profile = () => {
 
   const dispatch = useDispatch();
   const { admins } = useSelector((store) => store.data.admins);
-  console.log("admins", admins);
-  const admin = admins.find((admin) => data.user.email === admin.email);
-  console.log(admin);
-
-  console.log("User ID:", data.user.id);
-  console.log("Admin ID:", admin ? admin.id : "Admin not found");
+  const admin = admins?.find((admin) => data?.user?.email === admin?.email) || {};
 
   useEffect(() => {
     dispatch(GetAdminDetails());
   }, [dispatch]);
+
+  const dobString = admin?.dob;
+  const formattedDob = dobString ? new Date(dobString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }) : "N/A";
 
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -101,15 +103,6 @@ const Admin_Profile = () => {
       : error("Incorrect Old Password");
   };
 
-  const dobString = admin.dob;
-  const dobDate = new Date(dobString);
-
-  const formattedDob = dobDate.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-
   if (data?.isAuthenticated === false) {
     return <Navigate to={"/"} />;
   }
@@ -132,25 +125,14 @@ const Admin_Profile = () => {
               <hr />
               <div className="singleitemdiv">
                 <GiMeditation className="singledivicons" />
-                <p>{admin.name}</p>
-              </div>
-              <div className="singleitemdiv">
-                <BsFillTelephoneFill className="singledivicons" />
-                <p>{admin.phonenum}</p>
+                <p>{admin.name || "Administrator"}</p>
               </div>
               <div className="singleitemdiv">
                 <MdEmail className="singledivicons" />
-
                 <p>{admin.email}</p>
               </div>
               <div className="singleitemdiv">
-                <FaBirthdayCake className="singledivicons" />
-                {<p>{formattedDob}</p>}
-              </div>
-              <div className="singleitemdiv">
                 <button onClick={showModal}>
-                  {" "}
-                  {/* <AiFillEdit /> */}
                   Change Password
                 </button>
               </div>
@@ -194,21 +176,12 @@ const Admin_Profile = () => {
                   Other Info
                 </h2>
                 <div className="singleitemdiv">
-                  <BsGenderAmbiguous className="singledivicons" />
-                  <p>{admin.gender}</p>
-                </div>
-                <div className="singleitemdiv">
-                  <GiAges className="singledivicons" />
-                  <p>{admin.age}</p>
-                </div>
-
-                {/* <div className="singleitemdiv">
-                  <MdOutlineCastForEducation className="singledivicons" />
-                  <p>{data?.user?.education}</p>
-                </div> */}
-                <div className="singleitemdiv">
                   <BsHouseFill className="singledivicons" />
-                  <p>{admin.address}</p>
+                  <p>{admin.address || "Addis Ababa Science and Technology University"}</p>
+                </div>
+                <div className="singleitemdiv">
+                  <FaBirthdayCake className="singledivicons" />
+                  <p>{formattedDob}</p>
                 </div>
               </div>
               {/* ***********  Third Div ******************** */}
@@ -218,17 +191,16 @@ const Admin_Profile = () => {
                 </h2>
                 <div className="singleitemdiv">
                   <BiTime className="singledivicons" />
-                  <p>09:00 AM - 20:00 PM (TIMING)</p>
+                  <p>09:00 AM - 08:00 PM (TIMING)</p>
                 </div>
                 <div className="singleitemdiv">
                   <FaRegHospital className="singledivicons" />
-                  <p>Aziz Fatima Hospital</p>
+                  <p>AASTU Student Health Center</p>
                 </div>
                 <div className="singleitemdiv">
                   <FaMapMarkedAlt className="singledivicons" />
                   <p>
-                    Faisalabad - Sheikhupura Road, Gulistan Colony Faisalabad,
-                    Punjab
+                    Addis Ababa, Ethiopia
                   </p>
                 </div>
               </div>

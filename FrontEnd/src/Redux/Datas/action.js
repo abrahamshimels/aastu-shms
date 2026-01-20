@@ -7,6 +7,9 @@ const baseURL = "http://localhost:3007";
 export const CreateReport = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.CREATE_REPORT_REQUEST });
+    const res = await axios.post("http://localhost:3007/reports", data, {
+      headers: { Authorization: localStorage.getItem("token") },
+    });
     const res = await axios.post(
       "http://localhost:3007/reports/create",
       data,
@@ -27,6 +30,9 @@ export const CreateReport = (data) => async (dispatch) => {
 export const GetDoctorDetails = () => async (dispatch) => {
   try {
     dispatch({ type: types.GET_DOCTOR_REQUEST });
+    const res = await axios.get("http://localhost:3007/admin/staff", {
+      headers: { Authorization: localStorage.getItem("token") },
+    });
     const res = await axios.get("http://localhost:3007/doctors");
     console.log("this", res);
     const doctors = { doctors: res.data };
@@ -47,6 +53,9 @@ export const GetDoctorDetails = () => async (dispatch) => {
 export const GetAdminDetails = () => async (dispatch) => {
   try {
     dispatch({ type: types.GET_ADMIN_REQUEST });
+    const res = await axios.get("http://localhost:3007/admin/staff", {
+      headers: { Authorization: localStorage.getItem("token") },
+    });
     const res = await axios.get("http://localhost:3007/admin");
     console.log(res.data);
     const admins = { admins: res.data };
@@ -122,6 +131,10 @@ export const GetPatients = () => async (dispatch) => {
 export const GetAllData = () => async (dispatch) => {
   try {
     dispatch({ type: types.GET_ALLDATA_REQUEST });
+    const res = await axios.get("http://localhost:3007/admin/dashboard", {
+      headers: { Authorization: localStorage.getItem("token") },
+    });
+    console.log("DASHBOARD DATA:", res.data);
     const res = await axios.get(`http://localhost:3007/hospitals`);
     console.log(res.data);
     dispatch({
@@ -178,6 +191,7 @@ export const GetAllReports = (userType, id) => async (dispatch) => {
     dispatch({ type: types.GET_REPORTS_REQUEST });
     const res = await axios.get(
       `http://localhost:3007/reports/${userType}/${id}`,
+      { headers: { Authorization: localStorage.getItem("token") } }
     );
     console.log("res", res.data);
     const reports = { reports: res.data.data };

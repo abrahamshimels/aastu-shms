@@ -99,6 +99,8 @@ export const AdminLogin = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.LOGIN_ADMIN_REQUEST });
     const res = await axios.post(
+      "http://localhost:3007/auth/login",
+      { id: data.ID, password: data.password },
       "http://localhost:3007/admin/login",
       data,
     );
@@ -116,9 +118,10 @@ export const AdminLogin = (data) => async (dispatch) => {
     dispatch({
       type: types.LOGIN_ADMIN_ERROR,
       payload: {
-        message: error,
+        message: error.response ? error.response.data.message : error.message,
       },
     });
+    return error.response ? error.response.data : { message: "Error" };
   }
 };
 
@@ -186,6 +189,178 @@ export const AdminRegister = (data) => async (dispatch) => {
   }
 };
 
+// --- NEW UNIFIED STAFF ACTIONS ---
+
+// REGISTER STAFF (Unified)
+export const RegisterStaff = (data) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.post(
+      "http://localhost:3007/admin/staff",
+      data,
+      { headers: { Authorization: token } }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Staff Registration Error:", error);
+    return error.response ? error.response.data : { message: "Error" };
+  }
+};
+
+// GET ALL STAFF
+export const GetAllStaff = () => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.get(
+      "http://localhost:3007/admin/staff",
+      { headers: { Authorization: token } }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Fetch Staff Error:", error);
+    return [];
+  }
+};
+
+// UPDATE STAFF STATUS (Activate/Deactivate)
+export const UpdateStaffStatus = (id, data) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.put(
+      `http://localhost:3007/admin/staff/${id}`,
+      data,
+      { headers: { Authorization: token } }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Update Staff Error:", error);
+    return { message: "Error" };
+  }
+};
+
+// RESET STAFF PASSWORD
+export const ResetStaffPassword = (id, password) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.post(
+      `http://localhost:3007/admin/staff/${id}/reset-password`,
+      { password },
+      { headers: { Authorization: token } }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Reset Password Error:", error);
+    return { message: "Error" };
+  }
+};
+
+// GET STAFF WORKLOAD
+export const GetStaffWorkload = (id) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.get(
+      `http://localhost:3007/admin/staff/${id}/workload`,
+      { headers: { Authorization: token } }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Fetch Workload Error:", error);
+    return null;
+  }
+};
+
+// GET SYSTEM CONFIG
+export const GetSystemConfig = (key) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.get(
+      `http://localhost:3007/admin/config/${key}`,
+      { headers: { Authorization: token } }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Fetch Config Error:", error);
+    return null;
+  }
+};
+
+// UPDATE SYSTEM CONFIG
+export const UpdateSystemConfig = (data) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.post(
+      `http://localhost:3007/admin/config`,
+      data,
+      { headers: { Authorization: token } }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Update Config Error:", error);
+    return { message: "Error" };
+  }
+};
+
+// TRIGGER BACKUP
+export const TriggerBackup = () => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.post(
+      `http://localhost:3007/admin/backup`,
+      {},
+      { headers: { Authorization: token } }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Backup Trigger Error:", error);
+    return { message: "Error" };
+  }
+};
+
+// GET AUDIT LOGS
+export const GetAuditLogs = () => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.get(
+      `http://localhost:3007/admin/logs`,
+      { headers: { Authorization: token } }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Fetch Logs Error:", error);
+    return [];
+  }
+};
+
+// GET ADMIN STATS
+export const GetAdminStats = () => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.get(
+      `http://localhost:3007/admin/stats`,
+      { headers: { Authorization: token } }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Fetch Stats Error:", error);
+    return { daily: {}, roles: [], workload: [] };
+  }
+};
+
+// GET TREND ANALYTICS
+export const GetTrendAnalytics = () => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.get(
+      `http://localhost:3007/admin/analytics/trends`,
+      { headers: { Authorization: token } }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Fetch Trends Error:", error);
+    return { illness: [], monthly: [] };
+  }
+};
+
 // REGISTER AMBULANCE
 export const AmbulanceRegister = (data) => async (dispatch) => {
   try {
@@ -225,6 +400,22 @@ export const availabilityRegister = (data) => async (dispatch) => {
         message: error,
       },
     });
+  }
+};
+
+// SEED TESTING DATA
+export const SeedTestingData = () => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.post(
+      `http://localhost:3007/admin/seed-testing-data`,
+      {},
+      { headers: { Authorization: token } }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Seeding Error:", error);
+    return { message: "Failed to seed data" };
   }
 };
 

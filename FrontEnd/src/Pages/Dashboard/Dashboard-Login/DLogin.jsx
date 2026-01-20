@@ -50,115 +50,35 @@ const DLogin = () => {
     e.preventDefault();
     setLoading(true);
     if (formValue.ID !== "" && formValue.password !== "") {
-      if (placement === "Patient") {
-        dispatch(patientLogin(formValue)).then((res) => {
-          if (res.message === "Successful") {
-            notify("Login Successful");
-            setLoading(false);
-            return navigate("/dashboard");
-          }
-          if (res.message === "Wrong credentials") {
-            setLoading(false);
-
-            notify("Wrong credentials");
-          }
-          if (res.message === "Error") {
-            setLoading(false);
-
-            notify("Something went Wrong, Please Try Again");
-          }
-        });
-      } else if (placement === "Doctor") {
-        let data = {
-          ...formValue,
-          docID: formValue.ID,
-        };
-        console.log(data);
-        dispatch(DoctorLogin(data)).then((res) => {
-          if (res.message === "Successful") {
-            notify("Login Successful");
-            setLoading(false);
-
-            return navigate("/dashboard");
-          }
-          if (res.message === "Wrong credentials") {
-            setLoading(false);
-
-            notify("Wrong credentials");
-          }
-          if (res.message === "Error") {
-            setLoading(false);
-
-            notify("Something went Wrong, Please Try Again");
-          }
-        });
-      } else if (placement === "Admin") {
-        let data = {
-          ...formValue,
-          adminID: formValue.ID,
-        };
-        dispatch(AdminLogin(data)).then((res) => {
-          if (res.message === "Successful") {
-            notify("Login Successful");
-            setLoading(false);
-
-            return navigate("/dashboard");
-          }
-          if (res.message === "Wrong credentials") {
-            setLoading(false);
-
-            notify("Wrong credentials");
-          }
-          if (res.message === "Error") {
-            setLoading(false);
-
-            notify("Something went Wrong, Please Try Again");
-          }
-        });
-      } else if (placement === "Lab Technologist") {
-        let data = {
-          ...formValue,
-          id: formValue.ID,
-        };
-        dispatch(LabTechLogin(data)).then((res) => {
-          if (res.message === "Login Successful") {
-            notify("Login Successful");
-            setLoading(false);
-
-            return navigate("/dashboard");
-          }
-          if (res.message === "Wrong credentials") {
-            setLoading(false);
-
-            notify("Wrong credentials");
-          }
-          if (res.message === "Error") {
-            setLoading(false);
-
-            notify("Something went Wrong, Please Try Again");
-          }
-        });
-      } else if (placement === "Nurse") {
-        let data = {
-          ...formValue,
-          nurseID: formValue.ID,
-        };
-        dispatch(NurseLogin(data)).then((res) => {
-          if (res.message === "Successful") {
-            notify("Login Successful");
-            setLoading(false);
-            return navigate("/dashboard");
-          }
-          if (res.message === "Wrong credentials") {
-            setLoading(false);
-            notify("Wrong credentials");
-          }
-          if (res.message === "Error") {
-            setLoading(false);
-            notify("Something went Wrong, Please Try Again");
-          }
-        });
-      }
+      // Unifying all login to follow the Staff logic
+      let data = {
+        ...formValue,
+        // The backend expects specific keys sometimes, but our unified Auth.Route
+        // just needs id and password in req.body. 
+        // We'll keep it simple to match the backend /auth/login
+      };
+      
+      // Using AdminLogin as the unified staff login (or choice depends on action name, 
+      // but usually they call the same /auth/login on backend now)
+      dispatch(AdminLogin(data)).then((res) => {
+        if (res.message === "Login successful" || res.message === "Successful") {
+          notify("Login Successful");
+          setLoading(false);
+          return navigate("/dashboard");
+        }
+        if (
+          res.message === "User not found" || 
+          res.message === "Invalid credentials" || 
+          res.message === "Wrong credentials" ||
+          res.status === 401
+        ) {
+          setLoading(false);
+          notify("Invalid ID or Password");
+        } else {
+          setLoading(false);
+          notify("Something went Wrong, Please Try Again");
+        }
+      });
     }
   };
 
@@ -206,36 +126,17 @@ const DLogin = () => {
           <img src={banner} alt="banner" />
         </div>
         <div className="rightside">
-          <h1>Login</h1>
-          <div>
-            <Radio.Group
-              value={placement}
-              onChange={placementChange}
-              className={"radiogroup"}
-            >
-              <Radio.Button value="Nurse" className={"radiobutton"}>
-                Nurse
-              </Radio.Button>
-              <Radio.Button value="Doctor" className={"radiobutton"}>
-                Doctor
-              </Radio.Button>
-              <Radio.Button value="Admin" className={"radiobutton"}>
-                Admin
-              </Radio.Button>
-              <Radio.Button value="Lab Technologist" className={"radiobutton"}>
-                Lab Tech
-              </Radio.Button>
-            </Radio.Group>
-          </div>
+          <h1>Staff Login</h1>
           <div className="Profileimg">
             <img src={admin} alt="profile" />
           </div>
           <div>
             <form onSubmit={HandleSubmit}>
-              <h3>{placement} ID</h3>
+              <h3>System ID</h3>
               <input
-                type="number"
+                type="text"
                 name="ID"
+                placeholder="e.g., DOC-001"
                 value={formValue.ID}
                 onChange={Handlechange}
                 required
@@ -249,16 +150,6 @@ const DLogin = () => {
                 required
               />
               <button type="submit">{Loading ? "Loading..." : "Submit"}</button>
-              {/* <p style={{ marginTop: "10px" }}>
-                Forget Password?{" "}
-                <span
-                  style={{ color: "blue", cursor: "pointer" }}
-                  onClick={showDrawer}
-                >
-                  Get it on Email !
-                </span>
-              </p> */}
-
 
               {/* ********************************************************* */}
               <Drawer

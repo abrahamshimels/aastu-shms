@@ -3,6 +3,8 @@ require("dotenv").config();
 const cors = require("cors");
 const authRouter = require("./routes/Auth.Route");
 const adminRouter = require("./routes/Admin.Route");
+const publicRouter = require("./routes/Public.Route");
+const reportRouter = require("./routes/Report.Route");
 // const ambulanceRouter = require("./routes/Ambulances.Route");
 const appointmentRouter = require("./routes/Appointments.Route");
 const doctorRouter = require("./routes/Doctors.Route");
@@ -27,6 +29,15 @@ app.get("/", (req, res) => {
 // Centralized Routes
 app.use("/auth", authRouter);
 app.use("/admin", adminRouter);
+app.use("/public", publicRouter);
+app.use("/reports", reportRouter);
+
+// Table Initializers
+const { initialize: initializeStaffTable } = require("./models/Staff.model");
+const { initialize: initializeAuditLogsTable } = require("./models/AuditLog.model");
+const { initialize: initializeConfigTable } = require("./models/Config.model");
+const { initialize: initializeQueueTable } = require("./models/Queue.model");
+const { initialize: initializeReportsTable } = require("./models/Report.model");
 // app.use("/ambulances", ambulanceRouter);
 app.use("/appointments", appointmentRouter);
 app.use("/doctors", doctorRouter);
@@ -57,6 +68,13 @@ app.listen(process.env.PORT || 3007, async () => {
     console.log("Connected to the database at", result.rows[0].now);
     console.log("Connected to DB successfully");
 
+    // Initialize only the core tables
+    await initializeStaffTable();
+    await initializeAuditLogsTable();
+    await initializeConfigTable();
+    await initializeQueueTable();
+    await initializeReportsTable();
+    console.log("SHMS tables initialized successfully");
     // Initialize tables
     // await createAdminTables();
     await createDoctorTables();

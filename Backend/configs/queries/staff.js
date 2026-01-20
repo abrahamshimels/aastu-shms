@@ -6,6 +6,11 @@ CREATE TABLE IF NOT EXISTS staff (
     password_hash VARCHAR(255) NOT NULL,
     role VARCHAR(20) NOT NULL CHECK (role IN ('ADMIN', 'NURSE', 'DOCTOR', 'LAB_TECH')),
     qualification VARCHAR(255),
+    phonenum VARCHAR(20),
+    dob DATE,
+    gender VARCHAR(10),
+    age INTEGER,
+    address TEXT,
     is_active BOOLEAN DEFAULT TRUE,
     last_login TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -13,22 +18,22 @@ CREATE TABLE IF NOT EXISTS staff (
 `;
 
 const addStaffQuery = `
-    INSERT INTO staff (id, name, email, password_hash, role, qualification)
-    VALUES ($1, $2, $3, $4, $5, $6)
+    INSERT INTO staff (id, name, email, password_hash, role, qualification, phonenum, dob, gender, age, address)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
     RETURNING *;
 `;
 
 const findByEmailQuery = `SELECT * FROM staff WHERE email = $1;`;
 
-const findByIdQuery = `SELECT id, name, email, role, qualification, is_active, last_login, created_at FROM staff WHERE id = $1;`;
+const findByIdQuery = `SELECT * FROM staff WHERE id = $1;`;
 
-const getAllStaffQuery = `SELECT id, name, email, role, qualification, is_active, last_login, created_at FROM staff ORDER BY created_at DESC;`;
+const getAllStaffQuery = `SELECT * FROM staff ORDER BY created_at DESC;`;
 
 const updateStaffQuery = `
     UPDATE staff 
-    SET name = $2, email = $3, role = $4, qualification = $5, is_active = $6
+    SET name = $2, email = $3, role = $4, qualification = $5, is_active = $6, phonenum = $7, dob = $8, gender = $9, age = $10, address = $11
     WHERE id = $1
-    RETURNING id, name, email, role, qualification, is_active;
+    RETURNING *;
 `;
 
 const countStaffByRoleQuery = `SELECT COUNT(*) AS count FROM staff WHERE role = $1;`;

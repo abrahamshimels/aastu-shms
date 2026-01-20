@@ -1,0 +1,123 @@
+.queue-container {
+  min-height: 100vh;
+  background-color: rgba(255, 243, 243, 0.874);
+  padding: 2rem;
+  font-family: "Poppins", sans-serif;
+}
+
+.queue-nav {
+  margin-bottom: 2rem;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  color: #666;
+  font-size: 1rem;
+  padding: 0;
+}
+
+.back-btn:hover {
+  color: #2196f3;
+}
+
+.queue-content {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.queue-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.queue-header h1 {
+  font-size: 2.5rem;
+  color: #333;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.queue-header p {
+  color: #888;
+  font-size: 1.1rem;
+}
+
+.queue-table-card {
+  background-color: white;
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.queue-number {
+  color: #2196f3;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.status-tag {
+  border-radius: 15px;
+  padding: 2px 15px;
+  font-weight: 600;
+}
+
+.wait-time {
+  display: flex;
+  align-items: center;
+  color: #666;
+}
+
+.queue-info {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #999;
+  font-size: 0.9rem;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.online {
+  background-color: #4caf50;
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); opacity: 0.7; }
+  70% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.7; }
+}
+
+/* Custom Table Styling to match theme */
+.custom-table .ant-table-thead > tr > th {
+  background-color: #f8f9fa;
+  font-weight: 700;
+}
+
+.custom-table .ant-table-tbody > tr:hover > td {
+  background-color: #fafcfe !important;
+}
+
+@media only screen and (max-width: 768px) {
+  .queue-header h1 {
+    font-size: 1.8rem;
+  }
+}
