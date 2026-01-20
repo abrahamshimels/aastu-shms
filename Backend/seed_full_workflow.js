@@ -20,13 +20,18 @@ const testDoctor = {
 };
 
 const testPatient = {
+    studentid: "ETS0110/16",
     name: "Student Patient One",
+    department: "Software Engineering",
+    year: 3,
     phonenum: "1234567890",
+    emergencycontact: "911911911",
     email: "patient@test.com",
     password: "Patient@123",
     age: 20,
     gender: "M",
     bloodgroup: "A+",
+    allergies: "Peanuts",
     dob: "2004-01-01",
     address: "AASTU Dormitory"
 };

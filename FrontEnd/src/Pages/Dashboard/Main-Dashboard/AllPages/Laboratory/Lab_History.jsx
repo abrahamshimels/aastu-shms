@@ -31,8 +31,14 @@ const Lab_History = () => {
     }
 
     const columns = [
-        { title: "Record ID", dataIndex: "id", key: "id" },
+        {
+            title: "Student ID",
+            dataIndex: "studentid",
+            key: "studentid",
+            render: (text) => <b style={{ color: "#1890ff" }}>{text}</b>
+        },
         { title: "Test Type", dataIndex: "test_type", key: "test_type" },
+        { title: "Reason", dataIndex: "notes", key: "notes" },
         { title: "Result", dataIndex: "result_value", key: "result_value" },
         {
             title: "Critical",
@@ -69,7 +75,7 @@ const Lab_History = () => {
                         <div className="patientBox">
                             <h2 style={{ marginBottom: "1rem" }}>Laboratory History Search</h2>
                             <Search
-                                placeholder="Enter Student ID (e.g., 1)"
+                                placeholder="Enter Student ID (e.g., ETS0110/16)"
                                 allowClear
                                 enterButton="Search History"
                                 size="large"

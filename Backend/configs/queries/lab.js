@@ -27,7 +27,7 @@ const createLabRecordTable = `CREATE TABLE IF NOT EXISTS lab_records (
 const addRequestQuery = `INSERT INTO lab_test_requests (patient_id, doctor_id, test_type, priority, notes)
 VALUES ($1, $2, $3, $4, $5) RETURNING id;`;
 
-const getPendingRequestsQuery = `SELECT lr.*, p.name as patient_name, d.name as doctor_name 
+const getPendingRequestsQuery = `SELECT lr.*, p.name as patient_name, p.studentid, d.name as doctor_name 
 FROM lab_test_requests lr
 JOIN patients p ON lr.patient_id = p.id
 JOIN doctors d ON lr.doctor_id = d.id
@@ -40,11 +40,12 @@ const updateRequestStatusQuery = `UPDATE lab_test_requests SET status = $1 WHERE
 const addLabRecordQuery = `INSERT INTO lab_records (request_id, technologist_id, result_value, critical_flag)
 VALUES ($1, $2, $3, $4) RETURNING id;`;
 
-const getRecordsByPatientQuery = `SELECT lrec.*, lreq.test_type, lreq.request_date, lt.name as technologist_name
+const getRecordsByPatientQuery = `SELECT lrec.*, lreq.test_type, lreq.request_date, lreq.notes, lt.name as technologist_name, p.studentid
 FROM lab_records lrec
 JOIN lab_test_requests lreq ON lrec.request_id = lreq.id
 JOIN laboratory_technologists lt ON lrec.technologist_id = lt.id
-WHERE lreq.patient_id = $1;`;
+JOIN patients p ON lreq.patient_id = p.id
+WHERE p.studentid = $1;`;
 
 const getRecordByIdQuery = `SELECT * FROM lab_records WHERE id = $1;`;
 
@@ -53,15 +54,15 @@ const lockRecordQuery = `UPDATE lab_records SET is_locked = TRUE WHERE id = $1;`
 const reviewRecordQuery = `UPDATE lab_records SET reviewed_by_doctor = TRUE WHERE id = $1;`;
 
 module.exports = {
-    createLabTestRequestTable,
-    createLabRecordTable,
-    addRequestQuery,
-    getPendingRequestsQuery,
-    getRequestByIdQuery,
-    updateRequestStatusQuery,
-    addLabRecordQuery,
-    getRecordsByPatientQuery,
-    getRecordByIdQuery,
-    lockRecordQuery,
-    reviewRecordQuery
+  createLabTestRequestTable,
+  createLabRecordTable,
+  addRequestQuery,
+  getPendingRequestsQuery,
+  getRequestByIdQuery,
+  updateRequestStatusQuery,
+  addLabRecordQuery,
+  getRecordsByPatientQuery,
+  getRecordByIdQuery,
+  lockRecordQuery,
+  reviewRecordQuery
 };

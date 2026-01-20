@@ -238,7 +238,7 @@ const Sidebar = () => {
               </>
             ) : null}
 
-            {user?.userType !== "admin" ? (
+            {user?.userType !== "admin" && user?.userType !== "lab_technologist" ? (
               <>
                 <Link
                   className="link"

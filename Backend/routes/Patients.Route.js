@@ -6,6 +6,7 @@ const {
   findCred,
   findIfExists,
   updatePass,
+  findByStudentId,
 } = require("../models/Patient.model");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
@@ -20,6 +21,21 @@ router.get("/", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(400).send({ error: "Something went wrong" });
+  }
+});
+
+router.get("/search/:studentId", async (req, res) => {
+  try {
+    const studentId = req.params.studentId;
+    const patient = await findByStudentId(studentId);
+    if (patient.length > 0) {
+      res.status(200).send({ message: "Found", data: patient[0] });
+    } else {
+      res.status(404).send({ message: "Not Found" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ error: "Error searching student" });
   }
 });
 
