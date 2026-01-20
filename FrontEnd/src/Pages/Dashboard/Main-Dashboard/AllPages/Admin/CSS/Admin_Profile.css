@@ -43,12 +43,12 @@
   .subfirstbox {
     background-color: white;
     border-radius: 2rem;
-    height: 51%;
+    padding-bottom: 20px;
   }
   .subSecondBox {
     background-color: white;
     border-radius: 2rem;
-    height: 48%;
+    padding-bottom: 20px;
   }
   
   .singleitemdiv button {
@@ -69,7 +69,8 @@
   .SecondBox {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
+    gap: 1.5rem;
   }
   
   @media only screen and (max-width: 1024px) {

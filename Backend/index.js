@@ -3,6 +3,8 @@ require("dotenv").config();
 const cors = require("cors");
 const authRouter = require("./routes/Auth.Route");
 const adminRouter = require("./routes/Admin.Route");
+const publicRouter = require("./routes/Public.Route");
+const reportRouter = require("./routes/Report.Route");
 
 const app = express();
 const db = require("./configs/db");
@@ -16,11 +18,15 @@ app.get("/", (req, res) => {
 // Centralized Routes
 app.use("/auth", authRouter);
 app.use("/admin", adminRouter);
+app.use("/public", publicRouter);
+app.use("/reports", reportRouter);
 
 // Table Initializers
 const { initialize: initializeStaffTable } = require("./models/Staff.model");
 const { initialize: initializeAuditLogsTable } = require("./models/AuditLog.model");
 const { initialize: initializeConfigTable } = require("./models/Config.model");
+const { initialize: initializeQueueTable } = require("./models/Queue.model");
+const { initialize: initializeReportsTable } = require("./models/Report.model");
 
 app.listen(process.env.PORT || 3007, async () => {
   try {
@@ -32,6 +38,8 @@ app.listen(process.env.PORT || 3007, async () => {
     await initializeStaffTable();
     await initializeAuditLogsTable();
     await initializeConfigTable();
+    await initializeQueueTable();
+    await initializeReportsTable();
     console.log("SHMS tables initialized successfully");
 
   } catch (err) {

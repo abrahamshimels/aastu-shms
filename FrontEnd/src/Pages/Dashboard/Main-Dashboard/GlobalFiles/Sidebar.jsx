@@ -9,9 +9,10 @@ import { Link } from "react-router-dom";
 import { ImMenu } from "react-icons/im";
 import { FiLogOut } from "react-icons/fi";
 import { RiAdminLine } from "react-icons/ri";
-import { MdDashboardCustomize } from "react-icons/md";
+import { MdDashboard, MdSettings, MdAnalytics } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { authLogout } from "../../../../Redux/auth/action";
+import { HistoryOutlined } from "@ant-design/icons";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -43,7 +44,7 @@ const Sidebar = () => {
           <div className="bottomSection">
             <Link className="link" activeclassname="active" to={"/dashboard"}>
               <div className="icon">
-                <MdDashboardCustomize className="mainIcon" />
+                <MdDashboard className="mainIcon" />
               </div>
               <div
                 style={{ display: isOpen ? "block" : "none" }}
@@ -91,7 +92,7 @@ const Sidebar = () => {
                 <Link
                   className="link"
                   activeclassname="active"
-                  to={"/addoctor"}
+                  to={"/addstaff"}
                 >
                   <div className="icon">
                     <AiOutlineUserAdd className="mainIcon" />
@@ -100,40 +101,24 @@ const Sidebar = () => {
                     style={{ display: isOpen ? "block" : "none" }}
                     className="link_text"
                   >
-                    Add Doctor
+                    Add Staff
                   </div>
                 </Link>
                 <Link
                   className="link"
                   activeclassname="active"
-                  to={"/addadmin"}
+                  to={"/managestaff"}
                 >
                   <div className="icon">
-                    <RiAdminLine
+                    <FaUsers
                       className="mainIcon"
-                      style={{ color: "white" }}
                     />
                   </div>
                   <div
                     style={{ display: isOpen ? "block" : "none" }}
                     className="link_text"
                   >
-                    Add Admin
-                  </div>
-                </Link>
-                <Link
-                  className="link"
-                  activeclassname="active"
-                  to={"/addambulance"}
-                >
-                  <div className="icon">
-                    <FaAmbulance className="mainIcon" />
-                  </div>
-                  <div
-                    style={{ display: isOpen ? "block" : "none" }}
-                    className="link_text"
-                  >
-                    Add AMBU
+                    Manage Staff
                   </div>
                 </Link>
                 <Link
@@ -149,6 +134,51 @@ const Sidebar = () => {
                     className="link_text"
                   >
                     Profile
+                  </div>
+                </Link>
+                <Link
+                  className="link"
+                  activeclassname="active"
+                  to={"/systemsetup"}
+                >
+                  <div className="icon">
+                    <MdSettings className="mainIcon" />
+                  </div>
+                  <div
+                    style={{ display: isOpen ? "block" : "none" }}
+                    className="link_text"
+                  >
+                    System Settings
+                  </div>
+                </Link>
+                <Link
+                  className="link"
+                  activeclassname="active"
+                  to={"/auditlogs"}
+                >
+                  <div className="icon">
+                    <HistoryOutlined className="mainIcon" />
+                  </div>
+                  <div
+                    style={{ display: isOpen ? "block" : "none" }}
+                    className="link_text"
+                  >
+                    Audit Logs
+                  </div>
+                </Link>
+                <Link
+                  className="link"
+                  activeclassname="active"
+                  to={"/analytics"}
+                >
+                  <div className="icon">
+                    <MdAnalytics className="mainIcon" />
+                  </div>
+                  <div
+                    style={{ display: isOpen ? "block" : "none" }}
+                    className="link_text"
+                  >
+                    Analytics & Reports
                   </div>
                 </Link>
               </>

@@ -5,10 +5,9 @@ import axios from "axios";
 export const CreateReport = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.CREATE_REPORT_REQUEST });
-    const res = await axios.post(
-      "https://aastu-shms.onrender.com/reports/create",
-      data,
-    );
+    const res = await axios.post("http://localhost:3007/reports", data, {
+      headers: { Authorization: localStorage.getItem("token") },
+    });
     console.log(res);
     return res.data;
     // dispatch({
@@ -31,7 +30,9 @@ export const CreateReport = (data) => async (dispatch) => {
 export const GetDoctorDetails = () => async (dispatch) => {
   try {
     dispatch({ type: types.GET_DOCTOR_REQUEST });
-    const res = await axios.get("https://aastu-shms.onrender.com/doctors");
+    const res = await axios.get("http://localhost:3007/admin/staff", {
+      headers: { Authorization: localStorage.getItem("token") },
+    });
     console.log("this", res);
     const doctors = { doctors: res.data };
     dispatch({
@@ -51,7 +52,9 @@ export const GetDoctorDetails = () => async (dispatch) => {
 export const GetAdminDetails = () => async (dispatch) => {
   try {
     dispatch({ type: types.GET_ADMIN_REQUEST });
-    const res = await axios.get("https://aastu-shms.onrender.com/admin");
+    const res = await axios.get("http://localhost:3007/admin/staff", {
+      headers: { Authorization: localStorage.getItem("token") },
+    });
     console.log(res.data);
     const admins = { admins: res.data };
     dispatch({
@@ -127,8 +130,10 @@ export const GetPatients = () => async (dispatch) => {
 export const GetAllData = () => async (dispatch) => {
   try {
     dispatch({ type: types.GET_ALLDATA_REQUEST });
-    const res = await axios.get(`https://aastu-shms.onrender.com/hospitals`);
-    console.log(res.data);
+    const res = await axios.get("http://localhost:3007/admin/dashboard", {
+      headers: { Authorization: localStorage.getItem("token") },
+    });
+    console.log("DASHBOARD DATA:", res.data);
     dispatch({
       type: types.GET_ALLDATA_SUCCESS,
       payload: res.data,
@@ -181,7 +186,8 @@ export const GetAllReports = (userType, id) => async (dispatch) => {
     console.log("action :", userType, id);
     dispatch({ type: types.GET_REPORTS_REQUEST });
     const res = await axios.get(
-      `https://aastu-shms.onrender.com/reports/${userType}/${id}`,
+      `http://localhost:3007/reports/${userType}/${id}`,
+      { headers: { Authorization: localStorage.getItem("token") } }
     );
     console.log("res", res.data);
     const reports = { reports: res.data.data };
