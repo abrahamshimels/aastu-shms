@@ -9,6 +9,8 @@ const hospitalRouter = require("./routes/Hospitals.Route");
 const patientRouter = require("./routes/Patients.Route");
 const prescriptionRouter = require("./routes/Prescriptions.Route");
 const reportRouter = require("./routes/Reports.Route");
+const nurseRouter = require("./routes/Nurses.Route");
+const certificateRouter = require("./routes/Certificates.Route");
 
 const app = express();
 const db = require("./configs/db");
@@ -27,12 +29,16 @@ app.use("/hospitals", hospitalRouter);
 app.use("/patients", patientRouter);
 app.use("/prescriptions", prescriptionRouter);
 app.use("/reports", reportRouter);
+app.use("/nurses", nurseRouter);
+app.use("/certificates", certificateRouter);
 
 // Import table creation functions
 const { createTables: createAdminTables } = require("./models/Admin.model");
 const { createTables: createDoctorTables } = require("./models/Doctor.model");
 const { createTable: createPatientTable } = require("./models/Patient.model");
 const { createTable: createAmbulanceTable } = require("./models/Ambulance.model");
+const { createTables: createNurseTables } = require("./models/Nurse.model");
+const { createTable: createQueueTable } = require("./models/Queue.model");
 
 app.listen(process.env.PORT || 3007, async () => {
   try {
@@ -45,6 +51,8 @@ app.listen(process.env.PORT || 3007, async () => {
     await createDoctorTables();
     await createPatientTable();
     await createAmbulanceTable();
+    await createNurseTables();
+    await createQueueTable();
     console.log("All tables initialized successfully");
 
   } catch (err) {

@@ -5,6 +5,7 @@ const {
   getLastReportIdQuery,
   getDoctorReportQuery,
   getPatientReportQuery,
+  getAllReportsQuery,
 } = require("../configs/queries/report");
 
 const countReport = () => {
@@ -44,10 +45,17 @@ const getPatientReports = (id) => {
   });
 };
 
+const getAllReports = () => {
+  return dbhelper.query(getAllReportsQuery, []).then((result) => {
+    return result;
+  });
+};
+
 module.exports = {
   countReport,
   createReport,
   getLastReportId,
   getDoctorReports,
   getPatientReports,
+  getAllReports,
 };

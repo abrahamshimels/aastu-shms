@@ -4,6 +4,7 @@ const {
   getLastReportId,
   getDoctorReports,
   getPatientReports,
+  getAllReports,
 } = require("../models/Report.model");
 const { createMedicine } = require("../models/Prescription.model");
 const router = express.Router();
@@ -17,7 +18,9 @@ router.get("/:userType/:id", async (req, res) => {
     const reports =
       userType === "doctor"
         ? await getDoctorReports(id)
-        : await getPatientReports(id);
+        : userType === "patient"
+        ? await getPatientReports(id)
+        : await getAllReports();
     res.status(200).send({ message: "Successful", data: reports });
     console.log("router reports", reports);
   } catch (error) {

@@ -288,10 +288,6 @@ const Doctor_Profile = () => {
                   Other Info
                 </h2>
                 <div className="singleitemdiv">
-                  <BiMoney className="singledivicons" />
-                  <p>{doctor.fees}</p>
-                </div>
-                <div className="singleitemdiv">
                   <AiFillClockCircle className="singledivicons" />
                   {/* <p>{`${doctor.availability[0]} - ${
                     doctor.availability[doctor.availability.length - 1]

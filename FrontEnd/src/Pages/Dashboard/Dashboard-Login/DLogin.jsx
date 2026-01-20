@@ -10,6 +10,7 @@ import {
   DoctorLogin,
   forgetPassword,
   patientLogin,
+  NurseLogin,
 } from "../../../Redux/auth/action";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -113,6 +114,26 @@ const DLogin = () => {
             notify("Something went Wrong, Please Try Again");
           }
         });
+      } else if (placement === "Nurse") {
+        let data = {
+          ...formValue,
+          nurseID: formValue.ID,
+        };
+        dispatch(NurseLogin(data)).then((res) => {
+          if (res.message === "Successful") {
+            notify("Login Successful");
+            setLoading(false);
+            return navigate("/dashboard");
+          }
+          if (res.message === "Wrong credentials") {
+            setLoading(false);
+            notify("Wrong credentials");
+          }
+          if (res.message === "Error") {
+            setLoading(false);
+            notify("Something went Wrong, Please Try Again");
+          }
+        });
       }
     }
   };
@@ -176,6 +197,9 @@ const DLogin = () => {
               </Radio.Button>
               <Radio.Button value="Admin" className={"radiobutton"}>
                 Admin
+              </Radio.Button>
+              <Radio.Button value="Nurse" className={"radiobutton"}>
+                Nurse
               </Radio.Button>
             </Radio.Group>
           </div>

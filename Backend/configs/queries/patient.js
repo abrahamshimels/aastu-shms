@@ -1,12 +1,17 @@
 const createTableQuery = `CREATE TABLE IF NOT EXISTS patients (
   id SERIAL PRIMARY KEY,
+  studentID VARCHAR(50) UNIQUE,
   name VARCHAR(255) NOT NULL,
+  department VARCHAR(255),
+  year INT,
   phoneNum BIGINT NOT NULL,
-  email VARCHAR(255) NOT NULL,
+  emergencyContact VARCHAR(255),
+  email VARCHAR(255) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
   age INT NOT NULL,
   gender CHAR(1),
   bloodGroup VARCHAR(3),
+  allergies TEXT,
   DOB DATE,
   address VARCHAR(255),
   docID INT,
@@ -18,32 +23,33 @@ const findCredQuery = `SELECT id,password,email FROM patients WHERE id = $1;`;
 const getCredsWithEmailQuery = `SELECT id,password FROM patients WHERE email = $1;`;
 
 const addQuery = `INSERT INTO patients (
+    studentID,
     name,
+    department,
+    year,
     phonenum,
+    emergencyContact,
     email,
     password,
     age,
     gender,
     bloodgroup,
+    allergies,
     dob,
     address
   )
 VALUES (
-    $1,
-    $2,
-    $3,
-    $4,
-    $5,
-    $6,
-    $7,
-    $8,
-    $9
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
   );
   `;
 
+const findByStudentIDQuery = `SELECT * FROM patients WHERE LOWER(TRIM(studentID)) = LOWER(TRIM($1));`;
+
+const updatePhoneQuery = `UPDATE patients SET phoneNum = $1 WHERE studentID = $2;`;
+
 const findIfExistsQuery = `SELECT email FROM patients WHERE email = $1;`;
 
-const getAllQuery = `SELECT * FROM patient_details;`;
+const getAllQuery = `SELECT * FROM patients;`;
 
 const countPatientQuery = `SELECT COUNT(*) FROM patients;`;
 
@@ -58,4 +64,6 @@ module.exports = {
   getCredsWithEmailQuery,
   countPatientQuery,
   updatePassQuery,
+  findByStudentIDQuery,
+  updatePhoneQuery,
 };

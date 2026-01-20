@@ -6,6 +6,7 @@ const {
   getAppointmentFromDoctorQuery,
   deleteAppointmentQuery,
   findByIDQuery,
+  getAllAppointmentsQuery,
 } = require("../configs/queries/appointment");
 
 const countAppointment = () => {
@@ -42,6 +43,12 @@ const getAppointmentFromDoctor = (id) => {
     return result;
   });
 };
+
+const getAllAppointments = () => {
+  return dbhelper.query(getAllAppointmentsQuery, []).then((result) => {
+    return result;
+  });
+};
 const createAppointment = (data) => {
   const array = Object.values(data);
   console.log(array);
@@ -57,4 +64,5 @@ module.exports = {
   getAppointmentFromDoctor,
   deleteAppointment,
   findById,
+  getAllAppointments,
 };

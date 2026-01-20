@@ -33,10 +33,17 @@ FROM reports
 JOIN patients ON reports.patientid = patients.id
 WHERE reports.doctorid = $1;`;
 
+const getAllReportsQuery = `SELECT patients.name as patient_name, doctors.name as doctor_name,
+reports.*
+FROM reports
+JOIN patients ON reports.patientid = patients.id
+JOIN doctors ON reports.doctorid = doctors.id;`;
+
 module.exports = {
   getLastReportIdQuery,
   countReportQuery,
   createReportQuery,
   getDoctorReportQuery,
   getPatientReportQuery,
+  getAllReportsQuery,
 };

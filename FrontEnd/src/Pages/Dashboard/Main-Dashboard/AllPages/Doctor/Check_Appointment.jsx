@@ -8,116 +8,113 @@ import "react-toastify/dist/ReactToastify.css";
 import {
   DeleteAppointment,
   GetAppointments,
+  GetPatients,
+  GetDoctorDetails,
 } from "../../../../../Redux/Datas/action";
 import Sidebar from "../../GlobalFiles/Sidebar";
+
 const notify = (text) => toast(text);
+
 const Check_Appointment = () => {
   const { data } = useSelector((store) => store.auth);
   const { patients } = useSelector((store) => store.data.patients);
   const { doctors } = useSelector((store) => store.data.doctors);
   const { appointments } = useSelector((store) => store.data.appointments);
-  console.log(appointments);
-  const patient =
-    data.user.userType === "patient"
-      ? patients.find((patient) => patient.id === appointments.patientid)
-      : appointments.map((appointment) => {
-          return patients.find(
-            (patient) => patient.id === appointment.patientid
-          );
-        });
-
-  const doctor =
-    data.user.userType === "patient"
-      ? appointments.map((appointment) => {
-          return doctors.find((doctor) => doctor.id === appointment.doctorid);
-        })
-      : doctors.find((doctor) => doctor.id === data.user.id);
-
+  
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (data.user?.userType) {
+      dispatch(GetAppointments(data.user.userType, data.user.id));
+      dispatch(GetPatients());
+      dispatch(GetDoctorDetails());
+    }
+  }, [data.user]);
+
   const createData = (
     id,
-    name,
+    patient_name,
+    doctor_name,
     date,
     time,
     phonenum,
     department,
-    fees,
     problem,
     buttonText
   ) => {
     return {
       id,
-      name,
+      patient_name,
+      doctor_name,
       date,
       time,
       buttonText,
-      details: [{ phonenum, department, problem, fees }],
+      details: [{ phonenum, department, problem }],
     };
   };
 
   const columns = [
     {
-      userType: data.user.userType,
-      label: "Name",
+      userType: data.user?.userType,
+      label: data.user?.userType === "patient" ? "Doctor Name" : "Patient Name",
+      key: data.user?.userType === "patient" ? "doctor_name" : "patient_name",
       align: "left",
     },
-    { label: "Date", align: "right" },
-    { label: "Time", align: "right" },
+    { label: "Date", key: "date", align: "right" },
+    { label: "Time", key: "time", align: "right" },
     {
       label:
-        data.user.userType === "patient"
+        data.user?.userType === "patient"
           ? "Cancel Appointment"
+          : data.user?.userType === "nurse"
+          ? "Status"
           : "Generate Report",
       align: "right",
     },
   ];
 
-  const datas = appointments.map((appointment, index) => {
-    return data.user.userType === "patient"
-      ? createData(
-          appointment.id,
-          doctor[index].name,
-          appointment.date,
-          appointment.time,
-          doctor[index].phonenum,
-          doctor[index].department,
-          doctor[index].fees,
-          appointment.problem,
-          "Cancel"
-        )
-      : createData(
-          appointment.id,
-          patient[index].name,
-          appointment.date,
-          appointment.time,
-          patient[index].phonenum,
-          doctor.department,
-          doctor.fees,
-          appointment.problem,
-          "Generate Report"
-        );
+  if (data.user?.userType === "nurse") {
+    columns.splice(1, 0, { label: "Doctor Name", key: "doctor_name", align: "left" });
+  }
+
+  const datas = (appointments || []).map((appointment) => {
+    const pName = appointment.patient_name || "Unknown";
+    const dName = appointment.doctor_name || "Unknown";
+    
+    // For details section
+    const activeDoctor = (doctors || []).find((d) => d.id === appointment.doctorid);
+    const dDept = activeDoctor?.department || "N/A";
+    const pPhone = data.user?.userType === "patient" ? activeDoctor?.phonenum : (patients?.find(p => p.id === appointment.patientid)?.phonenum || "N/A");
+
+    return createData(
+      appointment.id,
+      data.user?.userType === "patient" ? "" : pName,
+      data.user?.userType === "doctor" ? "" : dName,
+      appointment.date ? new Date(appointment.date).toLocaleDateString() : "N/A",
+      appointment.time,
+      pPhone,
+      dDept,
+      appointment.problem,
+      data.user?.userType === "patient" ? "Cancel" : data.user?.userType === "nurse" ? "Confirmed" : "Generate Report"
+    );
   });
+
   const clicked = (index) => {
-    let appointment;
-    data.user.userType === "patient"
-      ? dispatch(DeleteAppointment(index)).then((res) => {
-          console.log(res);
-          if (res.message === "successful") {
-            notify("Appointment Cancelled");
-          }
-        })
-      : (appointment = appointments.find(
-          (appointment) => appointment.id === index
-        ));
-    console.log(appointment);
-    if (appointment !== undefined) {
-      return navigate("/createreport", { state: appointment });
+    if (data.user?.userType === "nurse") return; // Nurses cannot take actions
+    if (data.user?.userType === "patient") {
+      dispatch(DeleteAppointment(index)).then((res) => {
+        if (res?.message === "successful") {
+          notify("Appointment Cancelled");
+        }
+      });
+    } else if (data.user?.userType === "doctor") {
+      const appointment = (appointments || []).find((a) => a.id === index);
+      if (appointment) {
+        navigate("/createreport", { state: appointment });
+      }
     }
   };
-  useEffect(() => {
-    dispatch(GetAppointments(data.user.userType, data.user.id));
-  }, []);
 
   if (data?.isAuthenticated === false) {
     return <Navigate to={"/"} />;

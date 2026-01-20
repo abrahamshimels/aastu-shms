@@ -15,6 +15,10 @@ import Patient_Profile from "../Pages/Dashboard/Main-Dashboard/AllPages/Patient/
 import FrontPage from "../Pages/Dashboard/Main-Dashboard/GlobalFiles/FrontPage";
 import Admin_Profile from "../Pages/Dashboard/Main-Dashboard/AllPages/Admin/Admin_Profile";
 import SignupDetails from "../Pages/Dashboard/Dashboard-Login/Signup/SignupDetails";
+import Registration from "../Pages/Dashboard/Main-Dashboard/AllPages/Nurse/Registration";
+import Queue from "../Pages/Dashboard/Main-Dashboard/AllPages/Nurse/Queue";
+import CertificatesPage from "../Pages/Dashboard/Main-Dashboard/AllPages/Nurse/CertificatesPage";
+
 const AllRoutes = () => {
   return (
     <>
@@ -27,15 +31,19 @@ const AllRoutes = () => {
         <Route path="/addambulance" element={<Add_Ambulance />} />
         <Route path="/addadmin" element={<Add_Admin />} />
         <Route path="/adminprofile" element={<Admin_Profile />} />
-        ******************** Doctor Part *************************
+        {/* ******************** Doctor Part ************************* */}
         <Route path="/reports" element={<AllReport />} />
         <Route path="/checkappointment" element={<Check_Appointment />} />
         <Route path="/createreport" element={<Create_Report />} />
         <Route path="/patientdetails" element={<Patient_Details />} />
         <Route path="/doctorprofile" element={<Doctor_Profile />} />
-        ******************** Patient Part *************************
+        {/* ******************** Patient Part ************************* */}
         <Route path="/bookappointment" element={<Book_Appointment />} />
         <Route path="/patientprofile" element={<Patient_Profile />} />
+        {/* ******************** Nurse Part ************************* */}
+        <Route path="/registration" element={<Registration />} />
+        <Route path="/queue" element={<Queue />} />
+        <Route path="/certificates" element={<CertificatesPage />} />
       </Routes>
     </>
   );

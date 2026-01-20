@@ -3,12 +3,13 @@ import * as types from "./types";
 const initialState = {
   loading: false,
   error: false,
-  reports: [],
-  doctors: [],
-  patients: [],
-  medicines: [],
+  reports: { reports: [] },
+  doctors: { doctors: [] },
+  patients: { patients: [] },
+  medicines: { medicines: [] },
   dashboard: [],
-  appointments: [],
+  appointments: { appointments: [] },
+  certificates: { certificates: [] },
 };
 
 export default function dataReducer(state = initialState, { type, payload }) {
@@ -51,7 +52,10 @@ export default function dataReducer(state = initialState, { type, payload }) {
       return {
         ...state,
         loading: false,
-        appointments: state.appointments.filter((ele) => ele._id !== payload),
+        appointments: {
+          ...state.appointments,
+          appointments: state.appointments.appointments.filter((ele) => ele.id !== payload),
+        },
       };
     case types.GET_APPOINTMENT_DETAILS_SUCCESS:
       return {
@@ -64,6 +68,12 @@ export default function dataReducer(state = initialState, { type, payload }) {
         ...state,
         loading: false,
         reports: payload,
+      };
+    case types.GET_CERTIFICATES_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        certificates: payload,
       };
 
     default:

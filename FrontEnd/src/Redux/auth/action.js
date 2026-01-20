@@ -7,7 +7,7 @@ export const patientLogin = (data) => async (dispatch) => {
     console.log("this is data given by redux", data);
     dispatch({ type: types.LOGIN_PATIENT_REQUEST });
     const res = await axios.post(
-      "https://aastu-shms.onrender.com/patients/login",
+      "http://localhost:3007/patients/login",
       data,
     );
     dispatch({
@@ -32,7 +32,7 @@ export const patientLogin = (data) => async (dispatch) => {
 export const CheckPatientExists = (data) => async (dispatch) => {
   try {
     const res = await axios.post(
-      "https://aastu-shms.onrender.com/patients/check",
+      "http://localhost:3007/patients/check",
       data,
     );
     dispatch({
@@ -55,7 +55,7 @@ export const PatientSignup = (data) => async (dispatch) => {
   try {
     console.log("data given by redux", data);
     const res = await axios.post(
-      "https://aastu-shms.onrender.com/patients/signup",
+      "http://localhost:3007/patients/signup",
       data,
     );
     dispatch({
@@ -82,7 +82,7 @@ export const DoctorLogin = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.LOGIN_DOCTOR_REQUEST });
     const res = await axios.post(
-      "https://aastu-shms.onrender.com/doctors/login",
+      "http://localhost:3007/doctors/login",
       data,
     );
     console.log("doctor", res.data);
@@ -110,7 +110,7 @@ export const AdminLogin = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.LOGIN_ADMIN_REQUEST });
     const res = await axios.post(
-      "https://aastu-shms.onrender.com/admin/login",
+      "http://localhost:3007/admin/login",
       data,
     );
     console.log("here", res.data.user);
@@ -139,7 +139,7 @@ export const DoctorRegister = (data) => async (dispatch) => {
     dispatch({ type: types.REGISTER_DOCTOR_REQUEST });
     console.log("here", data);
     const res = await axios.post(
-      "https://aastu-shms.onrender.com/doctors/register",
+      "http://localhost:3007/doctors/register",
       data,
     );
     return res.data;
@@ -159,7 +159,7 @@ export const AdminRegister = (data) => async (dispatch) => {
     console.log(data);
     dispatch({ type: types.REGISTER_ADMIN_REQUEST });
     const res = await axios.post(
-      "https://aastu-shms.onrender.com/admin/register",
+      "http://localhost:3007/admin/register",
       data,
     );
     return res.data;
@@ -179,7 +179,7 @@ export const AmbulanceRegister = (data) => async (dispatch) => {
     console.log("Data", data);
     dispatch({ type: types.REGISTER_AMBULANCE_REQUEST });
     const res = await axios.post(
-      "https://aastu-shms.onrender.com/ambulances/add",
+      "http://localhost:3007/ambulances/add",
       data,
     );
     console.log(res);
@@ -199,7 +199,7 @@ export const availabilityRegister = (data) => async (dispatch) => {
     console.log("ava data", data);
     dispatch({ type: types.ADD_AVAILABLETIMES_REQUEST });
     const res = await axios.post(
-      "https://aastu-shms.onrender.com/doctors/availability",
+      "http://localhost:3007/doctors/availability",
       data,
     );
     console.log(data);
@@ -230,7 +230,7 @@ export const authLogout = () => async (dispatch) => {
 export const updatePatient = (id, data, token) => async (dispatch) => {
   try {
     const res = await axios.patch(
-      `https://aastu-shms.onrender.com/patients/${id}`,
+      `http://localhost:3007/patients/${id}`,
       data,
     );
     res.status === 200
@@ -255,7 +255,7 @@ export const updatePatient = (id, data, token) => async (dispatch) => {
 export const UpdateDoctor = (id, data, token) => async (dispatch) => {
   try {
     const res = await axios.patch(
-      `https://aastu-shms.onrender.com/doctors/${id}`,
+      `http://localhost:3007/doctors/${id}`,
       data,
     );
     res.status === 200
@@ -279,7 +279,7 @@ export const UpdateDoctor = (id, data, token) => async (dispatch) => {
 export const UpdateAdmin = (id, data, token) => async (dispatch) => {
   try {
     const res = await axios.patch(
-      `https://aastu-shms.onrender.com/admin/${id}`,
+      `http://localhost:3007/admin/${id}`,
       data,
     );
     res.status === 200
@@ -305,7 +305,7 @@ export const sendVerification = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.EDIT_DOCTOR_REQUEST });
     const res = await axios.post(
-      `https://aastu-shms.onrender.com/admin/verification`,
+      `http://localhost:3007/admin/verification`,
       data,
     );
     // console.log(res);
@@ -319,7 +319,7 @@ export const mailCreds = (data) => async (dispatch) => {
   try {
     //dispatch({ type: types.EDIT_DOCTOR_REQUEST });
     const res = await axios.post(
-      `https://aastu-shms.onrender.com/admin/mailCreds`,
+      `http://localhost:3007/admin/mailCreds`,
       data,
     );
     console.log(res);
@@ -328,15 +328,54 @@ export const mailCreds = (data) => async (dispatch) => {
     console.log(error);
   }
 };
-//update doctor
+//login nurse
+export const NurseLogin = (data) => async (dispatch) => {
+  try {
+    dispatch({ type: types.LOGIN_NURSE_REQUEST });
+    const res = await axios.post("http://localhost:3007/nurses/login", data);
+    dispatch({
+      type: types.LOGIN_NURSE_SUCCESS,
+      payload: {
+        message: res.data.message,
+        user: res.data.user,
+        token: res.data.token,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    dispatch({
+      type: types.LOGIN_NURSE_ERROR,
+      payload: {
+        message: error,
+      },
+    });
+  }
+};
+
+// REGISTER NURSE
+export const NurseRegister = (data) => async (dispatch) => {
+  try {
+    dispatch({ type: types.REGISTER_NURSE_REQUEST });
+    const res = await axios.post("http://localhost:3007/nurses/register", data);
+    return res.data;
+  } catch (error) {
+    dispatch({
+      type: types.REGISTER_NURSE_ERROR,
+      payload: {
+        message: error,
+      },
+    });
+  }
+};
+
+//forget password
 export const forgetPassword = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.FORGET_PASSWORD_REQUEST });
     const res = await axios.post(
-      `https://zany-gray-clam-gear.cyclic.app/admin/forgot`,
+      "http://localhost:3007/admin/forgot",
       data,
     );
-    // console.log(res);
     return res.data;
   } catch (error) {
     console.log(error);

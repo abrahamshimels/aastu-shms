@@ -5,6 +5,7 @@ const {
   getAppointmentFromDoctor,
   deleteAppointment,
   findById,
+  getAllAppointments,
 } = require("../models/Appointment.model");
 const { getDoctorCredFromEmail } = require("../models/Doctor.model");
 const router = express.Router();
@@ -16,7 +17,9 @@ router.get("/:userType/:id", async (req, res) => {
     const appointments =
       userType === "doctor"
         ? await getAppointmentFromDoctor(id)
-        : await getAppointmentFromPatient(id);
+        : userType === "patient"
+        ? await getAppointmentFromPatient(id)
+        : await getAllAppointments();
     res.status(200).send({ message: "successful", data: appointments });
   } catch (error) {
     console.log(error);

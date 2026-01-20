@@ -187,6 +187,40 @@ const Sidebar = () => {
                 </Link>
               </>
             ) : null}
+            {user?.userType === "nurse" ? (
+              <>
+                <Link
+                  className="link"
+                  activeclassname="active"
+                  to={"/registration"}
+                >
+                  <div className="icon">
+                    <AiOutlineUserAdd className="mainIcon" />
+                  </div>
+                  <div
+                    style={{ display: isOpen ? "block" : "none" }}
+                    className="link_text"
+                  >
+                    Registration
+                  </div>
+                </Link>
+                <Link
+                  className="link"
+                  activeclassname="active"
+                  to={"/queue"}
+                >
+                  <div className="icon">
+                    <FaUsers className="mainIcon" />
+                  </div>
+                  <div
+                    style={{ display: isOpen ? "block" : "none" }}
+                    className="link_text"
+                  >
+                    Queue
+                  </div>
+                </Link>
+              </>
+            ) : null}
 
             {user?.userType !== "admin" ? (
               <>
@@ -205,7 +239,11 @@ const Sidebar = () => {
                     My Appointments
                   </div>
                 </Link>
-                <Link className="link" activeclassname="active" to={"/reports"}>
+                <Link
+                  className="link"
+                  activeclassname="active"
+                  to={"/certificates"}
+                >
                   <div className="icon">
                     <TbReportMedical className="mainIcon" />
                   </div>
@@ -213,7 +251,7 @@ const Sidebar = () => {
                     style={{ display: isOpen ? "block" : "none" }}
                     className="link_text"
                   >
-                    Reports
+                    Certificates
                   </div>
                 </Link>
               </>

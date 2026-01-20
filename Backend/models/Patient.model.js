@@ -8,6 +8,8 @@ const {
   getCredsWithEmailQuery,
   countPatientQuery,
   updatePassQuery,
+  findByStudentIDQuery,
+  updatePhoneQuery,
 } = require("../configs/queries/patient");
 
 const createTable = () => {
@@ -54,10 +56,37 @@ const findIfExists = (email) => {
 
 const addPatient = (patient) => {
   console.log("patient received:", patient);
-  const array = Object.values(patient);
+  const array = [
+    patient.studentID.trim().toUpperCase(),
+    patient.name,
+    patient.department,
+    patient.year,
+    patient.phoneNum,
+    patient.emergencyContact,
+    patient.email,
+    patient.password,
+    patient.age,
+    patient.gender,
+    patient.bloodGroup,
+    patient.allergies,
+    patient.DOB,
+    patient.address
+  ];
   console.log(array);
   return dbhelper.query(addQuery, array).then((result) => {
-    console.log(result, "in db helper");
+    console.log("patient added successfully");
+    return result;
+  });
+};
+
+const findByStudentID = (studentID) => {
+  return dbhelper.query(findByStudentIDQuery, [studentID]).then((result) => {
+    return result;
+  });
+};
+
+const updatePhone = (phoneNum, studentID) => {
+  return dbhelper.query(updatePhoneQuery, [phoneNum, studentID]).then((result) => {
     return result;
   });
 };
@@ -78,4 +107,6 @@ module.exports = {
   getPatientCredFromEmail,
   countPatient,
   updatePass,
+  findByStudentID,
+  updatePhone,
 };
