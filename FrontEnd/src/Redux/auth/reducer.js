@@ -15,6 +15,7 @@ export default function authReducer(state = initialState, { type, payload }) {
     case types.LOGIN_ADMIN_REQUEST:
     case types.LOGIN_DOCTOR_REQUEST:
     case types.LOGIN_NURSE_REQUEST:
+    case types.LOGIN_LABTECH_REQUEST:
       return {
         ...state,
         userLogin: { loading: true, error: false },
@@ -24,6 +25,8 @@ export default function authReducer(state = initialState, { type, payload }) {
     case types.LOGIN_ADMIN_SUCCESS:
     case types.LOGIN_DOCTOR_SUCCESS:
     case types.LOGIN_NURSE_SUCCESS:
+
+    case types.LOGIN_LABTECH_SUCCESS:
       localStorage.setItem("token", payload.token);
       return {
         ...state,
@@ -55,6 +58,7 @@ export default function authReducer(state = initialState, { type, payload }) {
           user: null,
         },
       };
+
 
     case types.EDIT_DOCTOR_SUCCESS:
     case types.EDIT_PATIENT_SUCCESS:

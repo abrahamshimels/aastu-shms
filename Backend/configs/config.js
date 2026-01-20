@@ -1,4 +1,4 @@
-module.exports = {
+const config = {
   user: process.env.PG_USER, // PostgreSQL username
   host: process.env.PG_HOST || "localhost", // PostgreSQL host
   database: process.env.PG_DATABASE, // PostgreSQL database name
@@ -8,3 +8,11 @@ module.exports = {
     rejectUnauthorized: false,
   },
 };
+
+if (process.env.PG_SSL === "true") {
+  config.ssl = {
+    rejectUnauthorized: false, // required for Neon or other cloud DBs
+  };
+}
+
+module.exports = config;

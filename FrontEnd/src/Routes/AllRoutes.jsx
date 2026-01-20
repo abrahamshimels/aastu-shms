@@ -19,6 +19,8 @@ import Registration from "../Pages/Dashboard/Main-Dashboard/AllPages/Nurse/Regis
 import Queue from "../Pages/Dashboard/Main-Dashboard/AllPages/Nurse/Queue";
 import CertificatesPage from "../Pages/Dashboard/Main-Dashboard/AllPages/Nurse/CertificatesPage";
 
+import Pending_Tests from "../Pages/Dashboard/Main-Dashboard/AllPages/Laboratory/Pending_Tests";
+import Lab_History from "../Pages/Dashboard/Main-Dashboard/AllPages/Laboratory/Lab_History";
 const AllRoutes = () => {
   return (
     <>
@@ -44,6 +46,9 @@ const AllRoutes = () => {
         <Route path="/registration" element={<Registration />} />
         <Route path="/queue" element={<Queue />} />
         <Route path="/certificates" element={<CertificatesPage />} />
+        ******************** Laboratory Part *************************
+        <Route path="/lab/pending" element={<Pending_Tests />} />
+        <Route path="/lab/history" element={<Lab_History />} />
       </Routes>
     </>
   );

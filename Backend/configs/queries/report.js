@@ -1,3 +1,19 @@
+const createReportTableQuery = `CREATE TABLE IF NOT EXISTS reports (
+  id SERIAL PRIMARY KEY,
+  patientid INT NOT NULL,
+  doctorid INT NOT NULL,
+  date DATE NOT NULL,
+  time TIME NOT NULL,
+  disease TEXT,
+  temperature VARCHAR(20),
+  weight VARCHAR(20),
+  bp VARCHAR(20),
+  glucose VARCHAR(20),
+  info TEXT,
+  FOREIGN KEY (patientid) REFERENCES patients(id),
+  FOREIGN KEY (doctorid) REFERENCES doctors(id)
+);`;
+
 const countReportQuery = `SELECT COUNT(*) FROM reports;`;
 
 const createReportQuery = `INSERT INTO reports (
@@ -46,4 +62,5 @@ module.exports = {
   getDoctorReportQuery,
   getPatientReportQuery,
   getAllReportsQuery,
+  createReportTableQuery,
 };

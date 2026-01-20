@@ -1,6 +1,8 @@
 import * as types from "./types";
 import axios from "axios";
 
+const baseURL = "http://localhost:3007";
+
 // CreateReport
 export const CreateReport = (data) => async (dispatch) => {
   try {
@@ -11,12 +13,6 @@ export const CreateReport = (data) => async (dispatch) => {
     );
     console.log(res);
     return res.data;
-    // dispatch({
-    //   type: types.CREATE_REPORT_SUCCESS,
-    //   payload: {
-    //
-    //   },
-    // });
   } catch (error) {
     dispatch({
       type: types.CREATE_REPORT_ERROR,
@@ -96,7 +92,6 @@ export const CreateBooking = (data) => async (dispatch) => {
     );
     console.log(res);
     return res.data;
-    // dispatch({ type: types.CREATE_BOOKING_SUCCESS, payload: res.data.postData });
   } catch (error) {
     console.log(error);
   }
@@ -140,6 +135,7 @@ export const GetAllData = () => async (dispatch) => {
 
 // GET ALL APPOINTMENT DETAILS
 export const GetAppointments = (userType, id) => async (dispatch) => {
+  if (!userType || !id) return;
   try {
     dispatch({ type: types.GET_APPOINTMENT_DETAILS_REQUEST });
     const res = await axios.get(
@@ -177,8 +173,8 @@ export const DeleteAppointment = (id) => async (dispatch) => {
 };
 
 export const GetAllReports = (userType, id) => async (dispatch) => {
+  if (!userType || !id) return;
   try {
-    console.log("action :", userType, id);
     dispatch({ type: types.GET_REPORTS_REQUEST });
     const res = await axios.get(
       `http://localhost:3007/reports/${userType}/${id}`,
@@ -220,6 +216,63 @@ export const GetAllCertificates = (userType, id) => async (dispatch) => {
     dispatch({
       type: types.GET_CERTIFICATES_SUCCESS,
       payload: certificates,
+    });
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// --- Laboratory Actions ---
+
+export const getPendingRequests = (token) => async (dispatch) => {
+  try {
+    dispatch({ type: types.GET_PENDING_REQUESTS_REQUEST });
+    const res = await axios.get(`${baseURL}/lab/requests/pending`, {
+      headers: { Authorization: token },
+    });
+    dispatch({
+      type: types.GET_PENDING_REQUESTS_SUCCESS,
+      payload: res.data,
+    });
+  } catch (error) {
+    dispatch({ type: types.GET_PENDING_REQUESTS_ERROR });
+  }
+};
+
+export const submitLabRecord = (data, token) => async (dispatch) => {
+  try {
+    dispatch({ type: types.SUBMIT_LAB_RECORD_REQUEST });
+    const res = await axios.post(`${baseURL}/lab/record`, data, {
+      headers: { Authorization: token },
+    });
+    dispatch({
+      type: types.SUBMIT_LAB_RECORD_SUCCESS,
+      payload: res.data,
+    });
+    return res.data;
+  } catch (error) {
+    dispatch({ type: types.SUBMIT_LAB_RECORD_ERROR });
+  }
+};
+
+export const getLabHistory = (patientId) => async (dispatch) => {
+  try {
+    dispatch({ type: types.GET_LAB_HISTORY_REQUEST });
+    const res = await axios.get(`${baseURL}/lab/history/${patientId}`);
+    dispatch({
+      type: types.GET_LAB_HISTORY_SUCCESS,
+      payload: res.data,
+    });
+  } catch (error) {
+    dispatch({ type: types.GET_LAB_HISTORY_ERROR });
+  }
+};
+
+export const createLabRequest = (data, token) => async (dispatch) => {
+  try {
+    const res = await axios.post(`${baseURL}/lab/request`, data, {
+      headers: { Authorization: token },
     });
     return res.data;
   } catch (error) {

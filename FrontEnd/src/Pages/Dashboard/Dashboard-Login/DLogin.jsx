@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import {
   AdminLogin,
   DoctorLogin,
+  LabTechLogin,
   forgetPassword,
   patientLogin,
   NurseLogin,
@@ -114,6 +115,29 @@ const DLogin = () => {
             notify("Something went Wrong, Please Try Again");
           }
         });
+      } else if (placement === "Lab Technologist") {
+        let data = {
+          ...formValue,
+          id: formValue.ID,
+        };
+        dispatch(LabTechLogin(data)).then((res) => {
+          if (res.message === "Login Successful") {
+            notify("Login Successful");
+            setLoading(false);
+
+            return navigate("/dashboard");
+          }
+          if (res.message === "Wrong credentials") {
+            setLoading(false);
+
+            notify("Wrong credentials");
+          }
+          if (res.message === "Error") {
+            setLoading(false);
+
+            notify("Something went Wrong, Please Try Again");
+          }
+        });
       } else if (placement === "Nurse") {
         let data = {
           ...formValue,
@@ -197,9 +221,6 @@ const DLogin = () => {
               </Radio.Button>
               <Radio.Button value="Admin" className={"radiobutton"}>
                 Admin
-              </Radio.Button>
-              <Radio.Button value="Nurse" className={"radiobutton"}>
-                Nurse
               </Radio.Button>
             </Radio.Group>
           </div>

@@ -6,7 +6,14 @@ const {
   getDoctorReportQuery,
   getPatientReportQuery,
   getAllReportsQuery,
+  createReportTableQuery,
 } = require("../configs/queries/report");
+
+const createTables = () => {
+  return dbhelper.query(createReportTableQuery, []).then((result) => {
+    return result;
+  });
+};
 
 const countReport = () => {
   console.log(countReportQuery);
@@ -52,6 +59,7 @@ const getAllReports = () => {
 };
 
 module.exports = {
+  createTables,
   countReport,
   createReport,
   getLastReportId,

@@ -20,7 +20,23 @@ const Check_Appointment = () => {
   const { patients } = useSelector((store) => store.data.patients);
   const { doctors } = useSelector((store) => store.data.doctors);
   const { appointments } = useSelector((store) => store.data.appointments);
-  
+  console.log(appointments);
+  const patient =
+    data.user.userType === "patient"
+      ? patients.find((patient) => patient.id === appointments.patientid)
+      : appointments.map((appointment) => {
+        return patients.find(
+          (patient) => patient.id === appointment.patientid
+        );
+      });
+
+  const doctor =
+    data.user.userType === "patient"
+      ? appointments.map((appointment) => {
+        return doctors.find((doctor) => doctor.id === appointment.doctorid);
+      })
+      : doctors.find((doctor) => doctor.id === data.user.id);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -68,53 +84,58 @@ const Check_Appointment = () => {
         data.user?.userType === "patient"
           ? "Cancel Appointment"
           : data.user?.userType === "nurse"
-          ? "Status"
-          : "Generate Report",
+            ? "Status"
+            : "Generate Report",
       align: "right",
     },
   ];
 
-  if (data.user?.userType === "nurse") {
-    columns.splice(1, 0, { label: "Doctor Name", key: "doctor_name", align: "left" });
-  }
-
-  const datas = (appointments || []).map((appointment) => {
-    const pName = appointment.patient_name || "Unknown";
-    const dName = appointment.doctor_name || "Unknown";
-    
-    // For details section
-    const activeDoctor = (doctors || []).find((d) => d.id === appointment.doctorid);
-    const dDept = activeDoctor?.department || "N/A";
-    const pPhone = data.user?.userType === "patient" ? activeDoctor?.phonenum : (patients?.find(p => p.id === appointment.patientid)?.phonenum || "N/A");
-
-    return createData(
-      appointment.id,
-      data.user?.userType === "patient" ? "" : pName,
-      data.user?.userType === "doctor" ? "" : dName,
-      appointment.date ? new Date(appointment.date).toLocaleDateString() : "N/A",
-      appointment.time,
-      pPhone,
-      dDept,
-      appointment.problem,
-      data.user?.userType === "patient" ? "Cancel" : data.user?.userType === "nurse" ? "Confirmed" : "Generate Report"
-    );
+  const datas = appointments.map((appointment, index) => {
+    return data.user.userType === "patient"
+      ? createData(
+        appointment.id,
+        doctor[index].name,
+        appointment.date,
+        appointment.time,
+        doctor[index].phonenum,
+        doctor[index].department,
+        doctor[index].fees,
+        appointment.problem,
+        "Cancel"
+      )
+      : createData(
+        appointment.id,
+        patient[index].name,
+        appointment.date,
+        appointment.time,
+        patient[index].phonenum,
+        doctor.department,
+        doctor.fees,
+        appointment.problem,
+        "Generate Report"
+      );
   });
 
   const clicked = (index) => {
-    if (data.user?.userType === "nurse") return; // Nurses cannot take actions
-    if (data.user?.userType === "patient") {
-      dispatch(DeleteAppointment(index)).then((res) => {
-        if (res?.message === "successful") {
+    let appointment;
+    data.user.userType === "patient"
+      ? dispatch(DeleteAppointment(index)).then((res) => {
+        console.log(res);
+        if (res.message === "successful") {
           notify("Appointment Cancelled");
         }
-      });
-    } else if (data.user?.userType === "doctor") {
-      const appointment = (appointments || []).find((a) => a.id === index);
-      if (appointment) {
-        navigate("/createreport", { state: appointment });
-      }
+      })
+      : (appointment = appointments.find(
+        (appointment) => appointment.id === index
+      ));
+    console.log(appointment);
+    if (appointment !== undefined) {
+      return navigate("/createreport", { state: appointment });
     }
   };
+  useEffect(() => {
+    dispatch(GetAppointments(data.user.userType, data.user.id));
+  }, []);
 
   if (data?.isAuthenticated === false) {
     return <Navigate to={"/"} />;
@@ -133,11 +154,19 @@ const Check_Appointment = () => {
           <div className="Payment_Page">
             <h1 style={{ marginBottom: "2rem" }}>Appointment Details</h1>
             <div className="patientBox">
-              <CollapsibleTable
-                data={datas}
-                columns={columns}
-                onDelete={clicked}
-              />
+              {appointments.length > 0 ? (
+                <CollapsibleTable
+                  data={datas}
+                  columns={columns}
+                  onDelete={clicked}
+                />
+              ) : (
+                <div style={{ padding: "2rem", textAlign: "center" }}>
+                  <h3>No Appointments Found</h3>
+                  <p>You need an active appointment to generate a lab request.</p>
+                  <p>Please run <code>node seed_full_workflow.js</code> in the Backend folder to set up test data.</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

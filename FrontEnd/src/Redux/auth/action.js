@@ -1,6 +1,8 @@
 import * as types from "./types";
 import axios from "axios";
 
+const baseURL = "http://localhost:3007";
+
 //login user
 export const patientLogin = (data) => async (dispatch) => {
   try {
@@ -10,14 +12,7 @@ export const patientLogin = (data) => async (dispatch) => {
       "http://localhost:3007/patients/login",
       data,
     );
-    dispatch({
-      type: types.LOGIN_PATIENT_SUCCESS,
-      payload: {
-        message: res.data.message,
-        user: res.data.user,
-        token: res.data.token,
-      },
-    });
+
     return res.data;
   } catch (error) {
     dispatch({
@@ -35,12 +30,6 @@ export const CheckPatientExists = (data) => async (dispatch) => {
       "http://localhost:3007/patients/check",
       data,
     );
-    dispatch({
-      type: types.LOGIN_PATIENT_SUCCESS,
-      payload: {
-        message: res.data.message,
-      },
-    });
     return res.data;
   } catch (error) {
     dispatch({
@@ -126,6 +115,30 @@ export const AdminLogin = (data) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: types.LOGIN_ADMIN_ERROR,
+      payload: {
+        message: error,
+      },
+    });
+  }
+};
+
+//login laboratory technologist
+export const LabTechLogin = (data) => async (dispatch) => {
+  try {
+    dispatch({ type: types.LOGIN_LABTECH_REQUEST });
+    const res = await axios.post(`${baseURL}/labtechs/login`, data);
+    dispatch({
+      type: types.LOGIN_LABTECH_SUCCESS,
+      payload: {
+        message: res.data.message,
+        user: res.data.user,
+        token: res.data.token,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    dispatch({
+      type: types.LOGIN_LABTECH_ERROR,
       payload: {
         message: error,
       },

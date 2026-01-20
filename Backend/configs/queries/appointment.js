@@ -1,3 +1,14 @@
+const createAppointmentQueryTable = `CREATE TABLE IF NOT EXISTS appointments (
+  id SERIAL PRIMARY KEY,
+  patientid INT NOT NULL,
+  date DATE NOT NULL,
+  time TIME NOT NULL,
+  problem TEXT,
+  doctorid INT NOT NULL,
+  FOREIGN KEY (patientid) REFERENCES patients(id),
+  FOREIGN KEY (doctorid) REFERENCES doctors(id)
+);`;
+
 const countAppoinmentQuery = `SELECT COUNT(*) FROM appointments; `;
 
 const createAppointmentQuery = `
@@ -43,4 +54,5 @@ module.exports = {
   getAppointmentFromDoctorQuery,
   findByIDQuery,
   getAllAppointmentsQuery,
+  createAppointmentQueryTable,
 };

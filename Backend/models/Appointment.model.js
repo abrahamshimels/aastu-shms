@@ -7,7 +7,14 @@ const {
   deleteAppointmentQuery,
   findByIDQuery,
   getAllAppointmentsQuery,
+  createAppointmentQueryTable,
 } = require("../configs/queries/appointment");
+
+const createTable = () => {
+  return dbhelper.query(createAppointmentQueryTable, []).then((result) => {
+    return result;
+  });
+};
 
 const countAppointment = () => {
   return dbhelper.query(countAppoinmentQuery, []).then((result) => {
@@ -65,4 +72,5 @@ module.exports = {
   deleteAppointment,
   findById,
   getAllAppointments,
+  createTable,
 };

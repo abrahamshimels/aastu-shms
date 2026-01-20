@@ -4,10 +4,13 @@ import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import {
   DeleteAppointment,
   CreateReport,
+  createLabRequest,
 } from "../../../../../Redux/Datas/action";
+import { Modal, Form, Select, Input, Button } from "antd";
 import Sidebar from "../../GlobalFiles/Sidebar";
 import "react-toastify/dist/ReactToastify.css";
 import { toast, ToastContainer } from "react-toastify";
+import "../Admin/CSS/Add_Doctor.css";
 const notify = (text) => toast(text);
 
 const Create_Report = () => {
@@ -17,6 +20,9 @@ const Create_Report = () => {
   const location = useLocation();
   const creds = location.state;
   const dispatch = useDispatch();
+
+  const [isLabModalOpen, setIsLabModalOpen] = useState(false);
+  const [labForm] = Form.useForm();
   const initmed = {
     name: "",
     dosage: "",
@@ -89,6 +95,24 @@ const Create_Report = () => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handleLabRequestSubmit = (values) => {
+    const payload = {
+      patient_id: creds?.patientid,
+      test_type: values.test_type,
+      priority: values.priority,
+      notes: values.notes,
+    };
+    dispatch(createLabRequest(payload, data.token)).then((res) => {
+      if (res) {
+        notify("Lab Request Sent Successfully");
+        setIsLabModalOpen(false);
+        labForm.resetFields();
+      } else {
+        notify("Failed to send Lab Request");
+      }
+    });
   };
 
   if (data?.isAuthenticated === false) {
@@ -249,16 +273,69 @@ const Create_Report = () => {
               </div>
               {/* *********************************** */}
 
-              <button
-                className="formsubmitbutton bookingbutton"
-                onClick={HandleReportSubmit}
-              >
-                {loading ? "Loading..." : "Generate Report"}
-              </button>
+              <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "2rem" }}>
+                <button
+                  className="formsubmitbutton"
+                  style={{ width: "200px", margin: "0" }}
+                  onClick={HandleReportSubmit}
+                >
+                  {loading ? "Loading..." : "Generate Report"}
+                </button>
+
+                <button
+                  type="button"
+                  className="formsubmitbutton"
+                  style={{ width: "240px", margin: "0", backgroundColor: "#52c41a" }}
+                  onClick={() => setIsLabModalOpen(true)}
+                >
+                  Request Laboratory Test
+                </button>
+              </div>
             </form>
           </div>
         </div>
       </div>
+
+      <Modal
+        title="Send Laboratory Request"
+        open={isLabModalOpen}
+        onCancel={() => setIsLabModalOpen(false)}
+        footer={null}
+      >
+        <Form form={labForm} layout="vertical" onFinish={handleLabRequestSubmit}>
+          <Form.Item
+            label="Test Type"
+            name="test_type"
+            rules={[{ required: true, message: "Please select test type" }]}
+          >
+            <Select placeholder="Select Test">
+              <Select.Option value="Blood Test">Blood Test</Select.Option>
+              <Select.Option value="Urine Test">Urine Test</Select.Option>
+              <Select.Option value="X-Ray">X-Ray</Select.Option>
+              <Select.Option value="ECG">ECG</Select.Option>
+              <Select.Option value="Other">Other</Select.Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item label="Priority" name="priority" initialValue="Normal">
+            <Select>
+              <Select.Option value="Normal">Normal</Select.Option>
+              <Select.Option value="Urgent">Urgent</Select.Option>
+              <Select.Option value="Emergency">Emergency</Select.Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item label="Doctor Notes" name="notes">
+            <Input.TextArea rows={3} placeholder="Specific instructions for the lab..." />
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block>
+              Send Request to Lab
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </>
   );
 };
