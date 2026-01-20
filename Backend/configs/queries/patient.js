@@ -1,5 +1,6 @@
 const createTableQuery = `CREATE TABLE IF NOT EXISTS patients (
   id SERIAL PRIMARY KEY,
+<<<<<<< HEAD
   studentID VARCHAR(50) UNIQUE,
   name VARCHAR(255) NOT NULL,
   department VARCHAR(255),
@@ -8,7 +9,7 @@ const createTableQuery = `CREATE TABLE IF NOT EXISTS patients (
   emergencyContact VARCHAR(255),
   email VARCHAR(255) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
-  age INT NOT NULL,
+  age INT,
   gender CHAR(1),
   bloodGroup VARCHAR(3),
   allergies TEXT,
@@ -27,15 +28,15 @@ const addQuery = `INSERT INTO patients (
     name,
     department,
     year,
-    phonenum,
+    phoneNum,
     emergencyContact,
     email,
     password,
     age,
     gender,
-    bloodgroup,
+    bloodGroup,
     allergies,
-    dob,
+    DOB,
     address
   )
 VALUES (
@@ -54,6 +55,7 @@ const getAllQuery = `SELECT * FROM patients;`;
 const countPatientQuery = `SELECT COUNT(*) FROM patients;`;
 
 const updatePassQuery = ` UPDATE patients SET password = $1 WHERE id = $2;`;
+const findByStudentIdQuery = `SELECT * FROM patients WHERE studentID = $1;`;
 
 module.exports = {
   findIfExistsQuery,
@@ -66,4 +68,5 @@ module.exports = {
   updatePassQuery,
   findByStudentIDQuery,
   updatePhoneQuery,
+  findByStudentIdQuery,
 };

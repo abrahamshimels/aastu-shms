@@ -325,8 +325,8 @@ const Create_Report = () => {
             </Select>
           </Form.Item>
 
-          <Form.Item label="Doctor Notes" name="notes">
-            <Input.TextArea rows={3} placeholder="Specific instructions for the lab..." />
+          <Form.Item label="Reason for Test" name="notes">
+            <Input.TextArea rows={3} placeholder="Explain why this test is needed (e.g., persistent fever, suspicious mass)..." />
           </Form.Item>
 
           <Form.Item>

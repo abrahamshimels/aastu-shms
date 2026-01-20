@@ -10,10 +10,11 @@ const {
   updatePassQuery,
   findByStudentIDQuery,
   updatePhoneQuery,
+  findByStudentIdQuery,
 } = require("../configs/queries/patient");
 
 const createTable = () => {
-  return dbhelper.query(createTableQuery, []).then((err, result) => {
+  return dbhelper.query(createTableQuery, []).then((result) => {
     console.log("patient table created or exists");
   });
 };
@@ -32,6 +33,13 @@ const findCred = (ID) => {
     return result;
   });
 };
+
+const findByStudentId = (studentId) => {
+  console.log("searching for studentid:", studentId);
+  return dbhelper.query(findByStudentIdQuery, [studentId]).then((result) => {
+    return result;
+  });
+};
 const getPatientCredFromEmail = (email) => {
   console.log("email received:", email);
   return dbhelper.query(getCredsWithEmailQuery, [email]).then((result) => {
@@ -41,7 +49,6 @@ const getPatientCredFromEmail = (email) => {
 };
 const getAllPatients = () => {
   return dbhelper.query(getAllQuery).then((result) => {
-    //console.log("in db helper", result);
     return result;
   });
 };
@@ -109,4 +116,5 @@ module.exports = {
   updatePass,
   findByStudentID,
   updatePhone,
+  findByStudentId,
 };
