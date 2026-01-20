@@ -1,6 +1,6 @@
 const createTableQuery = `CREATE TABLE IF NOT EXISTS patients (
   id SERIAL PRIMARY KEY,
-<<<<<<< HEAD
+
   studentID VARCHAR(50) UNIQUE,
   name VARCHAR(255) NOT NULL,
   department VARCHAR(255),

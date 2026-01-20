@@ -25,7 +25,6 @@ export default function authReducer(state = initialState, { type, payload }) {
     case types.LOGIN_ADMIN_SUCCESS:
     case types.LOGIN_DOCTOR_SUCCESS:
     case types.LOGIN_NURSE_SUCCESS:
-
     case types.LOGIN_LABTECH_SUCCESS:
       localStorage.setItem("token", payload.token);
       return {

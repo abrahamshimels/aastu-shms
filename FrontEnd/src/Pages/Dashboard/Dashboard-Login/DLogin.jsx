@@ -35,7 +35,7 @@ const DLogin = () => {
 
   // ************************************************
   const [Loading, setLoading] = useState(false);
-  const [placement, setPlacement] = useState("Patient");
+  const [placement, setPlacement] = useState("Nurse");
   const [formValue, setFormValue] = useState({
     ID: "",
     password: "",
@@ -213,14 +213,17 @@ const DLogin = () => {
               onChange={placementChange}
               className={"radiogroup"}
             >
-              <Radio.Button value="Patient" className={"radiobutton"}>
-                Patient
+              <Radio.Button value="Nurse" className={"radiobutton"}>
+                Nurse
               </Radio.Button>
               <Radio.Button value="Doctor" className={"radiobutton"}>
                 Doctor
               </Radio.Button>
               <Radio.Button value="Admin" className={"radiobutton"}>
                 Admin
+              </Radio.Button>
+              <Radio.Button value="Lab Technologist" className={"radiobutton"}>
+                Lab Tech
               </Radio.Button>
             </Radio.Group>
           </div>
@@ -255,17 +258,7 @@ const DLogin = () => {
                   Get it on Email !
                 </span>
               </p> */}
-              {placement === "Patient" ? (
-                <p style={{ marginTop: "10px" }}>
-                  New here?{" "}
-                  <span
-                    style={{ color: "blue", cursor: "pointer" }}
-                    onClick={toSignUp}
-                  >
-                    Sign up!
-                  </span>
-                </p>
-              ) : null}
+
 
               {/* ********************************************************* */}
               <Drawer
