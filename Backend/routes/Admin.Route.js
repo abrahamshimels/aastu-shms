@@ -7,7 +7,7 @@ const { logAction, getLogs, getFilteredLogs } = require("../models/AuditLog.mode
 const { setConfig, getConfig } = require("../models/Config.model");
 const { authenticate, authorize } = require("../middlewares/authMiddleware");
 const dbhelper = require("../configs/dbhelper");
-const { getDailyStatsQuery, getRoleDistributionQuery, getWorkloadQuery, getOverviewCountsQuery } = require("../configs/queries/analytics");
+const { getDailyStatsQuery, getRoleDistributionQuery, getWorkloadQuery, getOverviewCountsQuery, getWeeklyActivityQuery, getOperationalLogQuery } = require("../configs/queries/analytics");
 const { getIllnessTrendsQuery, getMonthlyTrendsQuery } = require("../configs/queries/reports");
 
 // All routes here require being an ADMIN
@@ -140,6 +140,53 @@ router.post("/staff/:id/reset-password", async (req, res) => {
 });
 
 /**
+ * @route   PATCH /admin/:id
+ * @desc    Self-update for admin (e.g., password change)
+ */
+router.patch("/:id", async (req, res) => {
+  const { id } = req.params;
+  const { oldPassword, newPassword, oldpassword, newpassword } = req.body;
+  
+  // Support both camelCase and lowercase (compatibility)
+  const op = oldPassword || oldpassword;
+  const np = newPassword || newpassword || req.body.password;
+
+  try {
+    const { findById } = require("../models/Staff.model");
+    const user = await findById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Only allow changing password if old password is correct
+    if (np) {
+        if (!op) {
+            return res.status(400).json({ message: "Old password is required to set a new one" });
+        }
+        
+        const isMatch = await bcrypt.compare(op, user.password_hash);
+        if (!isMatch) {
+            return res.status(401).json({ message: "Incorrect Old Password" });
+        }
+
+        const new_hash = await bcrypt.hash(np, 10);
+        await updatePassword(id, new_hash);
+        
+        return res.status(200).json({ 
+            message: "password updated",
+            user: { id: user.id, name: user.name, role: user.role } 
+        });
+    }
+
+    res.status(400).json({ message: "No valid fields provided for update" });
+  } catch (err) {
+    console.error("Self-update error:", err.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+/**
  * @route   GET /admin/staff/:id/workload
  * @desc    View professional workload for a staff member
  */
@@ -246,11 +293,15 @@ router.get("/stats", async (req, res) => {
     const dailyStats = await dbhelper.query(getDailyStatsQuery);
     const roleDist = await dbhelper.query(getRoleDistributionQuery);
     const workload = await dbhelper.query(getWorkloadQuery);
+    const weeklyActivity = await dbhelper.query(getWeeklyActivityQuery);
+    const operationalLog = await dbhelper.query(getOperationalLogQuery);
     
     res.status(200).json({
       daily: dailyStats[0],
       roles: roleDist,
-      workload: workload
+      workload: workload,
+      weekly: weeklyActivity,
+      tracelog: operationalLog
     });
   } catch (err) {
     console.error("Stats fetch error:", err.message);

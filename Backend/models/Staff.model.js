@@ -12,6 +12,7 @@ const {
 const DoctorsModel = require("./Doctors.model");
 const PatientsModel = require("./Patients.model");
 const NursesModel = require("./Nurses.model");
+const LabTechModel = require("./LabTechnologist.model");
 
 const initialize = async () => {
   try {
@@ -20,6 +21,7 @@ const initialize = async () => {
     await DoctorsModel.init();
     await PatientsModel.init();
     await NursesModel.init();
+    await LabTechModel.createTables();
   } catch (err) {
     console.error("❌ Failed to initialize database tables:", err.message);
   }
@@ -94,6 +96,22 @@ const addStaff = async (staff) => {
       console.log(`✅ Synced NURSE ${newStaff.id} to independent nurses table.`);
     } catch (syncErr) {
       console.error(`❌ Sync failed for NURSE ${newStaff.id}:`, syncErr.message);
+    }
+  } else if (newStaff.role === "LAB_TECH") {
+    try {
+      await LabTechModel.addLabTech({
+        name: staff.name,
+        phonenum: staff.phonenum || 0,
+        email: staff.email,
+        password: staff.password || "Lab@123",
+        age: staff.age || 0,
+        gender: staff.gender || "M",
+        dob: staff.dob || new Date().toISOString().split("T")[0],
+        address: staff.address || "AASTU",
+      });
+      console.log(`✅ Synced LAB_TECH ${newStaff.id} to independent lab tech table.`);
+    } catch (syncErr) {
+      console.error(`❌ Sync failed for LAB_TECH ${newStaff.id}:`, syncErr.message);
     }
   }
 

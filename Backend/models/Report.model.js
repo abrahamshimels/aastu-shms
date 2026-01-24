@@ -1,10 +1,20 @@
 const dbhelper = require("../configs/dbhelper");
 const {
   createReportsTable,
-  createReportQuery,
-  getAllReportsQuery,
+  createReportQuery: createReportQueryNew,
+  getAllReportsQuery: getAllReportsQueryNew,
   getReportsByUserQuery,
 } = require("../configs/queries/reports");
+
+const {
+  getLastReportIdQuery,
+  countReportQuery,
+  createReportQuery,
+  getDoctorReportQuery,
+  getPatientReportQuery,
+  getAllReportsQuery,
+  createReportTableQuery,
+} = require("../configs/queries/report");
 
 const initialize = async () => {
   try {
@@ -17,9 +27,9 @@ const initialize = async () => {
 
 const createReport = async (reportData) => {
   const values = [
-    reportData.patient_id,
-    reportData.doctor_id,
-    reportData.appointment_id,
+    reportData.patient_id || reportData.patientid,
+    reportData.doctor_id || reportData.doctorid,
+    reportData.appointment_id || null,
     reportData.date,
     reportData.time,
     reportData.disease,
@@ -30,31 +40,17 @@ const createReport = async (reportData) => {
     reportData.info,
     JSON.stringify(reportData.medicines || []),
   ];
-  const result = await dbhelper.query(createReportQuery, values);
+  const result = await dbhelper.query(createReportQueryNew, values);
   return result[0];
 };
 
 const getAllReports = async () => {
-  return dbhelper.query(getAllReportsQuery);
+  return dbhelper.query(getAllReportsQueryNew);
 };
 
 const getReportsByUser = async (userId) => {
   return dbhelper.query(getReportsByUserQuery, [userId]);
 };
-
-module.exports = {
-  initialize,
-  createReport,
-  getAllReports,
-  getReportsByUser,
-  countReportQuery,
-  createReportQuery,
-  getLastReportIdQuery,
-  getDoctorReportQuery,
-  getPatientReportQuery,
-  getAllReportsQuery,
-  createReportTableQuery,
-} = require("../configs/queries/report");
 
 const createTables = () => {
   return dbhelper.query(createReportTableQuery, []).then((result) => {
@@ -63,54 +59,44 @@ const createTables = () => {
 };
 
 const countReport = () => {
-  console.log(countReportQuery);
   return dbhelper.query(countReportQuery, []).then((result) => {
-    console.log(result, "in db helper");
-    return result[0];
-  });
-};
-
-const createReport = (data) => {
-  const array = Object.values(data);
-  return dbhelper.query(createReportQuery, array).then((result) => {
-    console.log(result, "in db helper");
     return result[0];
   });
 };
 
 const getLastReportId = () => {
   return dbhelper.query(getLastReportIdQuery, []).then((result) => {
-    console.log(result, "in db helper");
     return result[0];
   });
 };
 
 const getDoctorReports = (id) => {
   return dbhelper.query(getDoctorReportQuery, [id]).then((result) => {
-    // console.log(result, "in db helper");
     return result;
   });
 };
 
 const getPatientReports = (id) => {
   return dbhelper.query(getPatientReportQuery, [id]).then((result) => {
-    //console.log(result, "in db helper");
     return result;
   });
 };
 
-const getAllReports = () => {
+const getAllReportsLegacy = () => {
   return dbhelper.query(getAllReportsQuery, []).then((result) => {
     return result;
   });
 };
 
 module.exports = {
+  initialize,
+  createReport,
+  getAllReports,
+  getReportsByUser,
   createTables,
   countReport,
-  createReport,
   getLastReportId,
   getDoctorReports,
   getPatientReports,
-  getAllReports,
+  getAllReportsLegacy,
 };

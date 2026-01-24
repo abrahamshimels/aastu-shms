@@ -58,8 +58,16 @@ const findIfExists = (email) => {
 
 const addLabTech = (labTech) => {
     console.log("lab tech received:", labTech);
-    const array = Object.values(labTech);
-    return dbhelper.query(addQuery, array).then((result) => {
+    const values = [
+        labTech.name,
+        labTech.phonenum || labTech.phoneNum || 0,
+        labTech.email,
+        labTech.age || 0,
+        labTech.gender || 'M',
+        labTech.dob || labTech.DOB,
+        labTech.address || 'AASTU'
+    ];
+    return dbhelper.query(addQuery, values).then((result) => {
         console.log("lab tech added successfully");
         return result;
     });

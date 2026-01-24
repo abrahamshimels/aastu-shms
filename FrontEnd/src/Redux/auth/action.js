@@ -485,6 +485,7 @@ export const UpdateAdmin = (id, data, token) => async (dispatch) => {
     const res = await axios.patch(
       `http://localhost:3007/admin/${id}`,
       data,
+      { headers: { Authorization: token } }
     );
     res.status === 200
       ? dispatch({ type: types.EDIT_ADMIN_REQUEST, payload: { token } })
@@ -501,6 +502,7 @@ export const UpdateAdmin = (id, data, token) => async (dispatch) => {
     return res.data;
   } catch (error) {
     console.log(error);
+    return error.response ? error.response.data : { message: "Something went wrong." };
   }
 };
 

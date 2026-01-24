@@ -17,6 +17,14 @@ const initialize = async () => {
         fields: ["student_id", "diagnosis", "rest_period"]
     };
     await dbhelper.query(setConfigQuery, ["certificate_settings", JSON.stringify(defaultCert)]);
+
+    const defaultBackup = {
+        schedule: "02:00 AM",
+        retention_days: 90,
+        format: "SQL Dump (compressed)",
+        enabled: true
+    };
+    await dbhelper.query(setConfigQuery, ["backup_settings", JSON.stringify(defaultBackup)]);
   } catch (err) {
     console.error("❌ Failed to initialize System Config table:", err.message);
   }

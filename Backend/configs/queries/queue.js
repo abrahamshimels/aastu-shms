@@ -21,12 +21,12 @@ const getActiveQueueQuery = `SELECT q.*, p.name as student_name, p.department as
                              LEFT JOIN doctors d ON q.doctor_id = d.id
                              WHERE q.status != 'Completed'
                              ORDER BY 
-                               CASE 
-                                 WHEN q.priority = 'Emergency' THEN 1
-                                 WHEN q.priority = 'Urgent' THEN 2
-                                 ELSE 3
-                               END, 
-                               q.created_at ASC;`;
+                                CASE 
+                                  WHEN q.priority = 'Emergency' THEN 1
+                                  WHEN q.priority = 'Urgent' THEN 2
+                                  ELSE 3
+                                END, 
+                                q.created_at ASC;`;
 
 const getDoctorQueueQuery = `SELECT q.*, p.name as student_name, p.department as student_dept, p.year as student_year 
                               FROM queue q 

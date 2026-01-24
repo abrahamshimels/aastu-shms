@@ -19,10 +19,16 @@ router.post("/login", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // 2. Check if account is active
+    if (user.is_active === false) {
+      console.log(`Deactivated user attempted login: ${id}`);
+      return res.status(403).json({ message: "Account is deactivated. Please contact the administrator." });
+    }
+
     console.log(`User found: ${user.name}, Role: ${user.role}`);
     console.log(`Has password_hash: ${!!user.password_hash}`);
 
-    // 2. Verify password
+    // 3. Verify password
     if (!password || !user.password_hash) {
       console.error("Missing password or hash for comparison");
       return res.status(401).json({ message: "Invalid credentials" });

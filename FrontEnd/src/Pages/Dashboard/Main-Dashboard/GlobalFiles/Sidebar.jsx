@@ -5,7 +5,7 @@ import { FaUsers } from "react-icons/fa";
 import { BsBookmarkPlus, BsFillBookmarkCheckFill } from "react-icons/bs";
 import { CgProfile } from "react-icons/cg";
 import { TbReportMedical } from "react-icons/tb";
-import { Link } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import { ImMenu } from "react-icons/im";
 import { FiLogOut } from "react-icons/fi";
 import { RiAdminLine } from "react-icons/ri";
@@ -44,7 +44,7 @@ const Sidebar = () => {
             </div>
           </div>
           <div className="bottomSection">
-            <Link className="link" activeclassname="active" to={"/dashboard"}>
+            <NavLink className="link" to={"/dashboard"}>
               <div className="icon">
                 <MdDashboard className="mainIcon" />
               </div>
@@ -54,12 +54,11 @@ const Sidebar = () => {
               >
                 DashBoard
               </div>
-            </Link>
+            </NavLink>
             {user?.userType === "patient" ? (
               <>
-                <Link
+                <NavLink
                   className="link"
-                  activeclassname="active"
                   to={"/patientprofile"}
                 >
                   <div className="icon">
@@ -71,10 +70,9 @@ const Sidebar = () => {
                   >
                     Profile
                   </div>
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   className="link"
-                  activeclassname="active"
                   to={"/bookappointment"}
                 >
                   <div className="icon">
@@ -86,14 +84,13 @@ const Sidebar = () => {
                   >
                     Book Appointment
                   </div>
-                </Link>
+                </NavLink>
               </>
             ) : null}
             {user?.userType === "admin" ? (
               <>
-                <Link
+                <NavLink
                   className="link"
-                  activeclassname="active"
                   to={"/addstaff"}
                 >
                   <div className="icon">
@@ -105,10 +102,9 @@ const Sidebar = () => {
                   >
                     Add Staff
                   </div>
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   className="link"
-                  activeclassname="active"
                   to={"/managestaff"}
                 >
                   <div className="icon">
@@ -122,10 +118,9 @@ const Sidebar = () => {
                   >
                     Manage Staff
                   </div>
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   className="link"
-                  activeclassname="active"
                   to={"/adminprofile"}
                 >
                   <div className="icon">
@@ -137,10 +132,9 @@ const Sidebar = () => {
                   >
                     Profile
                   </div>
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   className="link"
-                  activeclassname="active"
                   to={"/systemsetup"}
                 >
                   <div className="icon">
@@ -152,10 +146,9 @@ const Sidebar = () => {
                   >
                     System Settings
                   </div>
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   className="link"
-                  activeclassname="active"
                   to={"/auditlogs"}
                 >
                   <div className="icon">
@@ -167,10 +160,9 @@ const Sidebar = () => {
                   >
                     Audit Logs
                   </div>
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   className="link"
-                  activeclassname="active"
                   to={"/analytics"}
                 >
                   <div className="icon">
@@ -182,14 +174,13 @@ const Sidebar = () => {
                   >
                     Analytics & Reports
                   </div>
-                </Link>
+                </NavLink>
               </>
             ) : null}
             {user?.userType === "doctor" ? (
               <>
-                <Link
+                <NavLink
                   className="link"
-                  activeclassname="active"
                   to={"/doctorprofile"}
                 >
                   <div className="icon">
@@ -201,10 +192,9 @@ const Sidebar = () => {
                   >
                     Profile
                   </div>
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   className="link"
-                  activeclassname="active"
                   to={"/patientdetails"}
                 >
                   <div className="icon">
@@ -216,10 +206,9 @@ const Sidebar = () => {
                   >
                     Patients
                   </div>
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   className="link"
-                  activeclassname="active"
                   to={"/lab/history"}
                 >
                   <div className="icon">
@@ -231,14 +220,13 @@ const Sidebar = () => {
                   >
                     Lab History
                   </div>
-                </Link>
+                </NavLink>
               </>
             ) : null}
             {user?.userType === "lab_technologist" ? (
               <>
-                <Link
+                <NavLink
                   className="link"
-                  activeclassname="active"
                   to={"/lab/pending"}
                 >
                   <div className="icon">
@@ -250,10 +238,9 @@ const Sidebar = () => {
                   >
                     Pending Tests
                   </div>
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   className="link"
-                  activeclassname="active"
                   to={"/lab/history"}
                 >
                   <div className="icon">
@@ -265,14 +252,13 @@ const Sidebar = () => {
                   >
                     Lab History
                   </div>
-                </Link>
+                </NavLink>
               </>
             ) : null}
             {user?.userType === "nurse" ? (
               <>
-                <Link
+                <NavLink
                   className="link"
-                  activeclassname="active"
                   to={"/registration"}
                 >
                   <div className="icon">
@@ -284,10 +270,9 @@ const Sidebar = () => {
                   >
                     Registration
                   </div>
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   className="link"
-                  activeclassname="active"
                   to={"/queue"}
                 >
                   <div className="icon">
@@ -299,15 +284,14 @@ const Sidebar = () => {
                   >
                     Queue
                   </div>
-                </Link>
+                </NavLink>
               </>
             ) : null}
 
             {user?.userType !== "admin" && user?.userType !== "lab_technologist" ? (
               <>
-                <Link
+                <NavLink
                   className="link"
-                  activeclassname="active"
                   to={"/checkappointment"}
                 >
                   <div className="icon">
@@ -319,10 +303,9 @@ const Sidebar = () => {
                   >
                     My Appointments
                   </div>
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   className="link"
-                  activeclassname="active"
                   to={"/certificates"}
                 >
                   <div className="icon">
@@ -334,7 +317,7 @@ const Sidebar = () => {
                   >
                     Certificates
                   </div>
-                </Link>
+                </NavLink>
               </>
             ) : null}
 

@@ -10,24 +10,34 @@ const { Title, Paragraph, Text } = Typography;
 const { TabPane } = Tabs;
 
 const SystemConfig = () => {
+  const dispatch = useDispatch();
   const { data } = useSelector((store) => store.auth);
   const [form] = Form.useForm();
+  const [backupForm] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [backupUpdateLoading, setBackupUpdateLoading] = useState(false);
   const [backupLoading, setBackupLoading] = useState(false);
   const [lastBackup, setLastBackup] = useState(null);
 
   useEffect(() => {
     // Load initial certificate settings
-    GetSystemConfig("certificate_settings")(null).then(res => {
+    dispatch(GetSystemConfig("certificate_settings")).then(res => {
         if (res) {
             form.setFieldsValue(res);
         }
     });
-  }, []);
+
+    // Load initial backup settings
+    dispatch(GetSystemConfig("backup_settings")).then(res => {
+        if (res) {
+            backupForm.setFieldsValue(res);
+        }
+    });
+  }, [dispatch]);
 
   const onUpdateConfig = (values) => {
     setLoading(true);
-    UpdateSystemConfig({ key: "certificate_settings", value: values })(null).then(res => {
+    dispatch(UpdateSystemConfig({ key: "certificate_settings", value: values })).then(res => {
       if (res.message === "Configuration updated successfully") {
         message.success("Certificate settings updated!");
       } else {
@@ -37,9 +47,21 @@ const SystemConfig = () => {
     });
   };
 
+  const onUpdateBackupPolicy = (values) => {
+    setBackupUpdateLoading(true);
+    dispatch(UpdateSystemConfig({ key: "backup_settings", value: values })).then(res => {
+      if (res.message === "Configuration updated successfully") {
+        message.success("Backup policy updated!");
+      } else {
+        message.error("Failed to update backup policy");
+      }
+      setBackupUpdateLoading(false);
+    });
+  };
+
   const onTriggerBackup = () => {
     setBackupLoading(true);
-    TriggerBackup()(null).then(res => {
+    dispatch(TriggerBackup()).then(res => {
       if (res.message === "Backup initiated successfully") {
           message.success(res.message);
           setLastBackup(new Date().toLocaleString());
@@ -128,17 +150,39 @@ const SystemConfig = () => {
               <div style={{ padding: '24px 0' }}>
                 <Row gutter={24}>
                   <Col span={12}>
-                    <Title level={4}>System Backup Policy</Title>
+                    <Title level={4}>Configure Backup Policy</Title>
                     <Paragraph>
-                        To ensure data integrity, the system performs an automated backup of the PostgreSQL database daily.
+                        Define how often the system should secure clinical records and user data.
                     </Paragraph>
-                    <Card style={{ backgroundColor: '#fffbe6', border: '1px solid #ffe58f', borderRadius: '8px' }}>
-                        <ul style={{ paddingLeft: '20px', margin: 0 }}>
-                            <li><b>Schedule:</b> Every day at 02:00 AM</li>
-                            <li><b>Retention:</b> Last 90 days.</li>
-                            <li><b>Format:</b> SQL Dump (compressed)</li>
-                        </ul>
-                    </Card>
+                    
+                    <Form
+                        form={backupForm}
+                        layout="vertical"
+                        onFinish={onUpdateBackupPolicy}
+                        style={{ backgroundColor: '#fffbe6', padding: '20px', border: '1px solid #ffe58f', borderRadius: '8px' }}
+                    >
+                        <Form.Item label="Backup Schedule (Time)" name="schedule" required>
+                            <Input placeholder="e.g. 02:00 AM" />
+                        </Form.Item>
+                        
+                        <Form.Item label="Retention Period (Days)" name="retention_days" required>
+                            <Input type="number" placeholder="90" />
+                        </Form.Item>
+
+                        <Form.Item label="Backup Format" name="format">
+                            <Input disabled />
+                        </Form.Item>
+
+                        <Button 
+                            type="dashed" 
+                            htmlType="submit" 
+                            loading={backupUpdateLoading}
+                            style={{ width: '100%', marginBottom: '10px' }}
+                        >
+                            Update Policy
+                        </Button>
+                    </Form>
+
                     <Divider />
                     <Space direction="vertical" size="large" style={{ width: '100%' }}>
                         <Button 
@@ -149,7 +193,7 @@ const SystemConfig = () => {
                             onClick={onTriggerBackup}
                             style={{ height: '50px', borderRadius: '8px', backgroundColor: '#52c41a', borderColor: '#52c41a' }}
                         >
-                            Trigger Manual Backup
+                            Trigger Manual Backup Now
                         </Button>
                         <Text type="secondary">Manual backup logs are recorded in the audit logs for compliance.</Text>
                     </Space>

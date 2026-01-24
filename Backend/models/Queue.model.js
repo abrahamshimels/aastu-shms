@@ -1,9 +1,16 @@
 const dbhelper = require("../configs/dbhelper");
-const { createQueueTable, getPublicQueueQuery, addToQueueQuery } = require("../configs/queries/queue");
+const { 
+  createTableQuery, 
+  addToQueueQuery, 
+  assignDoctorQuery, 
+  getActiveQueueQuery, 
+  getDoctorQueueQuery, 
+  completeQueueItemQuery 
+} = require("../configs/queries/queue");
 
 const initialize = async () => {
   try {
-    await dbhelper.query(createQueueTable);
+    await dbhelper.query(createTableQuery);
     console.log("✅ Queue table initialized successfully.");
   } catch (err) {
     console.error("❌ Failed to initialize Queue table:", err.message);
@@ -11,40 +18,21 @@ const initialize = async () => {
 };
 
 const getPublicQueue = async () => {
-  return await dbhelper.query(getPublicQueueQuery);
+  // Use getActiveQueueQuery for public queue display
+  return await dbhelper.query(getActiveQueueQuery);
 };
 
-const addToQueue = async (patientData) => {
-  const { patient_name, department, status, wait_time } = patientData;
-  return await dbhelper.query(addToQueueQuery, [
-    patient_name,
-    department,
-    status || 'Waiting',
-    wait_time || '10-20 mins'
-  ]);
+const addToQueue = async (student_id, chief_complaint, priority) => {
+  // This supports both positional arguments and object arguments if needed
+  if (typeof student_id === 'object') {
+    const { student_id: sid, chief_complaint: cc, priority: p } = student_id;
+    return await dbhelper.query(addToQueueQuery, [sid, cc, p]);
+  }
+  return await dbhelper.query(addToQueueQuery, [student_id, chief_complaint, priority]);
 };
-
-module.exports = {
-  initialize,
-  getPublicQueue,
-  addToQueue
-const {
-  createTableQuery,
-  addToQueueQuery,
-  assignDoctorQuery,
-  getActiveQueueQuery,
-  getDoctorQueueQuery,
-  completeQueueItemQuery,
-} = require("../configs/queries/queue");
 
 const createTable = () => {
   return dbhelper.query(createTableQuery, []).then((result) => {
-    return result;
-  });
-};
-
-const addToQueue = (student_id, chief_complaint, priority) => {
-  return dbhelper.query(addToQueueQuery, [student_id, chief_complaint, priority]).then((result) => {
     return result;
   });
 };
@@ -74,8 +62,10 @@ const completeQueueItem = (id) => {
 };
 
 module.exports = {
-  createTable,
+  initialize,
+  getPublicQueue,
   addToQueue,
+  createTable,
   assignDoctor,
   getActiveQueue,
   getDoctorQueue,

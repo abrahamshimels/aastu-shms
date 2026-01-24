@@ -15,9 +15,26 @@ const getRoleDistributionQuery = `
 const getWorkloadQuery = `
     SELECT 
         id, name, role,
-        (SELECT COUNT(*) FROM reports WHERE doctor_id = staff.id) as total_reports
+        CASE 
+            WHEN role = 'DOCTOR' THEN (SELECT COUNT(*) FROM reports WHERE doctor_id = staff.id)
+            WHEN role = 'NURSE' THEN (SELECT COUNT(*) FROM audit_logs WHERE user_id = staff.id AND action = 'CREATE_PATIENT')
+            WHEN role = 'LAB_TECH' THEN (SELECT COUNT(*) FROM lab_records WHERE technologist_id = (SELECT id FROM laboratory_technologists WHERE email = staff.email LIMIT 1))
+            ELSE 0
+        END as total_reports,
+        (SELECT COUNT(*) FROM reports) as grand_total
     FROM staff
     WHERE role IN ('DOCTOR', 'NURSE', 'LAB_TECH');
+`;
+
+const getWeeklyActivityQuery = `
+    SELECT 
+        TO_CHAR(created_at, 'Dy') as day_name,
+        COUNT(*) as count,
+        EXTRACT(DOW FROM created_at) as dow
+    FROM queue
+    WHERE created_at::date >= CURRENT_DATE - INTERVAL '7 days'
+    GROUP BY day_name, dow
+    ORDER BY dow ASC;
 `;
 
 const getOverviewCountsQuery = `
@@ -25,10 +42,24 @@ const getOverviewCountsQuery = `
         (SELECT COUNT(*) FROM patients) as patient,
         (SELECT COUNT(*) FROM staff WHERE role = 'DOCTOR') as doctor,
         (SELECT COUNT(*) FROM staff WHERE role = 'ADMIN') as admin,
-        (SELECT COUNT(*) FROM queue) as appointment,
-        (SELECT COUNT(*) FROM reports) as report,
-        (SELECT 5) as ambulance
+        (SELECT COUNT(*) FROM staff WHERE role = 'LAB_TECH') as lab_tech
     ;
+`;
+
+const getOperationalLogQuery = `
+    (SELECT r.date::text as timestamp, s.name as staff_name, s.role, 'Consultation' as action, r.patient_id as target
+     FROM reports r JOIN staff s ON r.doctor_id = s.id)
+    UNION ALL
+    (SELECT al.timestamp::text, s.name as staff_name, s.role, 'Registration' as action, al.target_id as target
+     FROM audit_logs al JOIN staff s ON al.user_id = s.id WHERE al.action = 'CREATE_PATIENT')
+    UNION ALL
+    (SELECT lr.submission_date::text, s.name as staff_name, s.role, 'Lab Test' as action, p.studentid as target
+     FROM lab_records lr 
+     JOIN laboratory_technologists lt ON lr.technologist_id = lt.id 
+     JOIN staff s ON lt.email = s.email
+     JOIN lab_test_requests lreq ON lr.request_id = lreq.id
+     JOIN patients p ON lreq.patient_id = p.id)
+    ORDER BY timestamp DESC LIMIT 100;
 `;
 
 module.exports = {
@@ -36,4 +67,6 @@ module.exports = {
   getRoleDistributionQuery,
   getWorkloadQuery,
   getOverviewCountsQuery,
+  getWeeklyActivityQuery,
+  getOperationalLogQuery,
 };

@@ -15,6 +15,7 @@ const ManageStaff = () => {
   const [currentStaff, setCurrentStaff] = useState(null);
   const [workloadData, setWorkloadData] = useState(null);
   const [newPassword, setNewPassword] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchStaff = () => {
     setLoading(true);
@@ -57,6 +58,12 @@ const ManageStaff = () => {
         setNewPassword("");
     });
   };
+
+  const filteredStaff = staffList?.filter(staff => 
+    staff.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    staff.id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    staff.email?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   if (data?.isAuthenticated === false) return <Navigate to={"/"} />;
   if (data?.user?.userType !== "admin") return <Navigate to={"/dashboard"} />;
@@ -127,9 +134,18 @@ const ManageStaff = () => {
             🏥 Staff Management & Performance
         </h1>
         
+        <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'flex-end' }}>
+          <Input.Search
+            placeholder="Search by Name, ID, or Email..."
+            style={{ width: 400 }}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            allowClear
+          />
+        </div>
+        
         <Table 
             columns={columns} 
-            dataSource={staffList} 
+            dataSource={filteredStaff} 
             rowKey="id" 
             loading={loading}
             pagination={{ pageSize: 8 }}

@@ -10,10 +10,6 @@ export const CreateReport = (data) => async (dispatch) => {
     const res = await axios.post("http://localhost:3007/reports", data, {
       headers: { Authorization: localStorage.getItem("token") },
     });
-    const res = await axios.post(
-      "http://localhost:3007/reports/create",
-      data,
-    );
     console.log(res);
     return res.data;
   } catch (error) {
@@ -33,7 +29,6 @@ export const GetDoctorDetails = () => async (dispatch) => {
     const res = await axios.get("http://localhost:3007/admin/staff", {
       headers: { Authorization: localStorage.getItem("token") },
     });
-    const res = await axios.get("http://localhost:3007/doctors");
     console.log("this", res);
     const doctors = { doctors: res.data };
     dispatch({
@@ -56,7 +51,6 @@ export const GetAdminDetails = () => async (dispatch) => {
     const res = await axios.get("http://localhost:3007/admin/staff", {
       headers: { Authorization: localStorage.getItem("token") },
     });
-    const res = await axios.get("http://localhost:3007/admin");
     console.log(res.data);
     const admins = { admins: res.data };
     dispatch({
@@ -134,8 +128,6 @@ export const GetAllData = () => async (dispatch) => {
     const res = await axios.get("http://localhost:3007/admin/dashboard", {
       headers: { Authorization: localStorage.getItem("token") },
     });
-    console.log("DASHBOARD DATA:", res.data);
-    const res = await axios.get(`http://localhost:3007/hospitals`);
     console.log(res.data);
     dispatch({
       type: types.GET_ALLDATA_SUCCESS,
