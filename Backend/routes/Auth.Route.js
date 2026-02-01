@@ -42,7 +42,9 @@ router.post("/login", async (req, res) => {
 
     // 3. Generate JWT Token
     // Frontend expects 'userType' and it should be lowercase (admin, doctor, etc)
-    const userType = user.role.toLowerCase();
+    let userType = user.role.toLowerCase();
+    if (userType === "lab_tech") userType = "lab_technologist";
+    
     const token = jwt.sign(
       { id: user.id, role: user.role, userType: userType, name: user.name },
       process.env.KEY,

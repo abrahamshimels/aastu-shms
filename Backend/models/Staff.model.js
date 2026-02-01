@@ -1,4 +1,5 @@
 const dbhelper = require("../configs/dbhelper");
+const bcrypt = require("bcrypt");
 const {
   createStaffTable,
   addStaffQuery,
@@ -22,6 +23,27 @@ const initialize = async () => {
     await PatientsModel.init();
     await NursesModel.init();
     await LabTechModel.createTables();
+
+    // Seed default admin if it doesn't exist
+    const adminExists = await findById("ADM-001");
+    if (!adminExists) {
+      console.log("Seeding default admin...");
+      const hashedPassword = await bcrypt.hash("12345678", 10);
+      await dbhelper.query(addStaffQuery, [
+        "ADM-001",
+        "System Admin",
+        "admin@aastu.edu.et",
+        hashedPassword,
+        "ADMIN",
+        "System Administrator",
+        "0900000000",
+        new Date().toISOString().split("T")[0],
+        "M",
+        30,
+        "AASTU Campus"
+      ]);
+      console.log("✅ Default Admin (ADM-001) created successfully.");
+    }
   } catch (err) {
     console.error("❌ Failed to initialize database tables:", err.message);
   }
