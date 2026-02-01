@@ -38,6 +38,7 @@ const { initialize: initializeAuditLogsTable } = require("./models/AuditLog.mode
 const { initialize: initializeConfigTable } = require("./models/Config.model");
 const { initialize: initializeQueueTable } = require("./models/Queue.model");
 const { initialize: initializeReportsTable } = require("./models/Report.model");
+const { initialize: initializeCertificateTable } = require("./models/Certificate.model");
 // app.use("/ambulances", ambulanceRouter);
 app.use("/appointments", appointmentRouter);
 app.use("/doctors", doctorRouter);
@@ -74,6 +75,18 @@ app.listen(process.env.PORT || 3007, async () => {
     await initializeConfigTable();
     await initializeQueueTable();
     await initializeReportsTable();
+    await initializeCertificateTable();
+    
+    // Schema cleanup: Ensure optional fields are nullable
+    try {
+        await db.query("ALTER TABLE patients ALTER COLUMN DOB DROP NOT NULL");
+        await db.query("ALTER TABLE patients ALTER COLUMN bloodGroup DROP NOT NULL");
+        await db.query("ALTER TABLE patients ALTER COLUMN allergies DROP NOT NULL");
+        console.log("✅ Schema constraints updated successfully");
+    } catch (e) {
+        console.log("Note: Schema constraints update skipped or already applied");
+    }
+
     console.log("SHMS tables initialized successfully");
     // Initialize tables
     // await createAdminTables();

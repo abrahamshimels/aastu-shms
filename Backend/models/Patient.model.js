@@ -74,9 +74,9 @@ const addPatient = (patient) => {
     patient.password,
     patient.age,
     patient.gender,
-    patient.bloodGroup,
-    patient.allergies,
-    patient.DOB,
+    patient.bloodGroup || 'O+',
+    patient.allergies || 'None',
+    patient.DOB || new Date().toISOString().split('T')[0],
     patient.address
   ];
   console.log(array);

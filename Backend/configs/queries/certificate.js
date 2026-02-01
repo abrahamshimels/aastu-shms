@@ -1,3 +1,15 @@
+const createCertificatesTableQuery = `
+  CREATE TABLE IF NOT EXISTS certificates (
+    id SERIAL PRIMARY KEY,
+    student_id INTEGER NOT NULL,
+    doctor_id INTEGER NOT NULL,
+    type VARCHAR(100) NOT NULL,
+    issue_date DATE NOT NULL,
+    content TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+`;
+
 const createCertificateQuery = `
   INSERT INTO certificates (student_id, doctor_id, type, issue_date, content)
   VALUES ($1, $2, $3, $4, $5)
@@ -29,6 +41,7 @@ const getCertificatesForDoctorQuery = `
 `;
 
 module.exports = {
+  createCertificatesTableQuery,
   createCertificateQuery,
   getCertificatesForNurseQuery,
   getCertificatesForStudentQuery,

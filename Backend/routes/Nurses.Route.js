@@ -51,11 +51,11 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// Student Registration
-router.post("/register-student", async (req, res) => {
+// Student/Patient Registration
+router.post("/register-patient", async (req, res) => {
   try {
     const existing = await findByStudentID(req.body.studentID);
-    if (existing.length > 0) {
+    if (existing && existing.length > 0) {
       return res.send({ message: "Student already registered" });
     }
     // Set a default password for students if not provided
@@ -70,7 +70,7 @@ router.post("/register-student", async (req, res) => {
   }
 });
 
-router.get("/student", async (req, res) => {
+router.get("/patient", async (req, res) => {
   try {
     const { studentID } = req.query;
     console.log("Searching for studentID:", studentID);
@@ -87,7 +87,7 @@ router.get("/student", async (req, res) => {
 });
 
 // Update Phone Number
-router.patch("/student/phone", async (req, res) => {
+router.patch("/patient/phone", async (req, res) => {
   try {
     const { studentID, phoneNum } = req.body;
     await updatePhone(phoneNum, studentID);

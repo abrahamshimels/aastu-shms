@@ -1,10 +1,20 @@
 const dbhelper = require("../configs/dbhelper");
 const {
+  createCertificatesTableQuery,
   createCertificateQuery,
   getCertificatesForNurseQuery,
   getCertificatesForStudentQuery,
   getCertificatesForDoctorQuery,
 } = require("../configs/queries/certificate");
+
+const initialize = async () => {
+  try {
+    await dbhelper.query(createCertificatesTableQuery);
+    console.log("✅ Certificates table initialized successfully.");
+  } catch (err) {
+    console.error("❌ Failed to initialize Certificates table:", err.message);
+  }
+};
 
 const createCertificate = (data) => {
   const { student_id, doctor_id, type, issue_date, content } = data;
@@ -38,6 +48,7 @@ const getCertificatesForDoctor = (doctor_id) => {
 };
 
 module.exports = {
+  initialize,
   createCertificate,
   getCertificatesForNurse,
   getCertificatesForStudent,
