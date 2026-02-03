@@ -17,7 +17,7 @@ const createCertificateQuery = `
 `;
 
 const getCertificatesForNurseQuery = `
-  SELECT c.*, p.name as student_name, p.studentid as student_display_id, d.name as doctor_name, p.department, p.year
+  SELECT c.*, p.name as patient_name, p.studentid as student_display_id, d.name as doctor_name, p.department, p.year
   FROM certificates c
   JOIN patients p ON c.student_id = p.id
   JOIN doctors d ON c.doctor_id = d.id

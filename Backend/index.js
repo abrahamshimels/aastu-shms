@@ -56,7 +56,7 @@ app.use("/lab", labRouter);
 const { createTables: createDoctorTables } = require("./models/Doctor.model");
 const { createTable: createPatientTable } = require("./models/Patient.model");
 // const { createTable: createAmbulanceTable } = require("./models/Ambulance.model");
-const { createTables: createNurseTables } = require("./models/Nurse.model");
+const { createTables: createNurseTables } = require("./models/Nurses.model");
 const { createTable: createQueueTable } = require("./models/Queue.model");
 const { createTables: createLabTechTables } = require("./models/LabTechnologist.model");
 const { createTables: createLabTables } = require("./models/Lab.model");

@@ -4,8 +4,11 @@ const {
   addToQueueQuery, 
   assignDoctorQuery, 
   getActiveQueueQuery, 
-  getDoctorQueueQuery, 
-  completeQueueItemQuery 
+  getDoctorQueueQuery,
+  completeQueueItemQuery,
+  deleteQueueItemQuery,
+  updateQueueItemQuery,
+  checkActiveInQueueQuery
 } = require("../configs/queries/queue");
 
 const initialize = async () => {
@@ -22,14 +25,7 @@ const getPublicQueue = async () => {
   return await dbhelper.query(getActiveQueueQuery);
 };
 
-const addToQueue = async (student_id, chief_complaint, priority) => {
-  // This supports both positional arguments and object arguments if needed
-  if (typeof student_id === 'object') {
-    const { student_id: sid, chief_complaint: cc, priority: p } = student_id;
-    return await dbhelper.query(addToQueueQuery, [sid, cc, p]);
-  }
-  return await dbhelper.query(addToQueueQuery, [student_id, chief_complaint, priority]);
-};
+
 
 const createTable = () => {
   return dbhelper.query(createTableQuery, []).then((result) => {
@@ -49,6 +45,13 @@ const getActiveQueue = () => {
   });
 };
 
+const addToQueue = (student_id, chief_complaint, priority, doctor_id = null) => {
+  const status = doctor_id ? 'Assigned' : 'Checked-In';
+  return dbhelper.query(addToQueueQuery, [student_id, chief_complaint, priority, doctor_id, status]).then((result) => {
+    return result;
+  });
+};
+
 const getDoctorQueue = (doctor_id) => {
   return dbhelper.query(getDoctorQueueQuery, [doctor_id]).then((result) => {
     return result;
@@ -57,6 +60,24 @@ const getDoctorQueue = (doctor_id) => {
 
 const completeQueueItem = (id) => {
   return dbhelper.query(completeQueueItemQuery, [id]).then((result) => {
+    return result;
+  });
+};
+
+const deleteQueueItem = (id) => {
+  return dbhelper.query(deleteQueueItemQuery, [id]).then((result) => {
+    return result;
+  });
+};
+
+const updateQueueItem = (id, chief_complaint, priority) => {
+  return dbhelper.query(updateQueueItemQuery, [chief_complaint, priority, id]).then((result) => {
+    return result;
+  });
+};
+
+const checkActiveInQueue = (student_id) => {
+  return dbhelper.query(checkActiveInQueueQuery, [student_id]).then((result) => {
     return result;
   });
 };
@@ -70,4 +91,7 @@ module.exports = {
   getActiveQueue,
   getDoctorQueue,
   completeQueueItem,
+  deleteQueueItem,
+  updateQueueItem,
+  checkActiveInQueue,
 };

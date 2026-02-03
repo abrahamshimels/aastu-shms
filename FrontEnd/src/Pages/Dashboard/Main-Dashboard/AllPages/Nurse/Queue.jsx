@@ -3,12 +3,14 @@ import { ToastContainer, toast } from "react-toastify";
 import Sidebar from "../../GlobalFiles/Sidebar";
 import axios from "axios";
 import "./CSS/Queue.css";
+import { FaUserMd, FaTrash, FaEdit } from "react-icons/fa";
 
 const Queue = () => {
   const [queue, setQueue] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showCheckIn, setShowCheckIn] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
   const [draggingItem, setDraggingItem] = useState(null);
   const [checkInData, setCheckInData] = useState({
     studentID: "",
@@ -47,25 +49,60 @@ const Queue = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const patientRes = await axios.get(`http://localhost:3007/nurses/patient?studentID=${encodeURIComponent(checkInData.studentID.trim())}`);
-      const patient = patientRes.data;
+      if (editingItem) {
+        // Update existing queue item
+        await axios.patch(`http://localhost:3007/nurses/queue/${editingItem.id}`, {
+          chief_complaint: checkInData.chief_complaint,
+          priority: checkInData.priority,
+        });
+        notify("Queue updated successfully");
+      } else {
+        // Create new check-in
+        const patientRes = await axios.get(`http://localhost:3007/nurses/patient?studentID=${encodeURIComponent(checkInData.studentID.trim())}`);
+        const patient = patientRes.data;
 
-      const res = await axios.post("http://localhost:3007/nurses/check-in", {
-        student_id: patient.id,
-        chief_complaint: checkInData.chief_complaint,
-        priority: checkInData.priority,
-      });
+        const res = await axios.post("http://localhost:3007/nurses/check-in", {
+          student_id: patient.id,
+          chief_complaint: checkInData.chief_complaint,
+          priority: checkInData.priority,
+        });
 
-      if (res.data.message === "Checked-in") {
-        notify("Patient added to queue");
-        fetchQueue();
-        setShowCheckIn(false);
-        setCheckInData({ studentID: "", chief_complaint: "", priority: "Normal" });
+        if (res.data.message === "Checked-in") {
+          notify("Patient added to queue");
+        }
       }
+      
+      fetchQueue();
+      setShowCheckIn(false);
+      setEditingItem(null);
+      setCheckInData({ studentID: "", chief_complaint: "", priority: "Normal" });
     } catch (error) {
-      notify("Error: Patient not found or system error");
+      const errorMsg = error.response?.data?.message || (editingItem ? "Error updating queue" : "Error: Patient not found or system error");
+      notify(errorMsg);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEdit = (item) => {
+    setEditingItem(item);
+    setCheckInData({
+      studentID: item.studentid,
+      chief_complaint: item.chief_complaint,
+      priority: item.priority || "Normal",
+    });
+    setShowCheckIn(true);
+  };
+
+  const handleRemove = async (queueId) => {
+    if(window.confirm("Remove this patient from the queue completely?")) {
+      try {
+        await axios.delete(`http://localhost:3007/nurses/queue/${queueId}`);
+        notify("Patient removed from queue");
+        fetchQueue();
+      } catch (error) {
+        notify("Error removing patient");
+      }
     }
   };
 
@@ -82,6 +119,14 @@ const Queue = () => {
   const onDrop = async (e, doctorId) => {
     e.preventDefault();
     const queueId = e.dataTransfer.getData("queueId");
+    
+    // Check if already assigned
+    const item = queue.find(q => q.id.toString() === queueId);
+    if (item && item.doctor_id) {
+       notify("⚠️ Patient already assigned! Remove manually if needed.");
+       return;
+    }
+
     try {
       await axios.patch("http://localhost:3007/nurses/assign-doctor", {
         queue_id: queueId,
@@ -120,10 +165,18 @@ const Queue = () => {
                 >
                   <div className="card-header">
                     <span className="student-name">{item.patient_name}</span>
-                    <span className={`priority-badge ${item.priority.toLowerCase()}`}>{item.priority}</span>
+                    <div className="card-actions">
+                      <button className="edit-btn" onClick={() => handleEdit(item)} title="Edit">
+                          <FaEdit />
+                      </button>
+                      <button className="remove-btn" onClick={() => handleRemove(item.id)} title="Remove">
+                          <FaTrash />
+                      </button>
+                    </div>
                   </div>
                   <div className="card-body">
-                    <p><strong>ID:</strong> {item.studentid}</p>
+                    <span className={`priority-badge ${item.priority.toLowerCase()}`}>{item.priority}</span>
+                    <p style={{marginTop:'5px'}}><strong>ID:</strong> {item.studentid}</p>
                     <p><strong>Complaint:</strong> {item.chief_complaint}</p>
                     <p className="card-meta">{item.patient_dept} | Year {item.patient_year}</p>
                   </div>
@@ -132,19 +185,19 @@ const Queue = () => {
             </div>
 
             {/* In-Consultation / Assigned Section */}
-            <h3 style={{marginTop: '30px'}}>In-Consultation (Re-assign by dragging)</h3>
+            <h3 style={{marginTop: '30px'}}>In-Consultation</h3>
             <div className="queue-list">
                {queue.filter(q => q.status === 'Assigned').length === 0 && <p className="empty-msg">No patients in consultation</p>}
                {queue.filter(q => q.status === 'Assigned').map((item) => (
                 <div 
                   key={item.id} 
                   className="queue-card assigned"
-                  draggable
-                  onDragStart={(e) => onDragStart(e, item)}
                 >
                   <div className="card-header">
                     <span className="student-name">{item.patient_name}</span>
-                    <span className="status-badge assigned">Assigned</span>
+                    <button className="remove-btn" onClick={() => handleRemove(item.id)} title="Remove">
+                        <FaTrash />
+                    </button>
                   </div>
                   <div className="card-body">
                     <p><strong>Doctor:</strong> {item.doctor_name}</p>
@@ -166,7 +219,7 @@ const Queue = () => {
                   onDragOver={onDragOver}
                   onDrop={(e) => onDrop(e, doc.id)}
                 >
-                  <div className="doc-icon">👨‍⚕️</div>
+                  <div className="doc-icon"><FaUserMd size={28} color="#1677ff"/></div>
                   <div className="doc-info">
                     <h4>{doc.name}</h4>
                     <p>{doc.department}</p>
@@ -180,7 +233,7 @@ const Queue = () => {
         {showCheckIn && (
           <div className="modal-overlay">
             <div className="modal-content-new">
-              <h2>Patient Check-In</h2>
+              <h2>{editingItem ? "Edit Queue Item" : "Patient Check-In"}</h2>
               <form onSubmit={handleCheckIn}>
                 <div className="input-group">
                   <label>AASTU Student ID</label>
@@ -188,6 +241,7 @@ const Queue = () => {
                     placeholder="e.g. ETS0217/15" 
                     value={checkInData.studentID}
                     onChange={(e) => setCheckInData({...checkInData, studentID: e.target.value})}
+                    disabled={!!editingItem}
                     required 
                   />
                 </div>
@@ -222,9 +276,9 @@ const Queue = () => {
                 </div>
                 <div className="modal-actions">
                   <button type="submit" className="submit-btn" disabled={loading}>
-                    {loading ? "Checking In..." : "Check-In Patient"}
+                    {loading ? "Processing..." : (editingItem ? "Update Item" : "Check-In Patient")}
                   </button>
-                  <button type="button" className="cancel-btn" onClick={() => setShowCheckIn(false)}>Cancel</button>
+                  <button type="button" className="cancel-btn" onClick={() => { setShowCheckIn(false); setEditingItem(null); setCheckInData({studentID:"", chief_complaint:"", priority:"Normal"}); }}>Cancel</button>
                 </div>
               </form>
             </div>

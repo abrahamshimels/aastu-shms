@@ -273,7 +273,7 @@ const Sidebar = () => {
                 </NavLink>
                 <NavLink
                   className="link"
-                  to={"/queue"}
+                  to={"/queuemanagement"}
                 >
                   <div className="icon">
                     <FaUsers className="mainIcon" />
@@ -282,13 +282,41 @@ const Sidebar = () => {
                     style={{ display: isOpen ? "block" : "none" }}
                     className="link_text"
                   >
-                    Queue
+                    Queue Management
+                  </div>
+                </NavLink>
+                <NavLink
+                  className="link"
+                  to={"/appointments"}
+                >
+                  <div className="icon">
+                    <BsBookmarkPlus className="mainIcon" />
+                  </div>
+                  <div
+                    style={{ display: isOpen ? "block" : "none" }}
+                    className="link_text"
+                  >
+                    Appointments
+                  </div>
+                </NavLink>
+                <NavLink
+                  className="link"
+                  to={"/certificates"}
+                >
+                  <div className="icon">
+                    <TbReportMedical className="mainIcon" />
+                  </div>
+                  <div
+                    style={{ display: isOpen ? "block" : "none" }}
+                    className="link_text"
+                  >
+                    Certificates
                   </div>
                 </NavLink>
               </>
             ) : null}
 
-            {user?.userType !== "admin" && user?.userType !== "lab_technologist" ? (
+            {user?.userType !== "admin" && user?.userType !== "lab_technologist" && user?.userType !== "nurse" ? (
               <>
                 <NavLink
                   className="link"

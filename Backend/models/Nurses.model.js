@@ -50,4 +50,49 @@ const NursesModel = {
   }
 };
 
-module.exports = NursesModel;
+// Compatibility wrappers for old Nurse.model.js API
+const createTables = async () => {
+  return await NursesModel.init();
+};
+
+const findCred = async (id) => {
+  // This function needs to find nurse by ID and return credentials
+  // Since we don't have a findById query, we'll need to add it
+  const query = 'SELECT id, password, email FROM nurses WHERE id = $1';
+  const result = await dbhelper.query(query, [id]);
+  return result;
+};
+
+const addNurse = async (nurse) => {
+  return await NursesModel.addNurse(nurse);
+};
+
+const findIfExists = async (email) => {
+  const result = await NursesModel.findByEmail(email);
+  return result ? [result] : [];
+};
+
+const getNurseCredsFromEmail = async (email) => {
+  const result = await NursesModel.findByEmail(email);
+  return result ? [result] : [];
+};
+
+const getAllNurses = async () => {
+  return await NursesModel.getAll();
+};
+
+const updatePass = async (password, id) => {
+  const query = 'UPDATE nurses SET password = $1 WHERE id = $2';
+  return await dbhelper.query(query, [password, id]);
+};
+
+module.exports = {
+  ...NursesModel,
+  createTables,
+  findCred,
+  addNurse,
+  findIfExists,
+  getNurseCredsFromEmail,
+  getAllNurses,
+  updatePass
+};

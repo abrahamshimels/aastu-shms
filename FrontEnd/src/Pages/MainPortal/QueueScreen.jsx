@@ -1,7 +1,7 @@
 import React from "react";
 import { Table, Tag, Button } from "antd";
 import { useNavigate } from "react-router-dom";
-import { FaArrowLeft, FaClock } from "react-icons/fa";
+import { FaArrowLeft, FaClock, FaUserMd } from "react-icons/fa";
 import "./QueueScreen.css";
 
 const QueueScreen = () => {
@@ -23,48 +23,77 @@ const QueueScreen = () => {
     };
 
     fetchQueue();
-    // Refresh every 30 seconds
-    const interval = setInterval(fetchQueue, 30000);
+    // Refresh every 5 seconds for live feel
+    const interval = setInterval(fetchQueue, 5000);
     return () => clearInterval(interval);
   }, []);
 
   const columns = [
     {
       title: "Queue #",
-      dataIndex: "number",
-      key: "number",
+      dataIndex: "id",
+      key: "id",
       render: (text) => <span className="queue-number">#{text}</span>,
     },
     {
       title: "Patient Name",
-      dataIndex: "patientName",
-      key: "patientName",
+      dataIndex: "patient_name",
+      key: "patient_name",
       render: (text) => <strong>{text}</strong>,
     },
     {
       title: "Department",
-      dataIndex: "department",
-      key: "department",
+      dataIndex: "patient_dept",
+      key: "patient_dept",
+    },
+    {
+      title: "Priority",
+      dataIndex: "priority",
+      key: "priority",
+      render: (priority) => {
+        let color = "green";
+        if (priority === "Urgent") color = "gold";
+        if (priority === "Emergency") color = "red";
+        return (
+          <Tag color={color} className="priority-tag">
+            {priority.toUpperCase()}
+          </Tag>
+        );
+      },
+    },
+    {
+      title: "Assigned Doctor",
+      dataIndex: "doctor_name",
+      key: "doctor_name",
+      render: (text) => (
+        <span className="doctor-info">
+          {text ? (
+            <>
+              <FaUserMd style={{ marginRight: "5px", color: "#1677ff" }} /> {text}
+            </>
+          ) : (
+            <span style={{ color: "#999", fontStyle: "italic" }}>Waiting for assignment...</span>
+          )}
+        </span>
+      ),
     },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status) => (
-        <Tag color={status === "In Consultation" ? "green" : "blue"} className="status-tag">
-          {status.toUpperCase()}
-        </Tag>
-      ),
-    },
-    {
-      title: "Est. Wait",
-      dataIndex: "waitTime",
-      key: "waitTime",
-      render: (text) => (
-        <span className="wait-time">
-          <FaClock style={{ marginRight: "5px" }} /> {text}
-        </span>
-      ),
+      render: (status) => {
+        let color = "blue";
+        let label = status;
+        if (status === "Assigned") {
+          color = "green";
+          label = "IN CONSULTATION";
+        }
+        return (
+          <Tag color={color} className="status-tag">
+            {label.toUpperCase()}
+          </Tag>
+        );
+      },
     },
   ];
 
@@ -82,8 +111,8 @@ const QueueScreen = () => {
 
       <div className="queue-content">
         <div className="queue-header">
-          <h1>Live Patient Queue</h1>
-          <p>Real-time status of current consultations</p>
+          <h1>AASTU SHMS - Live Patient Queue</h1>
+          <p>Real-time status of current consultations. Priority cases are handled first.</p>
         </div>
 
         <div className="queue-table-card">
@@ -97,12 +126,12 @@ const QueueScreen = () => {
           />
         </div>
 
-        <div className="queue-info">
+        <div className="queue-footer">
           <div className="info-item">
             <span className="dot online"></span> Live Updates Active
           </div>
           <div className="info-item">
-            Please wait for your number to be called.
+            Please wait in the lounge until your name is called.
           </div>
         </div>
       </div>

@@ -7,7 +7,7 @@ import "./CSS/Registration.css";
 const Registration = () => {
   const [searchID, setSearchID] = useState("");
   const [patient, setPatient] = useState(null);
-  const [isNew, setIsNew] = useState(false);
+  const [isNew, setIsNew] = useState(true);
   const [formData, setFormData] = useState({
     studentID: "",
     name: "",

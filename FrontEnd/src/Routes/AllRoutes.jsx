@@ -22,6 +22,7 @@ import QueueScreen from "../Pages/MainPortal/QueueScreen";
 import Registration from "../Pages/Dashboard/Main-Dashboard/AllPages/Nurse/Registration";
 import Queue from "../Pages/Dashboard/Main-Dashboard/AllPages/Nurse/Queue";
 import CertificatesPage from "../Pages/Dashboard/Main-Dashboard/AllPages/Nurse/CertificatesPage";
+import Appointments from "../Pages/Dashboard/Main-Dashboard/AllPages/Nurse/Appointments";
 
 import Pending_Tests from "../Pages/Dashboard/Main-Dashboard/AllPages/Laboratory/Pending_Tests";
 import Lab_History from "../Pages/Dashboard/Main-Dashboard/AllPages/Laboratory/Lab_History";
@@ -52,9 +53,10 @@ const AllRoutes = () => {
         <Route path="/patientprofile" element={<Patient_Profile />} />
         {/* ******************** Nurse Part ************************* */}
         <Route path="/registration" element={<Registration />} />
-        <Route path="/queue" element={<Queue />} />
+        <Route path="/queuemanagement" element={<Queue />} />
         <Route path="/certificates" element={<CertificatesPage />} />
-        ******************** Laboratory Part *************************
+        <Route path="/appointments" element={<Appointments />} />
+        {/* ******************** Laboratory Part ************************* */}
         <Route path="/lab/pending" element={<Pending_Tests />} />
         <Route path="/lab/history" element={<Lab_History />} />
       </Routes>

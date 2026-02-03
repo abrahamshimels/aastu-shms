@@ -33,16 +33,39 @@ const CertificatesPage = () => {
     );
   }
 
+  const [config, setConfig] = useState(null);
+
+  useEffect(() => {
+    // Fetch certificate template config
+    const fetchConfig = async () => {
+      try {
+        const response = await fetch("http://localhost:3007/nurses/config/certificate_settings");
+        const data = await response.json();
+        setConfig(data);
+      } catch (error) {
+        console.error("Error fetching certificate config:", error);
+      }
+    };
+    fetchConfig();
+  }, []);
+
   const handlePrint = (record) => {
     console.log("Printing record:", record);
+    
+    // Default fallback if no config
+    const templateName = config?.template || "Standard Medical Certificate";
+    const logoUrl = config?.logo_url || ""; 
+    const fields = config?.fields || ["student_id", "diagnosis", "rest_period"];
+
     const printWindow = window.open("", "_blank");
     printWindow.document.write(`
       <html>
         <head>
-          <title>Medical Certificate - ${record.student_name}</title>
+          <title>${templateName} - ${record.patient_name}</title>
           <style>
             body { font-family: 'Inter', sans-serif; padding: 40px; color: #333; line-height: 1.6; }
             .header { text-align: center; border-bottom: 2px solid #1a1a1a; padding-bottom: 20px; margin-bottom: 30px; }
+            .header img { max-height: 80px; margin-bottom: 10px; }
             .content { margin: 20px 0; }
             .footer { margin-top: 50px; text-align: right; }
             .stamp { border: 2px solid #d32f2f; color: #d32f2f; display: inline-block; padding: 5px 15px; transform: rotate(-10deg); font-weight: bold; margin-top: 20px; }
@@ -53,8 +76,9 @@ const CertificatesPage = () => {
         </head>
         <body>
           <div class="header">
+            ${logoUrl ? `<img src="${logoUrl}" alt="Logo" />` : ''}
             <h1>AASTU PATIENT HEALTH CENTER</h1>
-            <p>Official Medical Certificate</p>
+            <p>${templateName}</p>
           </div>
           <div class="content">
             <h2>${record.type}</h2>
@@ -64,6 +88,7 @@ const CertificatesPage = () => {
               <p><strong>Patient Name:</strong> ${record.patient_name}</p>
               <p><strong>Patient ID:</strong> ${record.patient_display_id || record.student_id}</p>
               <p><strong>Doctor:</strong> ${record.doctor_name}</p>
+              ${fields.includes("department") ? `<p><strong>Department:</strong> ${record.department || 'N/A'}</p>` : ''}
             </div>
             <div style="border: 1px dashed #ccc; padding: 20px; background: #fafafa;">
               <p><strong>Medical Justification:</strong></p>

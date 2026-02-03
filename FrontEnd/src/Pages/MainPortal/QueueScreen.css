@@ -1,123 +1,138 @@
 .queue-container {
   min-height: 100vh;
-  background-color: rgba(255, 243, 243, 0.874);
-  padding: 2rem;
-  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #f0f2f5 0%, #e6f7ff 100%);
+  padding: 40px;
+  font-family: 'Poppins', system-ui, -apple-system, sans-serif;
 }
 
 .queue-nav {
-  margin-bottom: 2rem;
+  margin-bottom: 30px;
 }
 
 .back-btn {
+  border-radius: 8px;
+  height: 40px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  border: none;
-  background: transparent;
   font-weight: 600;
+  border: none;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+  padding: 0 20px;
+  cursor: pointer;
   color: #666;
-  font-size: 1rem;
-  padding: 0;
 }
 
 .back-btn:hover {
-  color: #2196f3;
+  transform: translateX(-5px);
+  color: #1677ff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .queue-content {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
 .queue-header {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 50px;
 }
 
 .queue-header h1 {
-  font-size: 2.5rem;
-  color: #333;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
+  font-size: 3rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 10px;
+  letter-spacing: -1px;
 }
 
 .queue-header p {
-  color: #888;
-  font-size: 1.1rem;
-}
-
-.queue-table-card {
-  background-color: white;
-  border-radius: 15px;
-  padding: 1.5rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
-}
-
-.queue-number {
-  color: #2196f3;
-  font-weight: 700;
-  font-size: 1.1rem;
-}
-
-.status-tag {
-  border-radius: 15px;
-  padding: 2px 15px;
-  font-weight: 600;
-}
-
-.wait-time {
-  display: flex;
-  align-items: center;
+  font-size: 1.2rem;
   color: #666;
 }
 
-.queue-info {
-  margin-top: 2rem;
+.queue-table-card {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+  border: 1px solid rgba(255,255,255,0.8);
+}
+
+.custom-table .ant-table-thead > tr > th {
+  background: transparent;
+  font-weight: 700;
+  color: #1a1a1a;
+  border-bottom: 2px solid #f0f0f0;
+  font-size: 1.1rem;
+}
+
+.custom-table .ant-table-tbody > tr > td {
+  padding: 24px 16px;
+  font-size: 1.1rem;
+}
+
+.queue-number {
+  background: #f0f5ff;
+  color: #1677ff;
+  padding: 6px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.status-tag, .priority-tag {
+  border-radius: 8px;
+  padding: 4px 12px;
+  font-weight: 700;
+  border: none;
+}
+
+.doctor-info {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  color: #999;
-  font-size: 0.9rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.queue-footer {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  color: #666;
+  font-weight: 500;
 }
 
 .info-item {
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 1rem;
 }
 
 .dot {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
 }
 
-.online {
-  background-color: #4caf50;
-  box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+.dot.online {
+  background: #52c41a;
+  box-shadow: 0 0 10px rgba(82, 196, 26, 0.5);
   animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
-  0% { transform: scale(0.95); opacity: 0.7; }
-  70% { transform: scale(1.1); opacity: 1; }
-  100% { transform: scale(0.95); opacity: 0.7; }
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
-/* Custom Table Styling to match theme */
-.custom-table .ant-table-thead > tr > th {
-  background-color: #f8f9fa;
-  font-weight: 700;
-}
-
-.custom-table .ant-table-tbody > tr:hover > td {
-  background-color: #fafcfe !important;
-}
-
-@media only screen and (max-width: 768px) {
-  .queue-header h1 {
-    font-size: 1.8rem;
-  }
+@media (max-width: 768px) {
+  .queue-header h1 { font-size: 2.2rem; }
+  .queue-container { padding: 20px; }
+  .queue-footer { flex-direction: column; align-items: center; gap: 15px; }
 }

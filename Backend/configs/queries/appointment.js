@@ -40,8 +40,8 @@ const findByIDQuery = `SELECT * FROM appointments WHERE id = $1;`;
 const getAllAppointmentsQuery = `
   SELECT a.*, p.name as patient_name, d.name as doctor_name 
   FROM appointments a
-  JOIN patients p ON a.patientid = p.id
-  JOIN doctors d ON a.doctorid = d.id;
+  LEFT JOIN patients p ON a.patientid = p.id
+  LEFT JOIN doctors d ON a.doctorid = d.id;
 `;
 
 const deleteAppointmentQuery = `DELETE FROM appointments WHERE id = $1;`;
