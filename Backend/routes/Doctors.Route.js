@@ -6,6 +6,7 @@ const {
   findIfExists,
   addDoctor,
   updatePass,
+  updateDoctorById,
   addAvailableTimes,
 } = require("../models/Doctor.model");
 const { getDoctorQueue, completeQueueItem } = require("../models/Queue.model");
@@ -54,7 +55,12 @@ router.post("/login", async (req, res) => {
   const { docID, password } = req.body;
   try {
     const doctor = await findById(docID);
-    if (doctor && doctor.length > 0 && docID == doctor[0].id && password == doctor[0].password) {
+    if (
+      doctor &&
+      doctor.length > 0 &&
+      docID == doctor[0].id &&
+      password == doctor[0].password
+    ) {
       const token = jwt.sign({ doctorID: doctor[0].id }, process.env.KEY, {
         expiresIn: "24h",
       });
@@ -75,39 +81,112 @@ router.post("/login", async (req, res) => {
 router.post("/availability", async (req, res) => {
   console.log(req.body);
   const docId = req.body.id;
-  const startMorningTime = req.body.MAS;
-  const endMorningTime = req.body.MAE;
-  const startEveningTime = req.body.EAS;
-  const endEveningTime = req.body.EAE;
+  const startMorningTime = req.body.MAS?.trim() || null;
+  const endMorningTime = req.body.MAE?.trim() || null;
+  const startEveningTime = req.body.EAS?.trim() || null;
+  const endEveningTime = req.body.EAE?.trim() || null;
+
+  const isValidTime = (value) => /^\d{2}:\d{2}$/.test(value);
+  const toMinutes = (value) => {
+    if (!value || !isValidTime(value)) return null;
+    const [hours, minutes] = value.split(":").map(Number);
+    return hours * 60 + minutes;
+  };
+
+  const hasMorning = startMorningTime || endMorningTime;
+  const hasEvening = startEveningTime || endEveningTime;
+
+  if (!hasMorning && !hasEvening) {
+    return res.status(400).send({ message: "No availability provided" });
+  }
+
+  if (
+    (startMorningTime && !endMorningTime) ||
+    (!startMorningTime && endMorningTime)
+  ) {
+    return res
+      .status(400)
+      .send({ message: "Morning start and end time are required" });
+  }
+
+  if (
+    (startEveningTime && !endEveningTime) ||
+    (!startEveningTime && endEveningTime)
+  ) {
+    return res
+      .status(400)
+      .send({ message: "Evening start and end time are required" });
+  }
+
+  if (
+    startMorningTime &&
+    (!isValidTime(startMorningTime) || !isValidTime(endMorningTime))
+  ) {
+    return res.status(400).send({ message: "Invalid morning time format" });
+  }
+
+  if (
+    startEveningTime &&
+    (!isValidTime(startEveningTime) || !isValidTime(endEveningTime))
+  ) {
+    return res.status(400).send({ message: "Invalid evening time format" });
+  }
+
+  if (
+    startMorningTime &&
+    toMinutes(startMorningTime) > toMinutes(endMorningTime)
+  ) {
+    return res
+      .status(400)
+      .send({ message: "Morning end time must be after start" });
+  }
+
+  if (
+    startEveningTime &&
+    toMinutes(startEveningTime) > toMinutes(endEveningTime)
+  ) {
+    return res
+      .status(400)
+      .send({ message: "Evening end time must be after start" });
+  }
   try {
     const doctor = await findById(docId);
     if (doctor.length > 0) {
       const times = [];
       let currentTime = startMorningTime;
 
-      while (currentTime <= endMorningTime) {
-        times.push(currentTime);
-        const [hours, minutes] = currentTime.split(":");
-        const totalMinutes = parseInt(hours) * 60 + parseInt(minutes);
-        const newTime = totalMinutes + 15;
-        const newHours = Math.floor(newTime / 60);
-        const newMinutes = newTime % 60;
-        currentTime = `${newHours.toString().padStart(2, "0")}:${newMinutes
-          .toString()
-          .padStart(2, "0")}`;
+      if (startMorningTime && endMorningTime) {
+        while (currentTime <= endMorningTime) {
+          times.push(currentTime);
+          const [hours, minutes] = currentTime.split(":");
+          const totalMinutes = parseInt(hours) * 60 + parseInt(minutes);
+          const newTime = totalMinutes + 15;
+          const newHours = Math.floor(newTime / 60);
+          const newMinutes = newTime % 60;
+          currentTime = `${newHours.toString().padStart(2, "0")}:${newMinutes
+            .toString()
+            .padStart(2, "0")}`;
+        }
       }
+
       currentTime = startEveningTime;
-      while (currentTime <= endEveningTime) {
-        times.push(currentTime);
-        const [hours, minutes] = currentTime.split(":");
-        const totalMinutes = parseInt(hours) * 60 + parseInt(minutes);
-        const newTime = totalMinutes + 15;
-        const newHours = Math.floor(newTime / 60);
-        const newMinutes = newTime % 60;
-        currentTime = `${newHours.toString().padStart(2, "0")}:${newMinutes
-          .toString()
-          .padStart(2, "0")}`;
-        console.log(currentTime);
+      if (startEveningTime && endEveningTime) {
+        while (currentTime <= endEveningTime) {
+          times.push(currentTime);
+          const [hours, minutes] = currentTime.split(":");
+          const totalMinutes = parseInt(hours) * 60 + parseInt(minutes);
+          const newTime = totalMinutes + 15;
+          const newHours = Math.floor(newTime / 60);
+          const newMinutes = newTime % 60;
+          currentTime = `${newHours.toString().padStart(2, "0")}:${newMinutes
+            .toString()
+            .padStart(2, "0")}`;
+          console.log(currentTime);
+        }
+      }
+
+      if (times.length === 0) {
+        return res.status(400).send({ message: "No valid availability slots" });
       }
       console.log(times);
       await addAvailableTimes(docId, times);
@@ -126,18 +205,28 @@ router.post("/availability", async (req, res) => {
 
 router.patch("/:doctorId", async (req, res) => {
   const id = req.params.doctorId;
-  const password = req.body.password;
+  const { password, ...profileUpdates } = req.body;
   try {
-    await updatePass(password, id);
-    const doctor = await findById(id);
-    if (doctor[0].password === password) {
-      return res.status(200).send({
-        message: "password updated",
-        user: { ...doctor[0], userType: "doctor" },
-      });
-    } else {
-      return res.send({ message: `password not updated` });
+    if (password) {
+      await updatePass(password, id);
+      const doctor = await findById(id);
+      if (doctor[0]?.password === password) {
+        return res.status(200).send({
+          message: "password updated",
+          user: { ...doctor[0], userType: "doctor" },
+        });
+      }
+      return res.send({ message: "password not updated" });
     }
+
+    const updated = await updateDoctorById(id, profileUpdates);
+    if (!updated) {
+      return res.status(404).send({ message: "doctor not found" });
+    }
+    return res.status(200).send({
+      message: "profile updated",
+      user: { ...updated, userType: "doctor" },
+    });
   } catch (error) {
     console.log(error);
     res.status(400).send({ message: "error" });
@@ -165,21 +254,22 @@ router.get("/consultation/*", async (req, res) => {
       return res.status(404).send({ message: "Patient not found" });
     }
     const patient = patientDetails[0];
+    const patientStudentId = patient.studentid || patient.studentID;
 
     // 2. Fetch Medical History (Reports)
-    const history = await getPatientReports(patient.studentID);
+    const history = await getPatientReports(patientStudentId);
 
     // 3. Fetch Lab Results
-    const labResults = await getPatientLabHistory(patient.studentID);
+    const labResults = await getPatientLabHistory(patientStudentId);
 
     // 4. Fetch Appointment History
-    const appointments = await getAppointmentFromPatient(patient.studentID);
+    const appointments = await getAppointmentFromPatient(patientStudentId);
 
     res.status(200).send({
       patient,
       history,
       labResults,
-      appointments
+      appointments,
     });
   } catch (error) {
     console.error(error);

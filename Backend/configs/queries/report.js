@@ -55,6 +55,34 @@ FROM reports
 JOIN patients p ON reports.patient_id = p.studentid
 JOIN staff s ON reports.doctor_id = s.id;`;
 
+const updateReportQuery = `UPDATE reports
+SET disease = $2,
+    temperature = $3,
+    weight = $4,
+    bp = $5,
+    glucose = $6,
+    info = $7,
+    medicines = $8,
+    treatment_plan = $9,
+    follow_up_date = $10,
+    recommendations = $11
+WHERE id = $1
+RETURNING *;`;
+
+const updateReportByDoctorQuery = `UPDATE reports
+SET disease = $2,
+    temperature = $3,
+    weight = $4,
+    bp = $5,
+    glucose = $6,
+    info = $7,
+    medicines = $8,
+    treatment_plan = $9,
+    follow_up_date = $10,
+    recommendations = $11
+WHERE id = $1 AND doctor_id = $12
+RETURNING *;`;
+
 module.exports = {
   getLastReportIdQuery,
   countReportQuery,
@@ -63,4 +91,6 @@ module.exports = {
   getPatientReportQuery,
   getAllReportsQuery,
   createReportTableQuery,
+  updateReportQuery,
+  updateReportByDoctorQuery,
 };

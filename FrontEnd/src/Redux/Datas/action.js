@@ -22,6 +22,22 @@ export const CreateReport = (data) => async (dispatch) => {
   }
 };
 
+// Update Report
+export const updateReport = (reportId, data) => async (dispatch) => {
+  try {
+    const res = await axios.patch(
+      `http://localhost:3007/reports/${reportId}`,
+      data,
+      {
+        headers: { Authorization: localStorage.getItem("token") },
+      },
+    );
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 // GET DOCTOR DETAILS
 export const GetDoctorDetails = () => async (dispatch) => {
   try {
@@ -162,9 +178,7 @@ export const GetAppointments = (userType, id) => async (dispatch) => {
 export const DeleteAppointment = (id) => async (dispatch) => {
   try {
     dispatch({ type: types.DELETE_APPOINTMENT_REQUEST });
-    const res = await axios.delete(
-      `http://localhost:3007/appointments/${id}`,
-    );
+    const res = await axios.delete(`http://localhost:3007/appointments/${id}`);
     console.log(res.data);
     // return res.data;
     dispatch({
@@ -183,7 +197,7 @@ export const GetAllReports = (userType, id) => async (dispatch) => {
     dispatch({ type: types.GET_REPORTS_REQUEST });
     const res = await axios.get(
       `http://localhost:3007/reports/${userType}/${id}`,
-      { headers: { Authorization: localStorage.getItem("token") } }
+      { headers: { Authorization: localStorage.getItem("token") } },
     );
     console.log("res", res.data);
     const reports = { reports: res.data.data };
@@ -203,10 +217,13 @@ export const CreateCertificate = (data) => async (dispatch) => {
     const res = await axios.post(
       "http://localhost:3007/certificates/create",
       data,
-      { headers: { Authorization: localStorage.getItem("token") } }
+      { headers: { Authorization: localStorage.getItem("token") } },
     );
     console.log(res);
-    dispatch({ type: types.CREATE_CERTIFICATE_SUCCESS, payload: res.data.data });
+    dispatch({
+      type: types.CREATE_CERTIFICATE_SUCCESS,
+      payload: res.data.data,
+    });
     return res.data;
   } catch (error) {
     console.log(error);
@@ -217,7 +234,7 @@ export const GetAllCertificates = (userType, id) => async (dispatch) => {
   try {
     dispatch({ type: types.GET_CERTIFICATES_REQUEST });
     const res = await axios.get(
-      `http://localhost:3007/certificates/${userType}/${id}`
+      `http://localhost:3007/certificates/${userType}/${id}`,
     );
     console.log("res", res.data);
     const certificates = { certificates: res.data.data };
@@ -291,9 +308,13 @@ export const createLabRequest = (data, token) => async (dispatch) => {
 export const reviewLabResult = (id, token) => async (dispatch) => {
   try {
     dispatch({ type: types.REVIEW_LAB_RECORD_REQUEST });
-    const res = await axios.patch(`${baseURL}/lab/record/${id}/review`, {}, {
-      headers: { Authorization: token },
-    });
+    const res = await axios.patch(
+      `${baseURL}/lab/record/${id}/review`,
+      {},
+      {
+        headers: { Authorization: token },
+      },
+    );
     dispatch({
       type: types.REVIEW_LAB_RECORD_SUCCESS,
       payload: id,
@@ -358,9 +379,12 @@ export const getDoctorQueue = (doctorId, token) => async (dispatch) => {
 export const getConsultationData = (studentId, token) => async (dispatch) => {
   try {
     dispatch({ type: types.GET_CONSULTATION_DATA_REQUEST });
-    const res = await axios.get(`${baseURL}/doctors/consultation/${encodeURIComponent(studentId)}`, {
-      headers: { Authorization: token },
-    });
+    const res = await axios.get(
+      `${baseURL}/doctors/consultation/${encodeURIComponent(studentId)}`,
+      {
+        headers: { Authorization: token },
+      },
+    );
     dispatch({
       type: types.GET_CONSULTATION_DATA_SUCCESS,
       payload: res.data,
@@ -376,9 +400,13 @@ export const getConsultationData = (studentId, token) => async (dispatch) => {
 export const completeConsultation = (queueId, token) => async (dispatch) => {
   try {
     dispatch({ type: types.COMPLETE_CONSULTATION_REQUEST });
-    await axios.patch(`${baseURL}/doctors/consultation/complete/${queueId}`, {}, {
-      headers: { Authorization: token },
-    });
+    await axios.patch(
+      `${baseURL}/doctors/consultation/complete/${queueId}`,
+      {},
+      {
+        headers: { Authorization: token },
+      },
+    );
     dispatch({ type: types.COMPLETE_CONSULTATION_SUCCESS });
   } catch (error) {
     dispatch({ type: types.COMPLETE_CONSULTATION_ERROR });
