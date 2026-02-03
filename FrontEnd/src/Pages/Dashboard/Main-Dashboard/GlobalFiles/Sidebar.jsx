@@ -55,10 +55,7 @@ const Sidebar = () => {
             </NavLink>
             {user?.userType === "patient" ? (
               <>
-                <NavLink
-                  className="link"
-                  to={"/patientprofile"}
-                >
+                <NavLink className="link" to={"/patientprofile"}>
                   <div className="icon">
                     <CgProfile className="mainIcon" />
                   </div>
@@ -69,10 +66,7 @@ const Sidebar = () => {
                     Profile
                   </div>
                 </NavLink>
-                <NavLink
-                  className="link"
-                  to={"/bookappointment"}
-                >
+                <NavLink className="link" to={"/bookappointment"}>
                   <div className="icon">
                     <BsBookmarkPlus className="mainIcon" />
                   </div>
@@ -87,10 +81,7 @@ const Sidebar = () => {
             ) : null}
             {user?.userType === "admin" ? (
               <>
-                <NavLink
-                  className="link"
-                  to={"/addstaff"}
-                >
+                <NavLink className="link" to={"/addstaff"}>
                   <div className="icon">
                     <AiOutlineUserAdd className="mainIcon" />
                   </div>
@@ -101,14 +92,9 @@ const Sidebar = () => {
                     Add Staff
                   </div>
                 </NavLink>
-                <NavLink
-                  className="link"
-                  to={"/managestaff"}
-                >
+                <NavLink className="link" to={"/managestaff"}>
                   <div className="icon">
-                    <FaUsers
-                      className="mainIcon"
-                    />
+                    <FaUsers className="mainIcon" />
                   </div>
                   <div
                     style={{ display: isOpen ? "block" : "none" }}
@@ -117,10 +103,7 @@ const Sidebar = () => {
                     Manage Staff
                   </div>
                 </NavLink>
-                <NavLink
-                  className="link"
-                  to={"/adminprofile"}
-                >
+                <NavLink className="link" to={"/adminprofile"}>
                   <div className="icon">
                     <CgProfile className="mainIcon" />
                   </div>
@@ -131,10 +114,7 @@ const Sidebar = () => {
                     Profile
                   </div>
                 </NavLink>
-                <NavLink
-                  className="link"
-                  to={"/systemsetup"}
-                >
+                <NavLink className="link" to={"/systemsetup"}>
                   <div className="icon">
                     <MdSettings className="mainIcon" />
                   </div>
@@ -145,10 +125,7 @@ const Sidebar = () => {
                     System Settings
                   </div>
                 </NavLink>
-                <NavLink
-                  className="link"
-                  to={"/auditlogs"}
-                >
+                <NavLink className="link" to={"/auditlogs"}>
                   <div className="icon">
                     <HistoryOutlined className="mainIcon" />
                   </div>
@@ -159,10 +136,7 @@ const Sidebar = () => {
                     Audit Logs
                   </div>
                 </NavLink>
-                <NavLink
-                  className="link"
-                  to={"/analytics"}
-                >
+                <NavLink className="link" to={"/analytics"}>
                   <div className="icon">
                     <MdAnalytics className="mainIcon" />
                   </div>
@@ -177,10 +151,7 @@ const Sidebar = () => {
             ) : null}
             {user?.userType === "doctor" ? (
               <>
-                <NavLink
-                  className="link"
-                  to={"/doctorprofile"}
-                >
+                <NavLink className="link" to={"/doctorprofile"}>
                   <div className="icon">
                     <CgProfile className="mainIcon" />
                   </div>
@@ -191,10 +162,7 @@ const Sidebar = () => {
                     Profile
                   </div>
                 </NavLink>
-                <NavLink
-                  className="link"
-                  to={"/patientdetails"}
-                >
+                <NavLink className="link" to={"/patientdetails"}>
                   <div className="icon">
                     <FaUsers className="mainIcon" />
                   </div>
@@ -205,10 +173,7 @@ const Sidebar = () => {
                     Patients
                   </div>
                 </NavLink>
-                <NavLink
-                  className="link"
-                  to={"/doctor/queue"}
-                >
+                <NavLink className="link" to={"/doctor/queue"}>
                   <div className="icon">
                     <MdOutlineAssignment className="mainIcon" />
                   </div>
@@ -219,10 +184,7 @@ const Sidebar = () => {
                     Patient Queue
                   </div>
                 </NavLink>
-                <NavLink
-                  className="link"
-                  to={"/doctor/lab"}
-                >
+                <NavLink className="link" to={"/doctor/lab"}>
                   <div className="icon">
                     <GiMicroscope className="mainIcon" />
                   </div>
@@ -233,10 +195,7 @@ const Sidebar = () => {
                     Lab Dashboard
                   </div>
                 </NavLink>
-                <NavLink
-                  className="link"
-                  to={"/doctor/appointments"}
-                >
+                <NavLink className="link" to={"/doctor/appointments"}>
                   <div className="icon">
                     <BsFillBookmarkCheckFill className="mainIcon" />
                   </div>
@@ -247,15 +206,23 @@ const Sidebar = () => {
                     My Appointments
                   </div>
                 </NavLink>
+                <NavLink className="link" to={"/certificates"}>
+                  <div className="icon">
+                    <TbReportMedical className="mainIcon" />
+                  </div>
+                  <div
+                    style={{ display: isOpen ? "block" : "none" }}
+                    className="link_text"
+                  >
+                    Certificates
+                  </div>
+                </NavLink>
               </>
             ) : null}
 
             {user?.userType === "lab_technologist" ? (
               <>
-                <NavLink
-                  className="link"
-                  to={"/lab/pending"}
-                >
+                <NavLink className="link" to={"/lab/pending"}>
                   <div className="icon">
                     <MdOutlineAssignment className="mainIcon" />
                   </div>
@@ -266,10 +233,7 @@ const Sidebar = () => {
                     Pending Tests
                   </div>
                 </NavLink>
-                <NavLink
-                  className="link"
-                  to={"/lab/history"}
-                >
+                <NavLink className="link" to={"/lab/history"}>
                   <div className="icon">
                     <GiMicroscope className="mainIcon" />
                   </div>
@@ -284,10 +248,7 @@ const Sidebar = () => {
             ) : null}
             {user?.userType === "nurse" ? (
               <>
-                <NavLink
-                  className="link"
-                  to={"/registration"}
-                >
+                <NavLink className="link" to={"/registration"}>
                   <div className="icon">
                     <AiOutlineUserAdd className="mainIcon" />
                   </div>
@@ -298,10 +259,7 @@ const Sidebar = () => {
                     Registration
                   </div>
                 </NavLink>
-                <NavLink
-                  className="link"
-                  to={"/queue"}
-                >
+                <NavLink className="link" to={"/queue"}>
                   <div className="icon">
                     <FaUsers className="mainIcon" />
                   </div>
@@ -315,12 +273,11 @@ const Sidebar = () => {
               </>
             ) : null}
 
-            {user?.userType !== "admin" && user?.userType !== "lab_technologist" && user?.userType !== "doctor" ? (
+            {user?.userType !== "admin" &&
+            user?.userType !== "lab_technologist" &&
+            user?.userType !== "doctor" ? (
               <>
-                <NavLink
-                  className="link"
-                  to={"/checkappointment"}
-                >
+                <NavLink className="link" to={"/checkappointment"}>
                   <div className="icon">
                     <BsFillBookmarkCheckFill className="mainIcon" />
                   </div>
@@ -331,10 +288,7 @@ const Sidebar = () => {
                     My Appointments
                   </div>
                 </NavLink>
-                <NavLink
-                  className="link"
-                  to={"/certificates"}
-                >
+                <NavLink className="link" to={"/certificates"}>
                   <div className="icon">
                     <TbReportMedical className="mainIcon" />
                   </div>
