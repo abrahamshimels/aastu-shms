@@ -10,7 +10,7 @@ import {
   GetAllReports,
   reviewLabResult,
 } from "../../../../../Redux/Datas/action";
-import { Modal, Form, Select, Input, Button, Carousel, Descriptions, Tag, Collapse, Space, Divider, Typography } from "antd";
+import { Modal, Form, Select, Input, Button, Descriptions, Tag, Collapse, Typography, Table, Divider } from "antd";
 import Sidebar from "../../GlobalFiles/Sidebar";
 import "react-toastify/dist/ReactToastify.css";
 import { toast, ToastContainer } from "react-toastify";

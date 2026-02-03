@@ -13,6 +13,7 @@ import PatientHistoryView from "../Pages/Dashboard/Main-Dashboard/AllPages/Docto
 import DoctorLabDashboard from "../Pages/Dashboard/Main-Dashboard/AllPages/Doctor/DoctorLabDashboard";
 import DoctorPatientQueue from "../Pages/Dashboard/Main-Dashboard/AllPages/Doctor/DoctorPatientQueue";
 import ConsultationView from "../Pages/Dashboard/Main-Dashboard/AllPages/Doctor/ConsultationView";
+import DoctorAppointments from "../Pages/Dashboard/Main-Dashboard/AllPages/Doctor/DoctorAppointments";
 import BookAppointment from "../Pages/Dashboard/Main-Dashboard/AllPages/Patient/Book_Appointment";
 import PatientProfile from "../Pages/Dashboard/Main-Dashboard/AllPages/Patient/Patient_Profile";
 import FrontPage from "../Pages/Dashboard/Main-Dashboard/GlobalFiles/FrontPage";
@@ -55,6 +56,7 @@ const AllRoutes = () => {
         <Route path="/doctor/queue" element={<DoctorPatientQueue />} />
         <Route path="/doctor/consultation/*" element={<ConsultationView />} />
         <Route path="/doctor/patient-history/*" element={<PatientHistoryView />} />
+        <Route path="/doctor/appointments" element={<DoctorAppointments />} />
         {/* ******************** Patient Part ************************* */}
         <Route path="/bookappointment" element={<BookAppointment />} />
         <Route path="/patientprofile" element={<PatientProfile />} />

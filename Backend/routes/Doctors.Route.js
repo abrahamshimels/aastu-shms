@@ -167,13 +167,13 @@ router.get("/consultation/*", async (req, res) => {
     const patient = patientDetails[0];
 
     // 2. Fetch Medical History (Reports)
-    const history = await getPatientReports(patient.id);
+    const history = await getPatientReports(patient.studentID);
 
     // 3. Fetch Lab Results
-    const labResults = await getPatientLabHistory(patient.id);
+    const labResults = await getPatientLabHistory(patient.studentID);
 
     // 4. Fetch Appointment History
-    const appointments = await getAppointmentFromPatient(patient.id);
+    const appointments = await getAppointmentFromPatient(patient.studentID);
 
     res.status(200).send({
       patient,

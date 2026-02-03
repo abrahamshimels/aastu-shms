@@ -385,3 +385,14 @@ export const completeConsultation = (queueId, token) => async (dispatch) => {
     console.log(error);
   }
 };
+// Email Certificate
+export const EmailCertificate = (data, token) => async (dispatch) => {
+  try {
+    const res = await axios.post(`${baseURL}/certificates/email`, data, {
+      headers: { Authorization: token },
+    });
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+};

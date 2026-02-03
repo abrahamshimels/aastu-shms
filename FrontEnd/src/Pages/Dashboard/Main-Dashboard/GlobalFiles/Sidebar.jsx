@@ -233,6 +233,20 @@ const Sidebar = () => {
                     Lab Dashboard
                   </div>
                 </NavLink>
+                <NavLink
+                  className="link"
+                  to={"/doctor/appointments"}
+                >
+                  <div className="icon">
+                    <BsFillBookmarkCheckFill className="mainIcon" />
+                  </div>
+                  <div
+                    style={{ display: isOpen ? "block" : "none" }}
+                    className="link_text"
+                  >
+                    My Appointments
+                  </div>
+                </NavLink>
               </>
             ) : null}
 
@@ -301,7 +315,7 @@ const Sidebar = () => {
               </>
             ) : null}
 
-            {user?.userType !== "admin" && user?.userType !== "lab_technologist" ? (
+            {user?.userType !== "admin" && user?.userType !== "lab_technologist" && user?.userType !== "doctor" ? (
               <>
                 <NavLink
                   className="link"

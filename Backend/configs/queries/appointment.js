@@ -1,18 +1,18 @@
 const createAppointmentQueryTable = `CREATE TABLE IF NOT EXISTS appointments (
-  id SERIAL PRIMARY KEY,
-  patient_id VARCHAR(50) NOT NULL,
+  id VARCHAR(50) PRIMARY KEY, -- Matches DB reality
+  patientid VARCHAR(50) NOT NULL,
   date DATE NOT NULL,
   time TIME NOT NULL,
   problem TEXT,
-  doctor_id VARCHAR(50) NOT NULL,
-  FOREIGN KEY (patient_id) REFERENCES patients(studentid),
-  FOREIGN KEY (doctor_id) REFERENCES staff(id)
+  doctorid VARCHAR(50) NOT NULL,
+  FOREIGN KEY (patientid) REFERENCES patients(studentid),
+  FOREIGN KEY (doctorid) REFERENCES staff(id)
 );`;
 
 const countAppoinmentQuery = `SELECT COUNT(*) FROM appointments; `;
 
 const createAppointmentQuery = `
-INSERT INTO appointments (patient_id, date, time, problem, doctor_id)
+INSERT INTO appointments (patientid, date, time, problem, doctorid)
 VALUES (
     $1,
     $2,
@@ -24,15 +24,15 @@ VALUES (
 const getAppointmentFromPatientQuery = `
   SELECT a.*, s.name as doctor_name 
   FROM appointments a
-  JOIN staff s ON a.doctor_id = s.id
-  WHERE a.patient_id = $1;
+  JOIN staff s ON a.doctorid = s.id
+  WHERE a.patientid = $1;
 `;
 
 const getAppointmentFromDoctorQuery = `
   SELECT a.*, p.name as patient_name 
   FROM appointments a
-  JOIN patients p ON a.patient_id = p.studentid
-  WHERE a.doctor_id = $1;
+  JOIN patients p ON a.patientid = p.studentid
+  WHERE a.doctorid = $1;
 `;
 
 const findByIDQuery = `SELECT * FROM appointments WHERE id = $1;`;
@@ -40,8 +40,8 @@ const findByIDQuery = `SELECT * FROM appointments WHERE id = $1;`;
 const getAllAppointmentsQuery = `
   SELECT a.*, p.name as patient_name, s.name as doctor_name 
   FROM appointments a
-  JOIN patients p ON a.patient_id = p.studentid
-  JOIN staff s ON a.doctor_id = s.id;
+  JOIN patients p ON a.patientid = p.studentid
+  JOIN staff s ON a.doctorid = s.id;
 `;
 
 const deleteAppointmentQuery = `DELETE FROM appointments WHERE id = $1;`;
