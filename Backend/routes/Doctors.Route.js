@@ -8,6 +8,11 @@ const {
   updatePass,
   addAvailableTimes,
 } = require("../models/Doctor.model");
+const { getDoctorQueue, completeQueueItem } = require("../models/Queue.model");
+const { getPatientReports } = require("../models/Report.model");
+const { getAppointmentFromPatient } = require("../models/Appointment.model");
+const { findByStudentId } = require("../models/Patient.model");
+const { getPatientLabHistory } = require("../models/Lab.model");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 
@@ -136,6 +141,60 @@ router.patch("/:doctorId", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(400).send({ message: "error" });
+  }
+});
+
+// GET Doctor's specific queue
+router.get("/queue/:doctorId", async (req, res) => {
+  try {
+    const queue = await getDoctorQueue(req.params.doctorId);
+    res.status(200).send(queue);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: "Error fetching doctor queue" });
+  }
+});
+
+// GET Comprehensive Consultation Data
+router.get("/consultation/*", async (req, res) => {
+  try {
+    const studentId = req.params[0];
+    console.log("Consultation requested for studentId (wildcard):", studentId);
+    const patientDetails = await findByStudentId(studentId);
+    if (!patientDetails || patientDetails.length === 0) {
+      return res.status(404).send({ message: "Patient not found" });
+    }
+    const patient = patientDetails[0];
+
+    // 2. Fetch Medical History (Reports)
+    const history = await getPatientReports(patient.id);
+
+    // 3. Fetch Lab Results
+    const labResults = await getPatientLabHistory(patient.id);
+
+    // 4. Fetch Appointment History
+    const appointments = await getAppointmentFromPatient(patient.id);
+
+    res.status(200).send({
+      patient,
+      history,
+      labResults,
+      appointments
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: "Error fetching consultation data" });
+  }
+});
+
+// Complete Consultation
+router.patch("/consultation/complete/:queueId", async (req, res) => {
+  try {
+    await completeQueueItem(req.params.queueId);
+    res.status(200).send({ message: "Consultation completed" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: "Error completing consultation" });
   }
 });
 

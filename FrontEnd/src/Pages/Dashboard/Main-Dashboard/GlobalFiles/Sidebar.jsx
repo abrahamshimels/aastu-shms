@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { AiOutlineUserAdd } from "react-icons/ai";
-import { FaAmbulance } from "react-icons/fa";
 import { FaUsers } from "react-icons/fa";
 import { BsBookmarkPlus, BsFillBookmarkCheckFill } from "react-icons/bs";
 import { CgProfile } from "react-icons/cg";
@@ -8,9 +7,8 @@ import { TbReportMedical } from "react-icons/tb";
 import { NavLink, Link } from "react-router-dom";
 import { ImMenu } from "react-icons/im";
 import { FiLogOut } from "react-icons/fi";
-import { RiAdminLine } from "react-icons/ri";
 import { MdDashboard, MdSettings, MdAnalytics } from "react-icons/md";
-import { MdDashboardCustomize, MdOutlineAssignment } from "react-icons/md";
+import { MdOutlineAssignment } from "react-icons/md";
 import { GiMicroscope } from "react-icons/gi";
 import { useDispatch, useSelector } from "react-redux";
 import { authLogout } from "../../../../Redux/auth/action";
@@ -209,7 +207,21 @@ const Sidebar = () => {
                 </NavLink>
                 <NavLink
                   className="link"
-                  to={"/lab/history"}
+                  to={"/doctor/queue"}
+                >
+                  <div className="icon">
+                    <MdOutlineAssignment className="mainIcon" />
+                  </div>
+                  <div
+                    style={{ display: isOpen ? "block" : "none" }}
+                    className="link_text"
+                  >
+                    Patient Queue
+                  </div>
+                </NavLink>
+                <NavLink
+                  className="link"
+                  to={"/doctor/lab"}
                 >
                   <div className="icon">
                     <GiMicroscope className="mainIcon" />
@@ -218,11 +230,12 @@ const Sidebar = () => {
                     style={{ display: isOpen ? "block" : "none" }}
                     className="link_text"
                   >
-                    Lab History
+                    Lab Dashboard
                   </div>
                 </NavLink>
               </>
             ) : null}
+
             {user?.userType === "lab_technologist" ? (
               <>
                 <NavLink

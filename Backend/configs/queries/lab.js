@@ -45,13 +45,37 @@ FROM lab_records lrec
 JOIN lab_test_requests lreq ON lrec.request_id = lreq.id
 JOIN laboratory_technologists lt ON lrec.technologist_id = lt.id
 JOIN patients p ON lreq.patient_id = p.id
-WHERE p.studentid = $1;`;
+WHERE p.id = $1;`;
 
 const getRecordByIdQuery = `SELECT * FROM lab_records WHERE id = $1;`;
 
 const lockRecordQuery = `UPDATE lab_records SET is_locked = TRUE WHERE id = $1;`;
 
 const reviewRecordQuery = `UPDATE lab_records SET reviewed_by_doctor = TRUE WHERE id = $1;`;
+
+const getRecordsByDoctorQuery = `
+SELECT 
+    lreq.id as request_id,
+    lreq.test_type,
+    lreq.status as request_status,
+    lreq.priority,
+    lreq.notes,
+    lreq.request_date,
+    p.name as patient_name,
+    p.studentid as patient_student_id,
+    lrec.id as record_id,
+    lrec.result_value,
+    lrec.critical_flag,
+    lrec.submission_date,
+    lrec.reviewed_by_doctor,
+    lt.name as technologist_name
+FROM lab_test_requests lreq
+JOIN patients p ON lreq.patient_id = p.id
+LEFT JOIN lab_records lrec ON lreq.id = lrec.request_id
+LEFT JOIN laboratory_technologists lt ON lrec.technologist_id = lt.id
+WHERE lreq.doctor_id = $1
+ORDER BY lreq.request_date DESC;
+`;
 
 module.exports = {
   createLabTestRequestTable,
@@ -64,5 +88,6 @@ module.exports = {
   getRecordsByPatientQuery,
   getRecordByIdQuery,
   lockRecordQuery,
-  reviewRecordQuery
+  reviewRecordQuery,
+  getRecordsByDoctorQuery
 };

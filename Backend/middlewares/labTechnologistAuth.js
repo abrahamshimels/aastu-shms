@@ -6,11 +6,12 @@ const authenticate = (req, res, next) => {
     if (token) {
         try {
             const decoded = jwt.verify(token, process.env.KEY);
-            if (decoded && decoded.labTechID) {
-                req.body.labTechID = decoded.labTechID;
+            if (decoded) {
+                req.user = decoded; // Standardize
+                req.body.labTechID = decoded.id;
                 next();
             } else {
-                res.status(401).send("Unauthorized: Invalid Laboratory Technologist token.");
+                res.status(401).send("Unauthorized: Invalid token.");
             }
         } catch (err) {
             res.status(401).send("Invalid or expired token.");

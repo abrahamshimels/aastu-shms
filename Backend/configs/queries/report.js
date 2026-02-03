@@ -1,7 +1,7 @@
 const createReportTableQuery = `CREATE TABLE IF NOT EXISTS reports (
   id SERIAL PRIMARY KEY,
-  patientid INT NOT NULL,
-  doctorid INT NOT NULL,
+  patient_id VARCHAR(50) NOT NULL,
+  doctor_id VARCHAR(50) NOT NULL,
   date DATE NOT NULL,
   time TIME NOT NULL,
   disease TEXT,
@@ -10,15 +10,15 @@ const createReportTableQuery = `CREATE TABLE IF NOT EXISTS reports (
   bp VARCHAR(20),
   glucose VARCHAR(20),
   info TEXT,
-  FOREIGN KEY (patientid) REFERENCES patients(id),
-  FOREIGN KEY (doctorid) REFERENCES doctors(id)
+  FOREIGN KEY (patient_id) REFERENCES patients(studentid),
+  FOREIGN KEY (doctor_id) REFERENCES staff(id)
 );`;
 
 const countReportQuery = `SELECT COUNT(*) FROM reports;`;
 
 const createReportQuery = `INSERT INTO reports (
-    patientid,
-    doctorid,
+    patient_id,
+    doctor_id,
     date,
     time,
     disease,
@@ -37,23 +37,23 @@ from reports
 ORDER BY id DESC
 LIMIT 1;`;
 
-const getPatientReportQuery = `SELECT doctors.name,
+const getPatientReportQuery = `SELECT s.name as doctor_name,
 reports.*
 FROM reports
-JOIN doctors ON reports.doctorid = doctors.id
-WHERE reports.patientid = $1;`;
+JOIN staff s ON reports.doctor_id = s.id
+WHERE reports.patient_id = $1;`;
 
-const getDoctorReportQuery = `SELECT patients.name,
+const getDoctorReportQuery = `SELECT p.name,
 reports.*
 FROM reports
-JOIN patients ON reports.patientid = patients.id
-WHERE reports.doctorid = $1;`;
+JOIN patients p ON reports.patient_id = p.id
+WHERE reports.doctor_id = $1;`;
 
-const getAllReportsQuery = `SELECT patients.name as patient_name, doctors.name as doctor_name,
+const getAllReportsQuery = `SELECT p.name as patient_name, s.name as doctor_name,
 reports.*
 FROM reports
-JOIN patients ON reports.patientid = patients.id
-JOIN doctors ON reports.doctorid = doctors.id;`;
+JOIN patients p ON reports.patient_id = p.id
+JOIN staff s ON reports.doctor_id = s.id;`;
 
 module.exports = {
   getLastReportIdQuery,

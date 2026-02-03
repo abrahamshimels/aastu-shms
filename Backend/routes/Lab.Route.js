@@ -5,7 +5,8 @@ const {
     getPendingRequests,
     submitLabRecord,
     getPatientLabHistory,
-    reviewRecord
+    reviewRecord,
+    getDoctorLabHistory
 } = require("../models/Lab.model");
 const doctorAuth = require("../middlewares/doctorAuth");
 const labAuth = require("../middlewares/labTechnologistAuth");
@@ -70,6 +71,16 @@ router.patch("/record/:id/review", doctorAuth.authenticate, async (req, res) => 
     try {
         await reviewRecord(req.params.id);
         res.status(200).send({ message: "Record marked as reviewed by doctor" });
+    } catch (error) {
+        res.status(400).send({ error: error.message });
+    }
+});
+
+// DOCTOR: View all lab requests sent by this doctor
+router.get("/history/doctor/:doctorId", doctorAuth.authenticate, async (req, res) => {
+    try {
+        const history = await getDoctorLabHistory(req.params.doctorId);
+        res.status(200).send(history);
     } catch (error) {
         res.status(400).send({ error: error.message });
     }

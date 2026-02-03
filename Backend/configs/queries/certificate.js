@@ -6,13 +6,15 @@ const createCertificatesTableQuery = `
     type VARCHAR(100) NOT NULL,
     issue_date DATE NOT NULL,
     content TEXT,
+    medical_justification TEXT,
+    duration_days INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );
 `;
 
 const createCertificateQuery = `
-  INSERT INTO certificates (student_id, doctor_id, type, issue_date, content)
-  VALUES ($1, $2, $3, $4, $5)
+  INSERT INTO certificates (student_id, doctor_id, type, issue_date, content, medical_justification, duration_days)
+  VALUES ($1, $2, $3, $4, $5, $6, $7)
   RETURNING *;
 `;
 

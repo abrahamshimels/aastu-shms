@@ -13,13 +13,16 @@ CREATE TABLE IF NOT EXISTS reports (
     glucose DECIMAL(5,2),
     info TEXT,
     medicines JSONB,
+    treatment_plan TEXT,
+    follow_up_date DATE,
+    recommendations TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 `;
 
 const createReportQuery = `
-    INSERT INTO reports (patient_id, doctor_id, appointment_id, date, time, disease, temperature, weight, bp, glucose, info, medicines)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+    INSERT INTO reports (patient_id, doctor_id, appointment_id, date, time, disease, temperature, weight, bp, glucose, info, medicines, treatment_plan, follow_up_date, recommendations)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
     RETURNING *;
 `;
 
@@ -55,10 +58,10 @@ const getMonthlyTrendsQuery = `
 `;
 
 module.exports = {
-  createReportsTable,
-  createReportQuery,
-  getAllReportsQuery,
-  getReportsByUserQuery,
-  getIllnessTrendsQuery,
-  getMonthlyTrendsQuery,
+    createReportsTable,
+    createReportQuery,
+    getAllReportsQuery,
+    getReportsByUserQuery,
+    getIllnessTrendsQuery,
+    getMonthlyTrendsQuery,
 };

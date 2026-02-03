@@ -15,7 +15,7 @@ const addToQueueQuery = `INSERT INTO queue (student_id, chief_complaint, priorit
 
 const assignDoctorQuery = `UPDATE queue SET doctor_id = $1, status = 'Assigned' WHERE id = $2 RETURNING *;`;
 
-const getActiveQueueQuery = `SELECT q.*, p.name as student_name, p.department as student_dept, p.year as student_year, d.name as doctor_name 
+const getActiveQueueQuery = `SELECT q.*, p.studentID as studentid, p.name as student_name, p.department as student_dept, p.year as student_year, d.name as doctor_name 
                              FROM queue q 
                              JOIN patients p ON q.student_id = p.id 
                              LEFT JOIN doctors d ON q.doctor_id = d.id
@@ -28,7 +28,7 @@ const getActiveQueueQuery = `SELECT q.*, p.name as student_name, p.department as
                                 END, 
                                 q.created_at ASC;`;
 
-const getDoctorQueueQuery = `SELECT q.*, p.name as student_name, p.department as student_dept, p.year as student_year 
+const getDoctorQueueQuery = `SELECT q.*, p.studentID as studentid, p.name as student_name, p.department as student_dept, p.year as student_year 
                               FROM queue q 
                               JOIN patients p ON q.student_id = p.id 
                               WHERE q.doctor_id = $1 AND q.status != 'Completed'

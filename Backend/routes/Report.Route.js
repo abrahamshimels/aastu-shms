@@ -16,9 +16,9 @@ router.post("/", authorize(["DOCTOR", "ADMIN"]), async (req, res) => {
   try {
     const report = await createReport({
       ...req.body,
-      doctor_id: req.body.doctorid || req.user.id, // Support frontend field names
-      patient_id: req.body.patientid,
-      appointment_id: req.body.appointmentid,
+      doctor_id: req.body.doctor_id || req.body.doctorid || req.user.id,
+      patient_id: req.body.patient_id || req.body.patientid,
+      appointment_id: req.body.appointment_id || req.body.appointmentid,
     });
 
     await logAction(req.user.id, "CREATE_REPORT", "reports", report.id);

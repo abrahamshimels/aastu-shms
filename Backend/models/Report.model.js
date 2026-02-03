@@ -39,6 +39,9 @@ const createReport = async (reportData) => {
     reportData.glucose,
     reportData.info,
     JSON.stringify(reportData.medicines || []),
+    reportData.treatment_plan || null,
+    reportData.follow_up_date || null,
+    reportData.recommendations || null,
   ];
   const result = await dbhelper.query(createReportQueryNew, values);
   return result[0];

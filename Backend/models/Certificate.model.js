@@ -17,13 +17,15 @@ const initialize = async () => {
 };
 
 const createCertificate = (data) => {
-  const { student_id, doctor_id, type, issue_date, content } = data;
+  const { student_id, doctor_id, type, issue_date, content, medical_justification, duration_days } = data;
   return dbhelper.query(createCertificateQuery, [
     student_id,
     doctor_id,
     type,
     issue_date || new Date(),
     content,
+    medical_justification || null,
+    duration_days || null,
   ]).then((result) => {
     return result[0];
   });
