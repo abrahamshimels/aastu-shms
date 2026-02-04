@@ -22,6 +22,22 @@ export const CreateReport = (data) => async (dispatch) => {
   }
 };
 
+// Update Report
+export const updateReport = (reportId, data) => async (dispatch) => {
+  try {
+    const res = await axios.patch(
+      `http://localhost:3007/reports/${reportId}`,
+      data,
+      {
+        headers: { Authorization: localStorage.getItem("token") },
+      },
+    );
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 // GET DOCTOR DETAILS
 export const GetDoctorDetails = () => async (dispatch) => {
   try {
@@ -162,9 +178,7 @@ export const GetAppointments = (userType, id) => async (dispatch) => {
 export const DeleteAppointment = (id) => async (dispatch) => {
   try {
     dispatch({ type: types.DELETE_APPOINTMENT_REQUEST });
-    const res = await axios.delete(
-      `http://localhost:3007/appointments/${id}`,
-    );
+    const res = await axios.delete(`http://localhost:3007/appointments/${id}`);
     console.log(res.data);
     // return res.data;
     dispatch({
@@ -183,7 +197,7 @@ export const GetAllReports = (userType, id) => async (dispatch) => {
     dispatch({ type: types.GET_REPORTS_REQUEST });
     const res = await axios.get(
       `http://localhost:3007/reports/${userType}/${id}`,
-      { headers: { Authorization: localStorage.getItem("token") } }
+      { headers: { Authorization: localStorage.getItem("token") } },
     );
     console.log("res", res.data);
     const reports = { reports: res.data.data };
@@ -199,12 +213,17 @@ export const GetAllReports = (userType, id) => async (dispatch) => {
 
 export const CreateCertificate = (data) => async (dispatch) => {
   try {
-    dispatch({ type: types.GET_CERTIFICATES_REQUEST });
+    dispatch({ type: types.GET_CERTIFICATES_REQUEST }); // Reusing request type for simplicity or define CREATE_CERTIFICATE_REQUEST
     const res = await axios.post(
       "http://localhost:3007/certificates/create",
-      data
+      data,
+      { headers: { Authorization: localStorage.getItem("token") } },
     );
     console.log(res);
+    dispatch({
+      type: types.CREATE_CERTIFICATE_SUCCESS,
+      payload: res.data.data,
+    });
     return res.data;
   } catch (error) {
     console.log(error);
@@ -215,7 +234,7 @@ export const GetAllCertificates = (userType, id) => async (dispatch) => {
   try {
     dispatch({ type: types.GET_CERTIFICATES_REQUEST });
     const res = await axios.get(
-      `http://localhost:3007/certificates/${userType}/${id}`
+      `http://localhost:3007/certificates/${userType}/${id}`,
     );
     console.log("res", res.data);
     const certificates = { certificates: res.data.data };
@@ -278,6 +297,126 @@ export const getLabHistory = (patientId) => async (dispatch) => {
 export const createLabRequest = (data, token) => async (dispatch) => {
   try {
     const res = await axios.post(`${baseURL}/lab/request`, data, {
+      headers: { Authorization: token },
+    });
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const reviewLabResult = (id, token) => async (dispatch) => {
+  try {
+    dispatch({ type: types.REVIEW_LAB_RECORD_REQUEST });
+    const res = await axios.patch(
+      `${baseURL}/lab/record/${id}/review`,
+      {},
+      {
+        headers: { Authorization: token },
+      },
+    );
+    dispatch({
+      type: types.REVIEW_LAB_RECORD_SUCCESS,
+      payload: id,
+    });
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getDoctorLabHistory = (doctorId, token) => async (dispatch) => {
+  try {
+    dispatch({ type: types.GET_DOCTOR_LAB_HISTORY_REQUEST });
+    const res = await axios.get(`${baseURL}/lab/history/doctor/${doctorId}`, {
+      headers: { Authorization: token },
+    });
+    dispatch({
+      type: types.GET_DOCTOR_LAB_HISTORY_SUCCESS,
+      payload: res.data,
+    });
+    return res.data;
+  } catch (error) {
+    dispatch({ type: types.GET_DOCTOR_LAB_HISTORY_ERROR });
+    console.log(error);
+  }
+};
+
+// Get all lab technicians
+export const GetLabTechs = () => async (dispatch) => {
+  try {
+    dispatch({ type: types.GET_LAB_TECHS_REQUEST });
+    const res = await axios.get(`${baseURL}/labtechs`);
+    dispatch({
+      type: types.GET_LAB_TECHS_SUCCESS,
+      payload: res.data,
+    });
+    return res.data;
+  } catch (error) {
+    dispatch({ type: types.GET_LAB_TECHS_ERROR });
+    console.log(error);
+  }
+};
+
+// Get Doctor's Assigned Queue
+export const getDoctorQueue = (doctorId, token) => async (dispatch) => {
+  try {
+    dispatch({ type: types.GET_DOCTOR_QUEUE_REQUEST });
+    const res = await axios.get(`${baseURL}/doctors/queue/${doctorId}`, {
+      headers: { Authorization: token },
+    });
+    dispatch({
+      type: types.GET_DOCTOR_QUEUE_SUCCESS,
+      payload: res.data,
+    });
+  } catch (error) {
+    dispatch({ type: types.GET_DOCTOR_QUEUE_ERROR });
+    console.log(error);
+  }
+};
+
+// Get Full Consultation Data for a Patient
+export const getConsultationData = (studentId, token) => async (dispatch) => {
+  try {
+    dispatch({ type: types.GET_CONSULTATION_DATA_REQUEST });
+    const res = await axios.get(
+      `${baseURL}/doctors/consultation/${encodeURIComponent(studentId)}`,
+      {
+        headers: { Authorization: token },
+      },
+    );
+    dispatch({
+      type: types.GET_CONSULTATION_DATA_SUCCESS,
+      payload: res.data,
+    });
+    return res.data;
+  } catch (error) {
+    dispatch({ type: types.GET_CONSULTATION_DATA_ERROR });
+    console.log(error);
+  }
+};
+
+// Mark Consultation as Completed
+export const completeConsultation = (queueId, token) => async (dispatch) => {
+  try {
+    dispatch({ type: types.COMPLETE_CONSULTATION_REQUEST });
+    await axios.patch(
+      `${baseURL}/doctors/consultation/complete/${queueId}`,
+      {},
+      {
+        headers: { Authorization: token },
+      },
+    );
+    dispatch({ type: types.COMPLETE_CONSULTATION_SUCCESS });
+  } catch (error) {
+    dispatch({ type: types.COMPLETE_CONSULTATION_ERROR });
+    console.log(error);
+  }
+};
+// Email Certificate
+export const EmailCertificate = (data, token) => async (dispatch) => {
+  try {
+    const res = await axios.post(`${baseURL}/certificates/email`, data, {
       headers: { Authorization: token },
     });
     return res.data;

@@ -30,6 +30,38 @@ const updateDoctorQuery = `
     RETURNING *;
 `;
 
+const findDoctorByIdQuery = `SELECT * FROM doctors WHERE id = $1;`;
+
+const updateDoctorByIdQuery = `
+    UPDATE doctors
+    SET name = $2,
+        phonenum = $3,
+        age = $4,
+        gender = $5,
+        bloodgroup = $6,
+        dob = $7,
+        address = $8,
+        education = $9,
+        department = $10,
+        fees = $11
+    WHERE id = $1
+    RETURNING *;
+`;
+
+const updateDoctorPasswordQuery = `
+    UPDATE doctors
+    SET password = $2
+    WHERE id = $1
+    RETURNING *;
+`;
+
+const updateDoctorAvailabilityQuery = `
+    UPDATE doctors
+    SET availability = $2
+    WHERE id = $1
+    RETURNING *;
+`;
+
 const findDoctorByEmailQuery = `SELECT * FROM doctors WHERE email = $1;`;
 
 const getAllDoctorsQuery = `SELECT * FROM doctors;`;
@@ -40,4 +72,8 @@ module.exports = {
   findDoctorByEmailQuery,
   getAllDoctorsQuery,
   updateDoctorQuery,
+  findDoctorByIdQuery,
+  updateDoctorByIdQuery,
+  updateDoctorPasswordQuery,
+  updateDoctorAvailabilityQuery,
 };

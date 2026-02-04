@@ -39,4 +39,21 @@ router.get("/:userType/:id", async (req, res) => {
   }
 });
 
+// Email Certificate
+router.post("/email", async (req, res) => {
+  const { to, subject, html } = req.body;
+  try {
+    const { sendEmail } = await import("../email.js"); // Dynamic import to avoid earlier requiring path issues
+    const result = await sendEmail({ to, subject, html });
+    if (result.success) {
+      res.status(200).send({ message: "Email Sent Successfully" });
+    } else {
+      res.status(500).send({ message: "Failed to send email" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: "Error sending email" });
+  }
+});
+
 module.exports = router;

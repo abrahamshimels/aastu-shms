@@ -10,7 +10,8 @@ const {
     getRecordsByPatientQuery,
     getRecordByIdQuery,
     lockRecordQuery,
-    reviewRecordQuery
+    reviewRecordQuery,
+    getRecordsByDoctorQuery
 } = require("../configs/queries/lab");
 
 const createTables = async () => {
@@ -63,6 +64,10 @@ const reviewRecord = (id) => {
     return dbhelper.query(reviewRecordQuery, [id]);
 };
 
+const getDoctorLabHistory = (doctorId) => {
+    return dbhelper.query(getRecordsByDoctorQuery, [doctorId]);
+};
+
 module.exports = {
     createTables,
     createRequest,
@@ -72,5 +77,6 @@ module.exports = {
     submitLabRecord,
     getPatientLabHistory,
     getRecordById,
-    reviewRecord
+    reviewRecord,
+    getDoctorLabHistory
 };

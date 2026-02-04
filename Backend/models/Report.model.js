@@ -14,6 +14,8 @@ const {
   getPatientReportQuery,
   getAllReportsQuery,
   createReportTableQuery,
+  updateReportQuery,
+  updateReportByDoctorQuery,
 } = require("../configs/queries/report");
 
 const initialize = async () => {
@@ -39,6 +41,9 @@ const createReport = async (reportData) => {
     reportData.glucose,
     reportData.info,
     JSON.stringify(reportData.medicines || []),
+    reportData.treatment_plan || null,
+    reportData.follow_up_date || null,
+    reportData.recommendations || null,
   ];
   const result = await dbhelper.query(createReportQueryNew, values);
   return result[0];
@@ -88,6 +93,34 @@ const getAllReportsLegacy = () => {
   });
 };
 
+const updateReport = async (id, reportData, doctorId = null) => {
+  const values = [
+    id,
+    reportData.disease,
+    reportData.temperature,
+    reportData.weight,
+    reportData.bp,
+    reportData.glucose,
+    reportData.info,
+    JSON.stringify(reportData.medicines || []),
+    reportData.treatment_plan || null,
+    reportData.follow_up_date || null,
+    reportData.recommendations || null,
+  ];
+
+  if (doctorId) {
+    const doctorValues = [...values, doctorId];
+    const result = await dbhelper.query(
+      updateReportByDoctorQuery,
+      doctorValues,
+    );
+    return result[0];
+  }
+
+  const result = await dbhelper.query(updateReportQuery, values);
+  return result[0];
+};
+
 module.exports = {
   initialize,
   createReport,
@@ -99,4 +132,5 @@ module.exports = {
   getDoctorReports,
   getPatientReports,
   getAllReportsLegacy,
+  updateReport,
 };
