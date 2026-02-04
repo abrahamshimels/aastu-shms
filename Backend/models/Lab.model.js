@@ -52,8 +52,45 @@ const submitLabRecord = async (requestId, technologistId, resultValue, criticalF
     return result;
 };
 
-const getPatientLabHistory = (patientId) => {
-    return dbhelper.query(getRecordsByPatientQuery, [patientId]);
+const getPatientLabHistory = (studentId) => {
+      //get the patient id from from patient table using studentId
+    // patient id is not same as studentId
+    return dbhelper
+      .query("SELECT id FROM patients WHERE studentid = $1", [studentId])
+      .then(async (result) => {
+        if (result.length === 0) {
+          return [];
+        }
+        const patId = result[0].id;
+        //get lab_test_requests records using patient id then fetch lab records using request id
+        // first get the requests
+        const requests = await dbhelper.query(
+          "SELECT * FROM lab_test_requests WHERE patient_id = $1",
+          [patId]
+        );
+        const labRecords = [];
+        for (const req of requests) {
+          const records = await dbhelper.query(
+            "SELECT * FROM lab_records WHERE request_id = $1",
+            [req.id]
+          );
+          for (const record of records) {
+            labRecords.push({
+              ...record,
+              testType: req.test_type,
+              requestDate: req.request_date,
+              priority: req.priority,
+              status: req.status,
+            });
+          }
+        }
+        return labRecords;
+       
+
+      });
+    
+
+
 };
 
 const getRecordById = (id) => {

@@ -571,17 +571,16 @@ const Doctor_Profile = () => {
                 </h2>
                 <div className="singleitemdiv">
                   <BiTime className="singledivicons" />
-                  <p>09:00 AM - 20:00 PM (TIMING)</p>
+                  <p>02:00 AM - 2:00 PM (TIMING)</p>
                 </div>
                 <div className="singleitemdiv">
                   <FaRegHospital className="singledivicons" />
-                  <p>AZIZ FATIMA HOSPITAL</p>
+                  <p>Addis Ababa Science and Technology University Clinic</p>
                 </div>
                 <div className="singleitemdiv">
                   <FaMapMarkedAlt className="singledivicons" />
                   <p>
-                    Faisalabad - Sheikhupura Road, Gulistan Colony Faisalabad,
-                    Punjab
+                    Addis Ababa Science and Technology University, Addis Ababa,
                   </p>
                 </div>
               </div>

@@ -52,6 +52,23 @@ const PatientHistoryView = () => {
   const [saving, setSaving] = React.useState(false);
   const [editForm] = Form.useForm();
 
+  const normalizeMedicines = (medicines) => {
+    if (!medicines) return [];
+    if (Array.isArray(medicines)) return medicines;
+    if (typeof medicines === "string") {
+      try {
+        const parsed = JSON.parse(medicines);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+    if (typeof medicines === "object") {
+      return Array.isArray(medicines) ? medicines : [];
+    }
+    return [];
+  };
+
   useEffect(() => {
     if (studentId && data?.token) {
       dispatch(getConsultationData(studentId, data.token));
@@ -78,16 +95,7 @@ const PatientHistoryView = () => {
     try {
       const values = await editForm.validateFields();
       setSaving(true);
-      let medicinesPayload = [];
-      if (selectedRecord?.medicines) {
-        try {
-          medicinesPayload = Array.isArray(selectedRecord.medicines)
-            ? selectedRecord.medicines
-            : JSON.parse(selectedRecord.medicines);
-        } catch (e) {
-          medicinesPayload = [];
-        }
-      }
+      const medicinesPayload = normalizeMedicines(selectedRecord?.medicines);
       const payload = {
         ...values,
         medicines: medicinesPayload,
@@ -284,19 +292,20 @@ const PatientHistoryView = () => {
                           <Paragraph>
                             <strong>Treatment:</strong> {h.treatment_plan}
                           </Paragraph>
-                          {h.medicines &&
-                            JSON.parse(h.medicines).length > 0 && (
-                              <div style={{ marginTop: "8px" }}>
-                                <Text strong>Prescribed:</Text>
-                                <Space style={{ marginLeft: "8px" }} wrap>
-                                  {JSON.parse(h.medicines).map((m, mi) => (
+                          {normalizeMedicines(h.medicines).length > 0 && (
+                            <div style={{ marginTop: "8px" }}>
+                              <Text strong>Prescribed:</Text>
+                              <Space style={{ marginLeft: "8px" }} wrap>
+                                {normalizeMedicines(h.medicines).map(
+                                  (m, mi) => (
                                     <Tag key={mi} color="purple">
                                       {m.name} ({m.dosage})
                                     </Tag>
-                                  ))}
-                                </Space>
-                              </div>
-                            )}
+                                  ),
+                                )}
+                              </Space>
+                            </div>
+                          )}
                           {h.recommendations && (
                             <Paragraph
                               style={{ marginTop: "8px", fontStyle: "italic" }}
@@ -553,12 +562,13 @@ const PatientHistoryView = () => {
                     <Badge status="processing" /> Prescribed Medication:
                   </Text>
                   <div style={{ marginTop: "8px" }}>
-                    {selectedRecord.medicines &&
-                    JSON.parse(selectedRecord.medicines).length > 0 ? (
+                    {normalizeMedicines(selectedRecord.medicines).length > 0 ? (
                       <Table
                         size="small"
                         pagination={false}
-                        dataSource={JSON.parse(selectedRecord.medicines)}
+                        dataSource={normalizeMedicines(
+                          selectedRecord.medicines,
+                        )}
                         columns={[
                           { title: "Medicine", dataIndex: "name", key: "name" },
                           {

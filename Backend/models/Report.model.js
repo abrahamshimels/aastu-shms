@@ -81,11 +81,24 @@ const getDoctorReports = (id) => {
   });
 };
 
-const getPatientReports = (id) => {
-  return dbhelper.query(getPatientReportQuery, [id]).then((result) => {
-    return result;
-  });
-};
+const getPatientReports = (studentId) => {
+  //get the patient id from from patient table using studentId
+  // patient id is not same as studentId
+  return dbhelper
+    .query("SELECT id FROM patients WHERE studentid = $1", [studentId])
+    .then(async (result) => {
+      if (result.length === 0) {
+        return [];
+      }
+      const patientId = result[0].id;
+      return dbhelper
+        .query(getPatientReportQuery, [patientId])
+        .then((reports) => {
+          return reports;
+        });
+    });
+}
+
 
 const getAllReportsLegacy = () => {
   return dbhelper.query(getAllReportsQuery, []).then((result) => {

@@ -41,13 +41,15 @@ const getPatientReportQuery = `SELECT s.name as doctor_name,
 reports.*
 FROM reports
 JOIN staff s ON reports.doctor_id = s.id
-WHERE reports.patient_id = $1;`;
+WHERE reports.patient_id = $1
+ORDER BY reports.date DESC, reports.time DESC;`;
 
 const getDoctorReportQuery = `SELECT p.name,
 reports.*
 FROM reports
 JOIN patients p ON reports.patient_id = p.studentid
-WHERE reports.doctor_id = $1;`;
+WHERE reports.doctor_id = $1
+ORDER BY reports.date DESC, reports.time DESC;`;
 
 const getAllReportsQuery = `SELECT p.name as patient_name, s.name as doctor_name,
 reports.*
