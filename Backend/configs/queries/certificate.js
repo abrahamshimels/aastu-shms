@@ -1,8 +1,8 @@
 const createCertificatesTableQuery = `
   CREATE TABLE IF NOT EXISTS certificates (
     id SERIAL PRIMARY KEY,
-    student_id INTEGER NOT NULL,
-    doctor_id INTEGER NOT NULL,
+    student_id VARCHAR(50) NOT NULL,
+    doctor_id VARCHAR(50) NOT NULL,
     type VARCHAR(100) NOT NULL,
     issue_date DATE NOT NULL,
     content TEXT,

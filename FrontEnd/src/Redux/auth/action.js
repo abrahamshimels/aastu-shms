@@ -543,6 +543,59 @@ export const NurseRegister = (data) => async (dispatch) => {
   }
 };
 
+// UPDATE NURSE
+export const UpdateNurse = (id, data, token) => async (dispatch) => {
+    try {
+        const res = await axios.patch(
+            `http://localhost:3007/nurses/${id}`,
+            data,
+            token ? { headers: { Authorization: token } } : undefined
+        );
+         dispatch({
+            type: types.LOGIN_NURSE_SUCCESS, // Reuse login success to update user in auth state if needed
+            payload: {
+                message: res.data.message,
+                user: res.data.user,
+                token: token
+            }
+        });
+        return res.data;
+    } catch (error) {
+        console.log(error);
+        return { message: "Error" };
+    }
+};
+
+
+// UPDATE LAB TECH
+export const UpdateLabTech = (id, data, token) => async (dispatch) => {
+    try {
+        const res = await axios.patch(
+            `http://localhost:3007/labtechs/${id}`, // Note: Route path in index.js might be /labtechs or /laboratory_technologists. 
+            // In Server.js/index.js (not seen), but usually consistent. 
+            // Let's assume /labtechs for now based on LabTechnologist.Route.js usually being mounted there.
+            // Wait, LabTechnologist.Route.js was checked? 
+            // In Step 1024, LabTechnologist.Route.js file exists.
+            // I need to be sure about the base route. 
+            // "LabTechLogin" uses `${baseURL}/labtechs/login`. So it is logic to use /labtechs.
+            data,
+            token ? { headers: { Authorization: token } } : undefined
+        );
+        dispatch({
+            type: types.LOGIN_LABTECH_SUCCESS,
+             payload: {
+                message: res.data.message,
+                user: res.data.user,
+                token: token
+            }
+        });
+        return res.data;
+    } catch (error) {
+        console.log(error);
+        return { message: "Error" };
+    }
+};
+
 //forget password
 export const forgetPassword = (data) => async (dispatch) => {
   try {

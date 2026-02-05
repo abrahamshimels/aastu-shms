@@ -64,7 +64,8 @@ const findIfExists = (email) => {
 const addPatient = (patient) => {
   console.log("patient received:", patient);
   const array = [
-    patient.studentID.trim().toUpperCase(),
+    patient.studentID.trim().toUpperCase(), // This is the 'id' column
+    patient.studentID.trim().toUpperCase(), // This is the 'studentID' column
     patient.name,
     patient.department,
     patient.year,

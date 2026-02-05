@@ -16,6 +16,10 @@ const { findByStudentId } = require("../models/Patient.model");
 const { getPatientLabHistory } = require("../models/Lab.model");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const { updatePassword: updateStaffPassword } = require("../models/Staff.model");
+const { logAction } = require("../models/AuditLog.model");
+const { authenticate } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
@@ -208,7 +212,17 @@ router.patch("/:doctorId", async (req, res) => {
   const { password, ...profileUpdates } = req.body;
   try {
     if (password) {
+      console.log(`DEBUG: Updating password for ${id}`);
+      
+      // 1. Update Doctor table (Plain text as per existing design)
       await updatePass(password, id);
+      console.log(`DEBUG: Updated Doctor table password for ${id}`);
+
+      // 2. Sync to Staff table (Hashed)
+      const hashedPassword = await bcrypt.hash(password, 10);
+      await updateStaffPassword(id, hashedPassword);
+      console.log(`DEBUG: Synced password update for DOCTOR ${id} to Staff table.`);
+
       const doctor = await findById(id);
       if (doctor[0]?.password === password) {
         return res.status(200).send({
@@ -219,7 +233,30 @@ router.patch("/:doctorId", async (req, res) => {
       return res.send({ message: "password not updated" });
     }
 
-    const updated = await updateDoctorById(id, profileUpdates);
+    // 1. Fetch existing doctor data to preserve fields
+    const currentDoctor = await findById(id);
+    if (!currentDoctor || currentDoctor.length === 0) {
+      return res.status(404).send({ message: "doctor not found" });
+    }
+    const existingData = currentDoctor[0];
+    console.log("DEBUG: Existing Doctor Data:", existingData);
+
+    // 2. Merge existing data with updates
+    const mergedData = {
+        name: profileUpdates.name || existingData.name,
+        phonenum: profileUpdates.phonenum || existingData.phonenum,
+        email: profileUpdates.email || existingData.email,
+        age: profileUpdates.age || existingData.age,
+        gender: profileUpdates.gender || existingData.gender,
+        bloodgroup: profileUpdates.bloodgroup || existingData.bloodgroup,
+        dob: profileUpdates.dob || existingData.dob,
+        address: profileUpdates.address || existingData.address,
+        education: profileUpdates.education || existingData.education,
+        department: profileUpdates.department || existingData.department,
+        fees: profileUpdates.fees || existingData.fees,
+    };
+
+    const updated = await updateDoctorById(id, mergedData);
     if (!updated) {
       return res.status(404).send({ message: "doctor not found" });
     }
@@ -278,9 +315,15 @@ router.get("/consultation/*", async (req, res) => {
 });
 
 // Complete Consultation
-router.patch("/consultation/complete/:queueId", async (req, res) => {
+router.patch("/consultation/complete/:queueId", authenticate, async (req, res) => {
   try {
     await completeQueueItem(req.params.queueId);
+    
+    // Log Action
+    if (req.user && req.user.id) {
+        await logAction(req.user.id, "COMPLETE_CONSULTATION", "queue", req.params.queueId);
+    }
+
     res.status(200).send({ message: "Consultation completed" });
   } catch (error) {
     console.error(error);

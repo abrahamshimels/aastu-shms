@@ -244,10 +244,32 @@ const Sidebar = () => {
                     Lab History
                   </div>
                 </NavLink>
+                <NavLink className="link" to={"/labtechprofile"}>
+                  <div className="icon">
+                    <CgProfile className="mainIcon" />
+                  </div>
+                  <div
+                    style={{ display: isOpen ? "block" : "none" }}
+                    className="link_text"
+                  >
+                   Profile
+                  </div>
+                </NavLink>
               </>
             ) : null}
             {user?.userType === "nurse" ? (
               <>
+                <NavLink className="link" to={"/nurseprofile"}>
+                  <div className="icon">
+                    <CgProfile className="mainIcon" />
+                  </div>
+                  <div
+                    style={{ display: isOpen ? "block" : "none" }}
+                    className="link_text"
+                  >
+                    Profile
+                  </div>
+                </NavLink>
                 <NavLink className="link" to={"/registration"}>
                   <div className="icon">
                     <AiOutlineUserAdd className="mainIcon" />

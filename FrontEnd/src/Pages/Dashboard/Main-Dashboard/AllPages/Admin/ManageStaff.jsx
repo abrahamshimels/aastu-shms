@@ -180,20 +180,19 @@ const ManageStaff = () => {
             ]}
             width={600}
         >
-            <div style={{ padding: '20px' }}>
-                <Row gutter={16}>
-                    <Col span={8}>
-                        <Statistic title="Consultations" value={workloadData?.doc_consultations || 0} prefix={<BarChartOutlined />} />
-                    </Col>
-                    <Col span={8}>
-                        <Statistic title="Lab Tests" value={workloadData?.lab_tests || 0} />
-                    </Col>
-                    <Col span={8}>
-                        <Statistic title="Nurse Check-ins" value={workloadData?.nurse_checkins || 0} />
-                    </Col>
-                </Row>
-                <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#e3f2fd', borderRadius: '8px' }}>
-                    <p><strong>Note:</strong> Performance metrics are calculated based on departmental records since the start of the current month.</p>
+            <div style={{ padding: '20px', textAlign: 'center' }}>
+                <Statistic 
+                    title={
+                        currentStaff?.role === 'DOCTOR' ? "Consultations Completed" :
+                        currentStaff?.role === 'NURSE' ? "Patient Registrations" :
+                        currentStaff?.role === 'LAB_TECH' ? "Laboratory Tests" : "Verified Actions"
+                    } 
+                    value={workloadData?.total_reports || 0} 
+                    prefix={<BarChartOutlined />} 
+                    valueStyle={{ color: '#1a237e', fontSize: '36px' }}
+                />
+                <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#e3f2fd', borderRadius: '8px', textAlign: 'left' }}>
+                    <p><strong>Note:</strong> Performance metrics are calculated based on departmental records since the system initialization.</p>
                 </div>
             </div>
         </Modal>

@@ -7,7 +7,11 @@ const {
     addLabTech,
     getLabTechCredsFromEmail,
     updatePass,
+    findById,
+    updateLabTechById
 } = require("../models/LabTechnologist.model");
+const bcrypt = require("bcrypt");
+const { updatePassword: updateStaffPassword } = require("../models/Staff.model");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
@@ -62,13 +66,56 @@ router.post("/login", async (req, res) => {
     }
 });
 
-// Update password
+// Update profile/password
 router.patch("/:id", async (req, res) => {
     const { id } = req.params;
-    const { password } = req.body;
+    const { password, ...profileUpdates } = req.body;
     try {
-        await updatePass(password, id);
-        res.status(200).send({ message: "Password updated successfully" });
+        if (password) {
+            // 1. Update LabTech table
+            await updatePass(password, id);
+
+             // 2. Sync to Staff table
+            const hashedPassword = await bcrypt.hash(password, 10);
+            await updateStaffPassword(id, hashedPassword);
+            console.log(`✅ Synced password update for LAB TECH ${id} to Staff table.`);
+
+            const currentLab = await findById(id);
+            res.status(200).send({ 
+                message: "password updated",
+                user: { ...currentLab[0], userType: "lab_technologist" }
+            });
+            return;
+        }
+
+        // 1. Fetch existing data
+        const currentLab = await findById(id);
+        if (!currentLab || currentLab.length === 0) {
+            return res.status(404).send({ message: "Technologist not found" });
+        }
+        const existingData = currentLab[0];
+
+        // 2. Merge data
+        const mergedData = {
+            name: profileUpdates.name || existingData.name,
+            phoneNum: profileUpdates.phonenum || profileUpdates.phoneNum || existingData.phonenum || existingData.phonenum,
+            email: profileUpdates.email || existingData.email,
+            age: profileUpdates.age || existingData.age,
+            gender: profileUpdates.gender || existingData.gender,
+            DOB: profileUpdates.dob || profileUpdates.DOB || existingData.dob || existingData.dob,
+            address: profileUpdates.address || existingData.address
+        };
+
+        const updated = await updateLabTechById(id, mergedData);
+        if (!updated) {
+            return res.status(404).send({ message: "Update failed" });
+        }
+
+        res.status(200).send({ 
+            message: "profile updated",
+            user: { ...updated, userType: "lab_technologist" }
+        });
+
     } catch (error) {
         res.status(400).send({ message: error.message });
     }

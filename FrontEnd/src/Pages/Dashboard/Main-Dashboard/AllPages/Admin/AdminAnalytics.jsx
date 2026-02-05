@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { GetAdminStats, GetTrendAnalytics, SeedTestingData } from "../../../../../Redux/auth/action";
+import { GetAdminStats, GetTrendAnalytics } from "../../../../../Redux/auth/action";
 import Sidebar from "../../GlobalFiles/Sidebar";
 import { Row, Col, Card, Statistic, Typography, Table, Tag, Button, Space, Divider, message } from "antd";
 import { 
@@ -11,8 +11,7 @@ import {
   FilePdfOutlined,
   FileExcelOutlined,
   ArrowUpOutlined,
-  LineChartOutlined,
-  DatabaseOutlined
+  LineChartOutlined
 } from "@ant-design/icons";
 import { Navigate } from "react-router-dom";
 import jsPDF from "jspdf";
@@ -40,20 +39,6 @@ const AdminAnalytics = () => {
     fetchData();
   }, []);
 
-  const handleSeedData = async () => {
-    message.loading("Seeding clinical test data...");
-    const res = await SeedTestingData()(null);
-    if (res.message === "Mock clinical data seeded successfully") {
-      message.success(res.message);
-      fetchData();
-    } else {
-      const errorMsg = res.error ? `${res.message}: ${res.error}` : "Failed to seed data";
-      message.error(errorMsg, 5);
-      if (res.detail) {
-        console.error("Seeding error details:", res.detail);
-      }
-    }
-  };
 
   const handleExportPDF = () => {
     const doc = new jsPDF();
@@ -228,7 +213,7 @@ const AdminAnalytics = () => {
             <Text type="secondary">Real-time insights into clinic performance and health trends.</Text>
           </div>
           <Space>
-            <Button icon={<DatabaseOutlined />} onClick={handleSeedData}>Seed Test Data</Button>
+
             <Button icon={<FilePdfOutlined />} type="primary" danger onClick={handleExportPDF}>Weekly PDF</Button>
             <Button icon={<FilePdfOutlined />} type="primary" ghost onClick={handleExportStaffPDF}>Staff PDF</Button>
             <Button icon={<FileExcelOutlined />} style={{ backgroundColor: '#2e7d32', color: 'white' }} onClick={handleExportExcel}>Monthly Excel</Button>

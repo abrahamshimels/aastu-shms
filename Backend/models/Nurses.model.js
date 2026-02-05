@@ -1,5 +1,5 @@
 const dbhelper = require('../configs/dbhelper');
-const { createNursesTable, addNurseQuery, updateNurseQuery, findNurseByEmailQuery, getAllNursesQuery } = require('../configs/queries/nurses');
+const { createNursesTable, addNurseQuery, updateNurseQuery, findNurseByEmailQuery, getAllNursesQuery, findNurseByIdQuery, updateNurseByIdQuery } = require('../configs/queries/nurses');
 
 const NursesModel = {
   init: async () => {
@@ -13,6 +13,7 @@ const NursesModel = {
 
   addNurse: async (nurse) => {
     const values = [
+      nurse.id,
       nurse.name,
       nurse.phonenum,
       nurse.email,
@@ -45,6 +46,26 @@ const NursesModel = {
     return result[0];
   },
 
+  findById: async (id) => {
+    const result = await dbhelper.query(findNurseByIdQuery, [id]);
+    return result;
+  },
+
+  updateNurseById: async (id, nurse) => {
+    const values = [
+      id,
+      nurse.name,
+      nurse.phonenum,
+      nurse.email,
+      nurse.age,
+      nurse.gender,
+      nurse.address,
+      nurse.qualification
+    ];
+    const result = await dbhelper.query(updateNurseByIdQuery, values);
+    return result[0];
+  },
+
   getAll: async () => {
     return await dbhelper.query(getAllNursesQuery);
   }
@@ -58,7 +79,7 @@ const createTables = async () => {
 const findCred = async (id) => {
   // This function needs to find nurse by ID and return credentials
   // Since we don't have a findById query, we'll need to add it
-  const query = 'SELECT id, password, email FROM nurses WHERE id = $1';
+  const query = 'SELECT * FROM nurses WHERE id = $1';
   const result = await dbhelper.query(query, [id]);
   return result;
 };
@@ -94,5 +115,7 @@ module.exports = {
   findIfExists,
   getNurseCredsFromEmail,
   getAllNurses,
-  updatePass
+  updatePass,
+  findById: NursesModel.findById,
+  updateNurseById: NursesModel.updateNurseById
 };

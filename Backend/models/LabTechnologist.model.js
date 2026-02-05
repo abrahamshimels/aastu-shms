@@ -8,6 +8,8 @@ const {
     countLabTechQuery,
     updatePassQuery,
     getAllQuery,
+    findLabTechByIdQuery,
+    updateLabTechByIdQuery,
 } = require("../configs/queries/labTechnologist");
 
 const getAllLabTechs = () => {
@@ -59,6 +61,7 @@ const findIfExists = (email) => {
 const addLabTech = (labTech) => {
     console.log("lab tech received:", labTech);
     const values = [
+        labTech.id,
         labTech.name,
         labTech.phonenum || labTech.phoneNum || 0,
         labTech.email,
@@ -73,6 +76,28 @@ const addLabTech = (labTech) => {
     });
 };
 
+const findById = (id) => {
+    return dbhelper.query(findLabTechByIdQuery, [id]).then((result) => {
+        return result;
+    });
+};
+
+const updateLabTechById = (id, labTech) => {
+     const values = [
+        id,
+        labTech.name,
+        labTech.phoneNum || labTech.phonenum,
+        labTech.email,
+        labTech.age,
+        labTech.gender,
+        labTech.DOB || labTech.dob,
+        labTech.address
+    ];
+    return dbhelper.query(updateLabTechByIdQuery, values).then((result) => {
+        return result[0];
+    });
+};
+
 module.exports = {
     findIfExists,
     createTables,
@@ -82,4 +107,6 @@ module.exports = {
     countLabTech,
     updatePass,
     getAllLabTechs,
+    findById,
+    updateLabTechById,
 };

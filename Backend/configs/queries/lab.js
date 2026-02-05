@@ -1,7 +1,7 @@
 const createLabTestRequestTable = `CREATE TABLE IF NOT EXISTS lab_test_requests (
   id SERIAL PRIMARY KEY,
-  patient_id INT NOT NULL,
-  doctor_id INT NOT NULL,
+  patient_id VARCHAR(50) NOT NULL,
+  doctor_id VARCHAR(50) NOT NULL,
   test_type VARCHAR(255) NOT NULL,
   status VARCHAR(50) DEFAULT 'Pending',
   priority VARCHAR(50) DEFAULT 'Normal',
@@ -13,8 +13,8 @@ const createLabTestRequestTable = `CREATE TABLE IF NOT EXISTS lab_test_requests 
 
 const createLabRecordTable = `CREATE TABLE IF NOT EXISTS lab_records (
   id SERIAL PRIMARY KEY,
-  request_id INT NOT NULL,
-  technologist_id INT NOT NULL,
+  request_id INTEGER NOT NULL,
+  technologist_id VARCHAR(50) NOT NULL,
   result_value TEXT NOT NULL,
   critical_flag BOOLEAN DEFAULT FALSE,
   submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

@@ -26,7 +26,10 @@ router.post("/", authorize(["DOCTOR", "ADMIN"]), async (req, res) => {
       appointment_id: req.body.appointment_id || req.body.appointmentid,
     });
 
-    await logAction(req.user.id, "CREATE_REPORT", "reports", report.id);
+    await logAction(req.user.id, "CREATE_REPORT", "reports", report.id, {
+      disease: report.disease,
+      patient_id: report.patient_id
+    });
 
     res.status(201).json({ message: "successful", report });
   } catch (err) {

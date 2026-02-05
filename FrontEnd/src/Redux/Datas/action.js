@@ -13,12 +13,14 @@ export const CreateReport = (data) => async (dispatch) => {
     console.log(res);
     return res.data;
   } catch (error) {
+    console.log(error);
     dispatch({
       type: types.CREATE_REPORT_ERROR,
       payload: {
         message: error,
       },
     });
+    return { message: error.response?.data?.message || error.message };
   }
 };
 
@@ -42,7 +44,8 @@ export const updateReport = (reportId, data) => async (dispatch) => {
 export const GetDoctorDetails = () => async (dispatch) => {
   try {
     dispatch({ type: types.GET_DOCTOR_REQUEST });
-    const res = await axios.get("http://localhost:3007/admin/staff", {
+    dispatch({ type: types.GET_DOCTOR_REQUEST });
+    const res = await axios.get("http://localhost:3007/doctors", {
       headers: { Authorization: localStorage.getItem("token") },
     });
     console.log("this", res);

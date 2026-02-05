@@ -1,6 +1,6 @@
 const createNursesTable = `
 CREATE TABLE IF NOT EXISTS nurses (
-    id SERIAL PRIMARY KEY,
+    id VARCHAR(50) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     phonenum BIGINT NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS nurses (
 `;
 
 const addNurseQuery = `
-    INSERT INTO nurses (name, phonenum, email, password, age, gender, address, qualification)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    INSERT INTO nurses (id, name, phonenum, email, password, age, gender, address, qualification)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     RETURNING *;
 `;
 
@@ -27,6 +27,15 @@ const updateNurseQuery = `
 
 const findNurseByEmailQuery = `SELECT * FROM nurses WHERE email = $1;`;
 
+const findNurseByIdQuery = `SELECT * FROM nurses WHERE id = $1;`;
+
+const updateNurseByIdQuery = `
+    UPDATE nurses 
+    SET name = $2, phonenum = $3, email = $4, age = $5, gender = $6, address = $7, qualification = $8
+    WHERE id = $1
+    RETURNING *;
+`;
+
 const getAllNursesQuery = `SELECT * FROM nurses;`;
 
 module.exports = {
@@ -34,5 +43,7 @@ module.exports = {
   addNurseQuery,
   updateNurseQuery,
   findNurseByEmailQuery,
+  findNurseByIdQuery,
+  updateNurseByIdQuery,
   getAllNursesQuery,
 };

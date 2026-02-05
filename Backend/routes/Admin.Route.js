@@ -1,13 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
-const { addStaff, getAllStaff, updateStaff, updatePassword } = require("../models/Staff.model");
+const { addStaff, getAllStaff, updateStaff, updatePassword, findById } = require("../models/Staff.model");
 const { createReport } = require("../models/Report.model");
 const { logAction, getLogs, getFilteredLogs } = require("../models/AuditLog.model");
 const { setConfig, getConfig } = require("../models/Config.model");
 const { authenticate, authorize } = require("../middlewares/authMiddleware");
 const dbhelper = require("../configs/dbhelper");
-const { getDailyStatsQuery, getRoleDistributionQuery, getWorkloadQuery, getOverviewCountsQuery, getWeeklyActivityQuery, getOperationalLogQuery } = require("../configs/queries/analytics");
+const { getDailyStatsQuery, getRoleDistributionQuery, getWorkloadQuery, getOverviewCountsQuery, getWeeklyActivityQuery, getOperationalLogQuery, getIndividualWorkloadQuery } = require("../configs/queries/analytics");
 const { getIllnessTrendsQuery, getMonthlyTrendsQuery } = require("../configs/queries/reports");
 
 // All routes here require being an ADMIN
@@ -88,20 +88,32 @@ router.get("/staff", async (req, res) => {
  */
 router.put("/staff/:id", async (req, res) => {
   const { id } = req.params;
-  const { name, email, role, qualification, is_active } = req.body;
+  const { name, email, role, qualification, is_active, phonenum, address, dob, gender, age } = req.body;
 
   try {
-    console.log(`Updating staff ${id}:`, req.body);
+    // 1. Fetch existing staff data to preserve fields like 'role' if not provided
+    const currentStaff = await findById(id);
+    if (!currentStaff) {
+      return res.status(404).json({ message: "Staff member not found" });
+    }
+
+    console.log(`Updating staff ${id}. Merging new data with existing.`);
+
     const updatedStaff = await updateStaff(id, {
-      name,
-      email,
-      role,
-      qualification,
-      is_active,
+      name: name || currentStaff.name,
+      email: email || currentStaff.email,
+      role: role || currentStaff.role, // Preserves role if null in body
+      qualification: qualification || currentStaff.qualification,
+      is_active: is_active !== undefined ? is_active : currentStaff.is_active,
+      phonenum: phonenum || currentStaff.phonenum,
+      address: address || currentStaff.address,
+      dob: dob || currentStaff.dob,
+      gender: gender || currentStaff.gender,
+      age: age || currentStaff.age
     });
 
     if (!updatedStaff) {
-      return res.status(404).json({ message: "Staff member not found" });
+      return res.status(404).json({ message: "Staff member not found after update" });
     }
 
     // LOG ACTION
@@ -192,7 +204,7 @@ router.patch("/:id", async (req, res) => {
  */
 router.get("/staff/:id/workload", async (req, res) => {
   try {
-    const workload = await dbhelper.query(getWorkloadQuery, [req.params.id]);
+    const workload = await dbhelper.query(getIndividualWorkloadQuery, [req.params.id]);
     res.status(200).json(workload[0]);
   } catch (err) {
     console.error("Workload fetch error:", err.message);

@@ -86,6 +86,7 @@ const addStaff = async (staff) => {
   if (newStaff.role === "DOCTOR") {
     try {
       await DoctorsModel.addDoctor({
+        id: newStaff.id,
         name: staff.name,
         phonenum: staff.phonenum || 0,
         email: staff.email,
@@ -106,6 +107,7 @@ const addStaff = async (staff) => {
   } else if (newStaff.role === "NURSE") {
     try {
       await NursesModel.addNurse({
+        id: newStaff.id,
         name: staff.name,
         phonenum: staff.phonenum || 0,
         email: staff.email,
@@ -122,6 +124,7 @@ const addStaff = async (staff) => {
   } else if (newStaff.role === "LAB_TECH") {
     try {
       await LabTechModel.addLabTech({
+        id: newStaff.id,
         name: staff.name,
         phonenum: staff.phonenum || 0,
         email: staff.email,

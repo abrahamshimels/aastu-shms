@@ -1,86 +1,118 @@
 const pool = require('./configs/db');
 
 async function migrate() {
-    console.log("Starting unified ID standardization migration...");
+    console.log("🚀 Starting Unified ID Synchronization...");
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
 
-        // 1. Identify and Drop Foreign Key Constraints
-        const constraintsRes = await client.query(`
-            SELECT conname, table_name
-            FROM (
-                SELECT conname, relname as table_name
-                FROM pg_constraint c
-                JOIN pg_class cl ON cl.oid = c.conrelid
-                JOIN pg_namespace n ON n.oid = c.connamespace
-                WHERE contype = 'f' AND n.nspname = 'public'
-            ) sub;
+        // 1. Sync Patients: Set id = studentID
+        console.log("👨‍🎓 Syncing Patient IDs (id = studentID)...");
+        await client.query(`
+            UPDATE patients SET id = studentID WHERE id != studentID;
         `);
 
-        for (const row of constraintsRes.rows) {
-            console.log(`Dropping constraint ${row.conname} on ${row.table_name}...`);
-            await client.query(`ALTER TABLE "${row.table_name}" DROP CONSTRAINT IF EXISTS "${row.conname}"`);
-        }
+        // 2. Sync Staff/Doctors: Match doctors.id to staff.id based on email
+        console.log("👨‍⚕️ Syncing Doctors/Staff IDs...");
+        await client.query(`
+            UPDATE doctors d
+            SET id = s.id
+            FROM staff s
+            WHERE d.email = s.email AND d.id != s.id;
+        `);
 
-        // 2. Change Primary Key columns to VARCHAR(50)
-        const tablesWithId = [
-            'staff', 'admins', 'nurses', 'doctors', 'laboratory_technologists', 'patients',
-            'ambulance', 'medication', 'audit_logs', 'system_config', 'queue', 'lab_records',
-            'lab_test_requests', 'appointments', 'reports', 'certificates'
-        ];
+        // 3. Sync Nurses
+        await client.query(`
+            UPDATE nurses n
+            SET id = s.id
+            FROM staff s
+            WHERE n.email = s.email AND n.id != s.id;
+        `);
 
-        for (const table of tablesWithId) {
-            console.log(`Converting ${table}.id to VARCHAR(50)...`);
-            // Use 'USING id::character varying' to safely convert if it was INT
-            await client.query(`ALTER TABLE "${table}" ALTER COLUMN id TYPE VARCHAR(50) USING id::character varying`);
-        }
+        // 4. Sync Lab Techs
+        await client.query(`
+            UPDATE laboratory_technologists l
+            SET id = s.id
+            FROM staff s
+            WHERE l.email = s.email AND l.id != s.id;
+        `);
 
-        // 3. Change Foreign Key columns to VARCHAR(50)
-        const fkMapiings = [
-            { table: 'patients', col: 'docid' },
-            { table: 'appointments', col: 'patientid' },
-            { table: 'appointments', col: 'doctorid' },
-            { table: 'queue', col: 'student_id' },
-            { table: 'queue', col: 'patient_id' },
-            { table: 'queue', col: 'doctor_id' },
-            { table: 'lab_test_requests', col: 'patient_id' },
-            { table: 'lab_test_requests', col: 'doctor_id' },
-            { table: 'lab_records', col: 'request_id' },
-            { table: 'lab_records', col: 'technologist_id' },
-            { table: 'reports', col: 'patient_id' },
-            { table: 'reports', col: 'doctor_id' },
-            { table: 'certificates', col: 'student_id' },
-            { table: 'certificates', col: 'doctor_id' },
-            { table: 'audit_logs', col: 'user_id' }
-        ];
+        // 5. Cleanup related tables using numeric lookups if needed
+        // (Usually, if patients.id changed from 1 to ETS..., all FKs must follow)
+        // This is tricky if we don't know the old ID. 
+        // But since we just changed 'patients.id' where it was 1, 2, 3...
+        // We need a mapping.
+        
+        console.log("🔗 Updating Foreign Keys in related tables...");
 
-        for (const mapping of fkMapiings) {
-            console.log(`Converting ${mapping.table}.${mapping.col} to VARCHAR(50)...`);
-            await client.query(`ALTER TABLE "${mapping.table}" ALTER COLUMN "${mapping.col}" TYPE VARCHAR(50) USING "${mapping.col}"::character varying`);
-        }
+        // Update Queue: link student_id to alphanumeric ID
+        await client.query(`
+            UPDATE queue q
+            SET student_id = p.id
+            FROM patients p
+            WHERE q.student_id = p.id::text OR (q.student_id ~ '^[0-9]+$' AND q.student_id = p.id::text);
+        `);
 
-        // 4. Re-establish basic foreign keys (optional but good for integrity)
-        // We might skip this if we want to be more flexible with alphanumeric IDs that might not exist in the linked table yet
-        // But for now, let's try to restore the important ones
-
-        console.log("Re-establishing critical foreign keys...");
-        try {
-            await client.query('ALTER TABLE appointments ADD FOREIGN KEY (patientid) REFERENCES patients(id)');
-            await client.query('ALTER TABLE appointments ADD FOREIGN KEY (doctorid) REFERENCES staff(id)'); // Link to staff(id) now!
-            await client.query('ALTER TABLE reports ADD FOREIGN KEY (patient_id) REFERENCES patients(id)');
-            await client.query('ALTER TABLE reports ADD FOREIGN KEY (doctor_id) REFERENCES staff(id)');
-            await client.query('ALTER TABLE lab_test_requests ADD FOREIGN KEY (patient_id) REFERENCES patients(id)');
-            await client.query('ALTER TABLE lab_test_requests ADD FOREIGN KEY (doctor_id) REFERENCES staff(id)');
-        } catch (fkErr) {
-            console.warn("Could not re-establish some foreign keys (likely due to inconsistent data):", fkErr.message);
-        }
-
-        await client.query('COMMIT');
-        console.log("✅ Unified ID standardization completed successfully!");
+        // Wait, the above logic is for when id was numeric. 
+        // If id is now 'ETS0036/15', we need to match the OLD numeric ID.
+        // I should have done this BEFORE setting id = studentID.
+        
+        // RE-WRITING SCRIPT LOGIC TO BE SAFER
+        await client.query('ROLLBACK');
+        console.log("🔄 Re-aligning script logic for safer migration...");
+        return migrateSafer();
     } catch (err) {
         await client.query('ROLLBACK');
-        console.error("❌ Migration failed:", err);
+        console.error("❌ Synchronization failed:", err);
+    } finally {
+        client.release();
+    }
+}
+
+async function migrateSafer() {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        
+        // A. Update FKs while id is still potentially numeric string
+        console.log("🔗 Updating Related Records (Queue, Reports, etc.) before Sync...");
+        
+        const tablesToUpdate = [
+            { table: 'queue', col: 'student_id', ref: 'patients', refCol: 'id', newVal: 'studentID' },
+            { table: 'queue', col: 'doctor_id', ref: 'staff', refCol: 'id', newVal: 'id' },
+            { table: 'reports', col: 'patient_id', ref: 'patients', refCol: 'id', newVal: 'studentID' },
+            { table: 'reports', col: 'doctor_id', ref: 'staff', refCol: 'id', newVal: 'id' },
+            { table: 'appointments', col: 'patientid', ref: 'patients', refCol: 'id', newVal: 'studentID' },
+            { table: 'appointments', col: 'doctorid', ref: 'staff', refCol: 'id', newVal: 'id' },
+            { table: 'certificates', col: 'student_id', ref: 'patients', refCol: 'id', newVal: 'studentID' },
+            { table: 'certificates', col: 'doctor_id', ref: 'staff', refCol: 'id', newVal: 'id' },
+            { table: 'lab_test_requests', col: 'patient_id', ref: 'patients', refCol: 'id', newVal: 'studentID' },
+            { table: 'lab_test_requests', col: 'doctor_id', ref: 'staff', refCol: 'id', newVal: 'id' },
+            { table: 'lab_records', col: 'technologist_id', ref: 'staff', refCol: 'id', newVal: 'id' },
+        ];
+
+        for (const item of tablesToUpdate) {
+            console.log(`  - Updating ${item.table}.${item.col}...`);
+            await client.query(`
+                UPDATE ${item.table} t
+                SET ${item.col} = r.${item.newVal}
+                FROM ${item.ref} r
+                WHERE t.${item.col} = r.${item.refCol};
+            `);
+        }
+
+        // B. Now Sync PKs
+        console.log("👨‍🎓 Syncing Primary Keys...");
+        await client.query(`UPDATE patients SET id = studentID WHERE id != studentID;`);
+        await client.query(`UPDATE doctors d SET id = s.id FROM staff s WHERE d.email = s.email AND d.id != s.id;`);
+        await client.query(`UPDATE nurses n SET id = s.id FROM staff s WHERE n.email = s.email AND n.id != s.id;`);
+        await client.query(`UPDATE laboratory_technologists l SET id = s.id FROM staff s WHERE l.email = s.email AND l.id != s.id;`);
+
+        await client.query('COMMIT');
+        console.log("✅ Unified ID Synchronization complete! Please restart your server.");
+    } catch (err) {
+        await client.query('ROLLBACK');
+        console.error("❌ Synchronization failed:", err);
     } finally {
         client.release();
         await pool.end();

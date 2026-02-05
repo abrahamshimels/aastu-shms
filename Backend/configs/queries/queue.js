@@ -1,10 +1,10 @@
 const createTableQuery = `CREATE TABLE IF NOT EXISTS queue (
   id SERIAL PRIMARY KEY,
-  student_id INT NOT NULL,
-  patient_id INT, -- if they are already in the patients table
+  student_id VARCHAR(50) NOT NULL,
+  patient_id VARCHAR(50), -- if they are already in the patients table
   chief_complaint TEXT,
   priority VARCHAR(20) DEFAULT 'Normal', -- Normal, Urgent, Emergency
-  doctor_id INT,
+  doctor_id VARCHAR(50),
   status VARCHAR(20) DEFAULT 'Checked-In', -- Checked-In, In-Consultation, Completed
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (student_id) REFERENCES patients(id), -- Assuming student_id maps to patients.id for now

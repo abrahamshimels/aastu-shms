@@ -36,6 +36,7 @@ const findIfExists = async (email) => {
 
 const addDoctor = async (doctor) => {
   const values = [
+    doctor.id,
     doctor.name,
     doctor.phonenum,
     doctor.email,

@@ -1,6 +1,6 @@
 const createDoctorsTable = `
 CREATE TABLE IF NOT EXISTS doctors (
-    id SERIAL PRIMARY KEY,
+    id VARCHAR(50) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     phonenum BIGINT NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,

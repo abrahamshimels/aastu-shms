@@ -1,5 +1,5 @@
 const createAppointmentQueryTable = `CREATE TABLE IF NOT EXISTS appointments (
-  id VARCHAR(50) PRIMARY KEY, -- Matches DB reality
+  id SERIAL PRIMARY KEY, -- Reverted to SERIAL for record table
   patientid VARCHAR(50) NOT NULL,
   date DATE NOT NULL,
   time TIME NOT NULL,

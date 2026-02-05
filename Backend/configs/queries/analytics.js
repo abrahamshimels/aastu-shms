@@ -18,12 +18,28 @@ const getWorkloadQuery = `
         CASE 
             WHEN role = 'DOCTOR' THEN (SELECT COUNT(*) FROM reports WHERE doctor_id = staff.id)
             WHEN role = 'NURSE' THEN (SELECT COUNT(*) FROM audit_logs WHERE user_id = staff.id AND action = 'CREATE_PATIENT')
-            WHEN role = 'LAB_TECH' THEN (SELECT COUNT(*) FROM lab_records WHERE technologist_id = (SELECT id FROM laboratory_technologists WHERE email = staff.email LIMIT 1))
+            WHEN role = 'LAB_TECH' THEN (SELECT COUNT(*) FROM lab_records WHERE technologist_id = staff.id)
             ELSE 0
         END as total_reports,
         (SELECT COUNT(*) FROM reports) as grand_total
     FROM staff
     WHERE role IN ('DOCTOR', 'NURSE', 'LAB_TECH');
+`;
+
+const getIndividualWorkloadQuery = `
+    SELECT 
+        id, name, role,
+        (SELECT COUNT(*) FROM reports WHERE doctor_id = staff.id) as doc_consultations,
+        (SELECT COUNT(*) FROM lab_records WHERE technologist_id = staff.id) as lab_tests,
+        (SELECT COUNT(*) FROM audit_logs WHERE user_id = staff.id AND action = 'CREATE_PATIENT') as nurse_checkins,
+        CASE 
+            WHEN role = 'DOCTOR' THEN (SELECT COUNT(*) FROM reports WHERE doctor_id = staff.id)
+            WHEN role = 'NURSE' THEN (SELECT COUNT(*) FROM audit_logs WHERE user_id = staff.id AND action = 'CREATE_PATIENT')
+            WHEN role = 'LAB_TECH' THEN (SELECT COUNT(*) FROM lab_records WHERE technologist_id = staff.id)
+            ELSE 0
+        END as total_reports
+    FROM staff
+    WHERE id = $1;
 `;
 
 const getWeeklyActivityQuery = `
@@ -69,4 +85,5 @@ module.exports = {
   getOverviewCountsQuery,
   getWeeklyActivityQuery,
   getOperationalLogQuery,
+  getIndividualWorkloadQuery
 };

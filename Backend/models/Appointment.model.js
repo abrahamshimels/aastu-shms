@@ -59,11 +59,11 @@ const getAllAppointments = () => {
 const createAppointment = (data) => {
   // Explicitly map values to match query: patientid, date, time, problem, doctorid
   const values = [
-    data.patientID,
+    data.patientid || data.patientID,
     data.date,
     data.time,
     data.notes || data.problem || "",
-    data.doctorID
+    data.doctorid || data.doctorID
   ];
   return dbhelper.query(createAppointmentQuery, values).then((result) => {
     return result;

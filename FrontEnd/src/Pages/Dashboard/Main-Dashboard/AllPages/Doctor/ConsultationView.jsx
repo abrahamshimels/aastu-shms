@@ -18,6 +18,7 @@ import {
     PlusOutlined,
     SafetyCertificateOutlined,
     WarningOutlined,
+    ReloadOutlined,
 } from "@ant-design/icons";
 import Sidebar from "../../GlobalFiles/Sidebar";
 import "react-toastify/dist/ReactToastify.css";
@@ -230,7 +231,21 @@ const ConsultationView = () => {
                                 </Panel>
 
                                 <Panel
-                                    header={<Space><ExperimentOutlined /> Laboratory Results</Space>}
+                                    header={
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', paddingRight: '20px' }}>
+                                            <Space><ExperimentOutlined /> Laboratory Results</Space>
+                                            <Button 
+                                                size="small" 
+                                                type="text" 
+                                                icon={<ReloadOutlined spin={loading} />} 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    dispatch(getConsultationData(studentId, data.token));
+                                                    toast.info("Refreshing laboratory results...");
+                                                }}
+                                            />
+                                        </div>
+                                    }
                                     key="2"
                                     style={{ marginBottom: "16px", background: "#fff", borderRadius: "8px", border: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
                                 >

@@ -43,8 +43,11 @@ const Registration = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem("token");
     try {
-      const res = await axios.post("http://localhost:3007/nurses/register-patient", formData);
+      const res = await axios.post("http://localhost:3007/nurses/register-patient", formData, {
+        headers: { Authorization: token }
+      });
       if (res.data.message === "Registered") {
         notify("Patient registered successfully");
         setFormData({
