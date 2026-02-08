@@ -18,8 +18,8 @@ router.get("/:userType/:id", async (req, res) => {
       userType === "doctor"
         ? await getAppointmentFromDoctor(id)
         : userType === "patient"
-        ? await getAppointmentFromPatient(id)
-        : await getAllAppointments();
+          ? await getAppointmentFromPatient(id)
+          : await getAllAppointments();
     res.status(200).send({ message: "successful", data: appointments });
   } catch (error) {
     console.log(error);
@@ -31,16 +31,34 @@ router.post("/create", async (req, res) => {
   const payload = req.body;
 
   try {
-    const doctor = await getDoctorCredFromEmail(req.body.docemail);
-    if (doctor.length > 0) {
-      const appointment = { ...payload, docid: doctor[0].id };
-      delete appointment.docemail;
-      console.log(appointment);
-      await createAppointment(appointment);
+    let doctorId = payload.doctorid || payload.docid; // Check direct ID first
+
+    if (!doctorId && payload.docemail) {
+      const doctor = await getDoctorCredFromEmail(payload.docemail);
+      if (doctor.length > 0) {
+        doctorId = doctor[0].id;
+      }
+    }
+
+    if (doctorId) {
+      // Construct explicit object to match SQL query param order: $1 patientid, $2 date, $3 time, $4 problem, $5 doctorid
+      const appointmentData = {
+        patientid: payload.patientid,
+        date: payload.date,
+        time: payload.time,
+        problem: payload.problem,
+        doctorid: doctorId
+      };
+
+      console.log("Creating appointment:", appointmentData);
+      await createAppointment(appointmentData);
       res.status(200).send({ message: "Successful" });
+    } else {
+      res.status(400).send({ message: "Doctor ID not found" });
     }
   } catch (error) {
-    res.send(error);
+    console.error(error);
+    res.status(500).send(error);
   }
 });
 

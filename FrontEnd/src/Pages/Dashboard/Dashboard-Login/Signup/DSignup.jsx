@@ -153,7 +153,6 @@ const DSignup = () => {
               ) : null}
 
               <button type="submit">{loading ? "Loading..." : "Submit"}</button>
-
               {/* ********************************************************* */}
             </form>
           </div>

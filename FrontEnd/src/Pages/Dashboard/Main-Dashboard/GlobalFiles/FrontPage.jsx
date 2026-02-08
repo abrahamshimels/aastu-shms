@@ -1,4 +1,4 @@
-import { Table, Descriptions } from "antd";
+import { Table, Descriptions, Input } from "antd";
 import React from "react";
 import { FaUserPlus, FaUserMd } from "react-icons/fa";
 import patient from "../../../../img/patient.png";
@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { FaAmbulance } from "react-icons/fa";
 import { BsFillBookmarkCheckFill } from "react-icons/bs";
 import { MdPayment } from "react-icons/md";
-import { RiAdminLine } from "react-icons/ri";
+import { RiAdminLine, RiTestTubeFill } from "react-icons/ri";
 import Sidebar from "./Sidebar";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,23 +23,21 @@ import {
 const FrontPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [staffSearch, setStaffSearch] = React.useState("");
+  const [patientSearch, setPatientSearch] = React.useState("");
 
   const patientColumns = [
+    { title: "Student ID", dataIndex: "studentid", key: "studentid" },
     { title: "Name", dataIndex: "name", key: "name" },
-    { title: "Age", dataIndex: "age", key: "age" },
-    { title: "Disease", dataIndex: "disease", key: "disease" },
-    { title: "Blood Group", dataIndex: "bloodgroup", key: "bloodgroup" },
-    { title: "Gender", dataIndex: "gender", key: "gender" },
     { title: "Email", dataIndex: "email", key: "email" },
+    { title: "Dept", dataIndex: "department", key: "department" },
   ];
 
   const doctorColumns = [
+    { title: "ID", dataIndex: "id", key: "id" },
     { title: "Name", dataIndex: "name", key: "name" },
-    { title: "Age", dataIndex: "age", key: "age" },
-    { title: "Gender", dataIndex: "gender", key: "gender" },
-    { title: "Phone Number", dataIndex: "phonenum", key: "phonenum" },
-    { title: "Department", dataIndex: "department", key: "department" },
     { title: "Email", dataIndex: "email", key: "email" },
+    { title: "Role", dataIndex: "role", key: "role" },
   ];
 
   const patientMedication = [
@@ -69,20 +67,28 @@ const FrontPage = () => {
     data: { user },
   } = useSelector((state) => state.auth);
 
+  const { dashboard } = useSelector((store) => store.data);
+  const data = dashboard?.data || {};
+
   const { patients } = useSelector((store) => store.data.patients);
   const { doctors } = useSelector((store) => store.data.doctors);
   const { medicines } = useSelector((store) => store.data.medicines);
   const reportCount = useSelector((store) => store.data.reports)?.reports
     ?.length;
-  const {
-    dashboard: { data },
-  } = useSelector((store) => store.data);
 
-  console.log(data);
-  console.log("patients", patients);
-  console.log("doctors", doctors);
-  console.log("medicies", medicines);
-  console.log("reports Count", reportCount);
+  const filteredStaff = doctors?.filter(
+    (s) =>
+      s.name?.toLowerCase().includes(staffSearch.toLowerCase()) ||
+      s.id?.toLowerCase().includes(staffSearch.toLowerCase()) ||
+      s.email?.toLowerCase().includes(staffSearch.toLowerCase())
+  );
+
+  const filteredPatients = patients?.filter(
+    (p) =>
+      p.name?.toLowerCase().includes(patientSearch.toLowerCase()) ||
+      p.studentid?.toLowerCase().includes(patientSearch.toLowerCase()) ||
+      p.email?.toLowerCase().includes(patientSearch.toLowerCase())
+  );
   console.log(user);
   console.log(user?.id);
   console.log("userType", user?.userType);
@@ -106,14 +112,7 @@ const FrontPage = () => {
                 </div>
                 <FaUserPlus className="overviewIcon" />
               </div>
-              <div className="six commondiv">
-                {" "}
-                <div>
-                  <h1>{data?.appointment}</h1>
-                  <p>Appointment</p>
-                </div>
-                <BsFillBookmarkCheckFill className="overviewIcon" />
-              </div>
+              
               {user?.userType === "admin" ? (
                 <>
                   <div className="one commondiv">
@@ -134,21 +133,22 @@ const FrontPage = () => {
                   <div className="five commondiv">
                     {" "}
                     <div>
-                      <h1>{data?.ambulance}</h1>
-                      <p>Ambulance</p>
+                      <h1>{data?.lab_tech}</h1>
+                      <p>Lab Technologist</p>
                     </div>
-                    <FaAmbulance className="overviewIcon" />
-                  </div>
-                  <div className="six commondiv">
-                    {" "}
-                    <div>
-                      <h1>{data?.report}</h1>
-                      <p>Reports</p>
-                    </div>
-                    <MdPayment className="overviewIcon" />
+                    <RiTestTubeFill className="overviewIcon" />
                   </div>
                 </>
-              ) : null}
+              ) : (
+                <div className="six commondiv">
+                  {" "}
+                  <div>
+                    <h1>{data?.appointment}</h1>
+                    <p>Appointment</p>
+                  </div>
+                  <BsFillBookmarkCheckFill className="overviewIcon" />
+                </div>
+              )}
             </>
           ) : null}
         </div>
@@ -205,17 +205,31 @@ const FrontPage = () => {
         <div>
           {user?.userType === "admin" ? (
             <div className="patientDetails">
-              <h1>Doctor Details</h1>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h1>Staff Details</h1>
+                <Input.Search 
+                  placeholder="Search staff..." 
+                  style={{ width: 300 }} 
+                  onChange={e => setStaffSearch(e.target.value)}
+                />
+              </div>
               <div className="patientBox">
-                <Table columns={doctorColumns} dataSource={doctors} />
+                <Table columns={doctorColumns} dataSource={filteredStaff} rowKey="id" />
               </div>
             </div>
           ) : null}
           {user?.userType !== "patient" ? (
             <div className="patientDetails">
-              <h1>Patient Details</h1>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h1>Patient Details</h1>
+                <Input.Search 
+                  placeholder="Search patients..." 
+                  style={{ width: 300 }} 
+                  onChange={e => setPatientSearch(e.target.value)}
+                />
+              </div>
               <div className="patientBox">
-                <Table columns={patientColumns} dataSource={patients} />
+                <Table columns={patientColumns} dataSource={filteredPatients} rowKey="studentid" />
               </div>
             </div>
           ) : null}

@@ -1,93 +1,107 @@
 const dbhelper = require("../configs/dbhelper");
 const {
-  createCredTable,
-  findCredQuery,
-  addQuery,
-  findIfExistsQuery,
-  getAllQuery,
-  updatePassQuery,
-  getCredsWithEmailQuery,
-  countDoctorQuery,
-  addAvailableTimesQuery,
-} = require("../configs/queries/doctor");
+  createDoctorsTable,
+  addDoctorQuery,
+  findDoctorByEmailQuery,
+  getAllDoctorsQuery,
+  updateDoctorQuery,
+  findDoctorByIdQuery,
+  updateDoctorByIdQuery,
+  updateDoctorPasswordQuery,
+  updateDoctorAvailabilityQuery,
+} = require("../configs/queries/doctors");
 
-const createTables = () => {
-  return dbhelper.query(createCredTable, []).then((result) => {
-    return result;
-  });
-};
-const getAllDoctors = () => {
-  return dbhelper.query(getAllQuery).then((result) => {
-    // console.log("in db helper", result);
-    return result;
-  });
+const createTables = async () => {
+  try {
+    await dbhelper.query(createDoctorsTable);
+    console.log("Doctors table initialized");
+  } catch (err) {
+    console.error("Error initializing Doctors table:", err.message);
+  }
 };
 
-const findIfExists = (email) => {
-  console.log("email received to db:", email);
-  return dbhelper.query(findIfExistsQuery, [email]).then((result) => {
-    console.log(result, "in db helper");
-    return result;
-  });
+const getAllDoctors = async () => {
+  return await dbhelper.query(getAllDoctorsQuery);
 };
 
-const countDoctor = () => {
-  return dbhelper.query(countDoctorQuery, []).then((result) => {
-    console.log(result, "in db helper");
-    return result[0];
-  });
+const findById = async (id) => {
+  return dbhelper.query(findDoctorByIdQuery, [id]).then((result) => result);
 };
 
-const addDoctor = (doctor) => {
-  console.log("doctor received:", doctor);
-  const array = Object.values(doctor);
-  console.log(array);
-  return dbhelper.query(addQuery, array).then((result) => {
-    console.log(result, "in db helper");
-    return result;
-  });
-};
-
-const findById = (ID) => {
-  console.log("id received:", ID);
-  return dbhelper.query(findCredQuery, [ID]).then((result) => {
-    console.log("in db helper", result);
-    return result;
-  });
-};
-
-const updatePass = (password, id) => {
-  return dbhelper.query(updatePassQuery, [password, id]).then((result) => {
-    console.log("in db helper", result);
-    return result;
-  });
-};
-const getDoctorCredFromEmail = (email) => {
-  console.log("email received:", email);
-  return dbhelper.query(getCredsWithEmailQuery, [email]).then((result) => {
-    console.log(result, "in db helper");
-    return result;
-  });
-};
-
-const addAvailableTimes = (id, availability) => {
-  console.log("availability", availability);
+const findIfExists = async (email) => {
   return dbhelper
-    .query(addAvailableTimesQuery, [availability, id])
-    .then((result) => {
-      console.log(result, "in db helper");
-      return result;
-    });
+    .query(findDoctorByEmailQuery, [email])
+    .then((result) => result);
+};
+
+const addDoctor = async (doctor) => {
+  const values = [
+    doctor.id,
+    doctor.name,
+    doctor.phonenum,
+    doctor.email,
+    doctor.password || "Doctor@123",
+    doctor.age,
+    doctor.gender,
+    doctor.bloodgroup,
+    doctor.dob,
+    doctor.address,
+    doctor.education,
+    doctor.department,
+    doctor.fees,
+  ];
+  const result = await dbhelper.query(addDoctorQuery, values);
+  return result[0];
+};
+
+const updatePass = async (password, id) => {
+  const result = await dbhelper.query(updateDoctorPasswordQuery, [
+    id,
+    password,
+  ]);
+  return result[0];
+};
+
+const addAvailableTimes = async (id, times) => {
+  const result = await dbhelper.query(updateDoctorAvailabilityQuery, [
+    id,
+    times,
+  ]);
+  return result[0];
+};
+
+const updateDoctorById = async (id, doctor) => {
+  const values = [
+    id,
+    doctor.name,
+    doctor.phonenum,
+    doctor.age,
+    doctor.gender,
+    doctor.bloodgroup,
+    doctor.dob,
+    doctor.address,
+    doctor.education,
+    doctor.department,
+    doctor.fees,
+  ];
+  const result = await dbhelper.query(updateDoctorByIdQuery, values);
+  return result[0];
+};
+
+const getDoctorCredFromEmail = async (email) => {
+  return dbhelper
+    .query(findDoctorByEmailQuery, [email])
+    .then((result) => result);
 };
 
 module.exports = {
-  getAllDoctors,
   createTables,
+  getAllDoctors,
   findById,
   findIfExists,
   addDoctor,
   updatePass,
-  getDoctorCredFromEmail,
-  countDoctor,
   addAvailableTimes,
+  updateDoctorById,
+  getDoctorCredFromEmail,
 };

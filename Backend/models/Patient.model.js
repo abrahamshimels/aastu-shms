@@ -10,10 +10,11 @@ const {
   updatePassQuery,
   findByStudentIDQuery,
   updatePhoneQuery,
+  findByStudentIdQuery,
 } = require("../configs/queries/patient");
 
 const createTable = () => {
-  return dbhelper.query(createTableQuery, []).then((err, result) => {
+  return dbhelper.query(createTableQuery, []).then((result) => {
     console.log("patient table created or exists");
   });
 };
@@ -32,6 +33,13 @@ const findCred = (ID) => {
     return result;
   });
 };
+
+const findByStudentId = (studentId) => {
+  console.log("searching for studentid:", studentId);
+  return dbhelper.query(findByStudentIdQuery, [studentId]).then((result) => {
+    return result;
+  });
+};
 const getPatientCredFromEmail = (email) => {
   console.log("email received:", email);
   return dbhelper.query(getCredsWithEmailQuery, [email]).then((result) => {
@@ -41,7 +49,6 @@ const getPatientCredFromEmail = (email) => {
 };
 const getAllPatients = () => {
   return dbhelper.query(getAllQuery).then((result) => {
-    //console.log("in db helper", result);
     return result;
   });
 };
@@ -57,7 +64,8 @@ const findIfExists = (email) => {
 const addPatient = (patient) => {
   console.log("patient received:", patient);
   const array = [
-    patient.studentID.trim().toUpperCase(),
+    patient.studentID.trim().toUpperCase(), // This is the 'id' column
+    patient.studentID.trim().toUpperCase(), // This is the 'studentID' column
     patient.name,
     patient.department,
     patient.year,
@@ -67,9 +75,9 @@ const addPatient = (patient) => {
     patient.password,
     patient.age,
     patient.gender,
-    patient.bloodGroup,
-    patient.allergies,
-    patient.DOB,
+    patient.bloodGroup || 'O+',
+    patient.allergies || 'None',
+    patient.DOB || new Date().toISOString().split('T')[0],
     patient.address
   ];
   console.log(array);
@@ -109,4 +117,5 @@ module.exports = {
   updatePass,
   findByStudentID,
   updatePhone,
+  findByStudentId,
 };

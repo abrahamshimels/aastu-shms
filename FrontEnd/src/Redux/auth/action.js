@@ -1,23 +1,15 @@
 import * as types from "./types";
 import axios from "axios";
 
+const baseURL = "http://localhost:3007";
+
 //login user
 export const patientLogin = (data) => async (dispatch) => {
   try {
     console.log("this is data given by redux", data);
     dispatch({ type: types.LOGIN_PATIENT_REQUEST });
-    const res = await axios.post(
-      "http://localhost:3007/patients/login",
-      data,
-    );
-    dispatch({
-      type: types.LOGIN_PATIENT_SUCCESS,
-      payload: {
-        message: res.data.message,
-        user: res.data.user,
-        token: res.data.token,
-      },
-    });
+    const res = await axios.post("http://localhost:3007/patients/login", data);
+
     return res.data;
   } catch (error) {
     dispatch({
@@ -31,16 +23,7 @@ export const patientLogin = (data) => async (dispatch) => {
 
 export const CheckPatientExists = (data) => async (dispatch) => {
   try {
-    const res = await axios.post(
-      "http://localhost:3007/patients/check",
-      data,
-    );
-    dispatch({
-      type: types.LOGIN_PATIENT_SUCCESS,
-      payload: {
-        message: res.data.message,
-      },
-    });
+    const res = await axios.post("http://localhost:3007/patients/check", data);
     return res.data;
   } catch (error) {
     dispatch({
@@ -54,10 +37,7 @@ export const CheckPatientExists = (data) => async (dispatch) => {
 export const PatientSignup = (data) => async (dispatch) => {
   try {
     console.log("data given by redux", data);
-    const res = await axios.post(
-      "http://localhost:3007/patients/signup",
-      data,
-    );
+    const res = await axios.post("http://localhost:3007/patients/signup", data);
     dispatch({
       type: types.LOGIN_PATIENT_SUCCESS,
       payload: {
@@ -81,10 +61,7 @@ export const PatientSignup = (data) => async (dispatch) => {
 export const DoctorLogin = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.LOGIN_DOCTOR_REQUEST });
-    const res = await axios.post(
-      "http://localhost:3007/doctors/login",
-      data,
-    );
+    const res = await axios.post("http://localhost:3007/doctors/login", data);
     console.log("doctor", res.data);
     dispatch({
       type: types.LOGIN_DOCTOR_SUCCESS,
@@ -110,6 +87,8 @@ export const AdminLogin = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.LOGIN_ADMIN_REQUEST });
     const res = await axios.post(
+      "http://localhost:3007/auth/login",
+      { id: data.ID, password: data.password },
       "http://localhost:3007/admin/login",
       data,
     );
@@ -126,6 +105,31 @@ export const AdminLogin = (data) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: types.LOGIN_ADMIN_ERROR,
+      payload: {
+        message: error.response ? error.response.data.message : error.message,
+      },
+    });
+    return error.response ? error.response.data : { message: "Error" };
+  }
+};
+
+//login laboratory technologist
+export const LabTechLogin = (data) => async (dispatch) => {
+  try {
+    dispatch({ type: types.LOGIN_LABTECH_REQUEST });
+    const res = await axios.post(`${baseURL}/labtechs/login`, data);
+    dispatch({
+      type: types.LOGIN_LABTECH_SUCCESS,
+      payload: {
+        message: res.data.message,
+        user: res.data.user,
+        token: res.data.token,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    dispatch({
+      type: types.LOGIN_LABTECH_ERROR,
       payload: {
         message: error,
       },
@@ -158,10 +162,7 @@ export const AdminRegister = (data) => async (dispatch) => {
   try {
     console.log(data);
     dispatch({ type: types.REGISTER_ADMIN_REQUEST });
-    const res = await axios.post(
-      "http://localhost:3007/admin/register",
-      data,
-    );
+    const res = await axios.post("http://localhost:3007/admin/register", data);
     return res.data;
   } catch (error) {
     dispatch({
@@ -173,15 +174,176 @@ export const AdminRegister = (data) => async (dispatch) => {
   }
 };
 
+// --- NEW UNIFIED STAFF ACTIONS ---
+
+// REGISTER STAFF (Unified)
+export const RegisterStaff = (data) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.post("http://localhost:3007/admin/staff", data, {
+      headers: { Authorization: token },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Staff Registration Error:", error);
+    return error.response ? error.response.data : { message: "Error" };
+  }
+};
+
+// GET ALL STAFF
+export const GetAllStaff = () => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.get("http://localhost:3007/admin/staff", {
+      headers: { Authorization: token },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Fetch Staff Error:", error);
+    return [];
+  }
+};
+
+// UPDATE STAFF STATUS (Activate/Deactivate)
+export const UpdateStaffStatus = (id, data) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.put(
+      `http://localhost:3007/admin/staff/${id}`,
+      data,
+      { headers: { Authorization: token } },
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Update Staff Error:", error);
+    return { message: "Error" };
+  }
+};
+
+// RESET STAFF PASSWORD
+export const ResetStaffPassword = (id, password) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.post(
+      `http://localhost:3007/admin/staff/${id}/reset-password`,
+      { password },
+      { headers: { Authorization: token } },
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Reset Password Error:", error);
+    return { message: "Error" };
+  }
+};
+
+// GET STAFF WORKLOAD
+export const GetStaffWorkload = (id) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.get(
+      `http://localhost:3007/admin/staff/${id}/workload`,
+      { headers: { Authorization: token } },
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Fetch Workload Error:", error);
+    return null;
+  }
+};
+
+// GET SYSTEM CONFIG
+export const GetSystemConfig = (key) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.get(`http://localhost:3007/admin/config/${key}`, {
+      headers: { Authorization: token },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Fetch Config Error:", error);
+    return null;
+  }
+};
+
+// UPDATE SYSTEM CONFIG
+export const UpdateSystemConfig = (data) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.post(`http://localhost:3007/admin/config`, data, {
+      headers: { Authorization: token },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Update Config Error:", error);
+    return { message: "Error" };
+  }
+};
+
+// TRIGGER BACKUP
+export const TriggerBackup = () => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.post(
+      `http://localhost:3007/admin/backup`,
+      {},
+      { headers: { Authorization: token } },
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Backup Trigger Error:", error);
+    return { message: "Error" };
+  }
+};
+
+// GET AUDIT LOGS
+export const GetAuditLogs = () => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.get(`http://localhost:3007/admin/logs`, {
+      headers: { Authorization: token },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Fetch Logs Error:", error);
+    return [];
+  }
+};
+
+// GET ADMIN STATS
+export const GetAdminStats = () => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.get(`http://localhost:3007/admin/stats`, {
+      headers: { Authorization: token },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Fetch Stats Error:", error);
+    return { daily: {}, roles: [], workload: [] };
+  }
+};
+
+// GET TREND ANALYTICS
+export const GetTrendAnalytics = () => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.get(
+      `http://localhost:3007/admin/analytics/trends`,
+      { headers: { Authorization: token } },
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Fetch Trends Error:", error);
+    return { illness: [], monthly: [] };
+  }
+};
+
 // REGISTER AMBULANCE
 export const AmbulanceRegister = (data) => async (dispatch) => {
   try {
     console.log("Data", data);
     dispatch({ type: types.REGISTER_AMBULANCE_REQUEST });
-    const res = await axios.post(
-      "http://localhost:3007/ambulances/add",
-      data,
-    );
+    const res = await axios.post("http://localhost:3007/ambulances/add", data);
     console.log(res);
     return res.data;
   } catch (error) {
@@ -215,6 +377,22 @@ export const availabilityRegister = (data) => async (dispatch) => {
   }
 };
 
+// SEED TESTING DATA
+export const SeedTestingData = () => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.post(
+      `http://localhost:3007/admin/seed-testing-data`,
+      {},
+      { headers: { Authorization: token } },
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Seeding Error:", error);
+    return { message: "Failed to seed data" };
+  }
+};
+
 // logout user
 export const authLogout = () => async (dispatch) => {
   try {
@@ -229,10 +407,7 @@ export const authLogout = () => async (dispatch) => {
 //update patient
 export const updatePatient = (id, data, token) => async (dispatch) => {
   try {
-    const res = await axios.patch(
-      `http://localhost:3007/patients/${id}`,
-      data,
-    );
+    const res = await axios.patch(`http://localhost:3007/patients/${id}`, data);
     res.status === 200
       ? dispatch({ type: types.EDIT_PATIENT_REQUEST, payload: { token } })
       : console.log("passing");
@@ -257,6 +432,7 @@ export const UpdateDoctor = (id, data, token) => async (dispatch) => {
     const res = await axios.patch(
       `http://localhost:3007/doctors/${id}`,
       data,
+      token ? { headers: { Authorization: token } } : undefined,
     );
     res.status === 200
       ? dispatch({ type: types.EDIT_DOCTOR_REQUEST, payload: { token } })
@@ -278,10 +454,9 @@ export const UpdateDoctor = (id, data, token) => async (dispatch) => {
 
 export const UpdateAdmin = (id, data, token) => async (dispatch) => {
   try {
-    const res = await axios.patch(
-      `http://localhost:3007/admin/${id}`,
-      data,
-    );
+    const res = await axios.patch(`http://localhost:3007/admin/${id}`, data, {
+      headers: { Authorization: token },
+    });
     res.status === 200
       ? dispatch({ type: types.EDIT_ADMIN_REQUEST, payload: { token } })
       : console.log("passing");
@@ -297,6 +472,9 @@ export const UpdateAdmin = (id, data, token) => async (dispatch) => {
     return res.data;
   } catch (error) {
     console.log(error);
+    return error.response
+      ? error.response.data
+      : { message: "Something went wrong." };
   }
 };
 
@@ -318,10 +496,7 @@ export const sendVerification = (data) => async (dispatch) => {
 export const mailCreds = (data) => async (dispatch) => {
   try {
     //dispatch({ type: types.EDIT_DOCTOR_REQUEST });
-    const res = await axios.post(
-      `http://localhost:3007/admin/mailCreds`,
-      data,
-    );
+    const res = await axios.post(`http://localhost:3007/admin/mailCreds`, data);
     console.log(res);
     return res.data;
   } catch (error) {
@@ -368,14 +543,64 @@ export const NurseRegister = (data) => async (dispatch) => {
   }
 };
 
+// UPDATE NURSE
+export const UpdateNurse = (id, data, token) => async (dispatch) => {
+    try {
+        const res = await axios.patch(
+            `http://localhost:3007/nurses/${id}`,
+            data,
+            token ? { headers: { Authorization: token } } : undefined
+        );
+         dispatch({
+            type: types.LOGIN_NURSE_SUCCESS, // Reuse login success to update user in auth state if needed
+            payload: {
+                message: res.data.message,
+                user: res.data.user,
+                token: token
+            }
+        });
+        return res.data;
+    } catch (error) {
+        console.log(error);
+        return { message: "Error" };
+    }
+};
+
+
+// UPDATE LAB TECH
+export const UpdateLabTech = (id, data, token) => async (dispatch) => {
+    try {
+        const res = await axios.patch(
+            `http://localhost:3007/labtechs/${id}`, // Note: Route path in index.js might be /labtechs or /laboratory_technologists. 
+            // In Server.js/index.js (not seen), but usually consistent. 
+            // Let's assume /labtechs for now based on LabTechnologist.Route.js usually being mounted there.
+            // Wait, LabTechnologist.Route.js was checked? 
+            // In Step 1024, LabTechnologist.Route.js file exists.
+            // I need to be sure about the base route. 
+            // "LabTechLogin" uses `${baseURL}/labtechs/login`. So it is logic to use /labtechs.
+            data,
+            token ? { headers: { Authorization: token } } : undefined
+        );
+        dispatch({
+            type: types.LOGIN_LABTECH_SUCCESS,
+             payload: {
+                message: res.data.message,
+                user: res.data.user,
+                token: token
+            }
+        });
+        return res.data;
+    } catch (error) {
+        console.log(error);
+        return { message: "Error" };
+    }
+};
+
 //forget password
 export const forgetPassword = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.FORGET_PASSWORD_REQUEST });
-    const res = await axios.post(
-      "http://localhost:3007/admin/forgot",
-      data,
-    );
+    const res = await axios.post("http://localhost:3007/admin/forgot", data);
     return res.data;
   } catch (error) {
     console.log(error);

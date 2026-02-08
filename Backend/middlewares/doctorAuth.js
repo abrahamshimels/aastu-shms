@@ -4,10 +4,10 @@ require("dotenv").config();
 const authenticate = (req, res, next) => {
   const token = req.headers.authorization;
   if (token) {
-    const decoded = jwt.verify(token, process.env.key);
+    const decoded = jwt.verify(token, process.env.KEY);
     if (decoded) {
-      const doctorID = decoded.doctorID;
-      req.body.doctorID = doctorID;
+      req.user = decoded; // Standardize by putting decoded token in req.user
+      req.body.doctorID = decoded.id; // Maintain backward compatibility for some models
       next();
     } else {
       res.send("You cannot edit this token.");
