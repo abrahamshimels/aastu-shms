@@ -26,7 +26,9 @@ const Appointments = () => {
 
   const fetchAppointments = async () => {
     try {
-      const res = await axios.get("http://localhost:3007/nurses/appointments");
+      const res = await axios.get(
+        "https://aastu-shms.onrender.com/nurses/appointments",
+      );
       setAppointments(res.data);
     } catch (error) {
       console.error("Error fetching appointments:", error);
@@ -35,7 +37,9 @@ const Appointments = () => {
 
   const fetchDoctors = async () => {
     try {
-      const res = await axios.get("http://localhost:3007/nurses/doctors");
+      const res = await axios.get(
+        "https://aastu-shms.onrender.com/nurses/doctors",
+      );
       setDoctors(res.data);
     } catch (error) {
       notify("Error fetching doctors");
@@ -49,9 +53,13 @@ const Appointments = () => {
     }
     try {
       const res = await axios.get(
-        `http://localhost:3007/nurses/patient?studentID=${encodeURIComponent(formData.studentID.trim())}`
+        `https://aastu-shms.onrender.com/nurses/patient?studentID=${encodeURIComponent(formData.studentID.trim())}`,
       );
-      setFormData({ ...formData, patientName: res.data.name, patientID: res.data.id });
+      setFormData({
+        ...formData,
+        patientName: res.data.name,
+        patientID: res.data.id,
+      });
       notify("Patient found: " + res.data.name);
     } catch (error) {
       notify("Patient not found");
@@ -61,7 +69,12 @@ const Appointments = () => {
 
   const handleSchedule = async (e) => {
     e.preventDefault();
-    if (!formData.patientID || !formData.doctorID || !formData.date || !formData.time) {
+    if (
+      !formData.patientID ||
+      !formData.doctorID ||
+      !formData.date ||
+      !formData.time
+    ) {
       notify("Please fill all required fields");
       return;
     }
@@ -77,14 +90,20 @@ const Appointments = () => {
 
       if (formData.id) {
         // Update existing
-        await axios.patch(`http://localhost:3007/nurses/appointments/${formData.id}`, appointmentData);
+        await axios.patch(
+          `https://aastu-shms.onrender.com/nurses/appointments/${formData.id}`,
+          appointmentData,
+        );
         notify("Appointment updated successfully");
       } else {
         // Create new
-        await axios.post("http://localhost:3007/nurses/appointments", appointmentData);
+        await axios.post(
+          "https://aastu-shms.onrender.com/nurses/appointments",
+          appointmentData,
+        );
         notify("Appointment scheduled successfully");
       }
-      
+
       setShowForm(false);
       setFormData({
         id: null,
@@ -144,14 +163,25 @@ const Appointments = () => {
                           className="action-btn checkin-btn"
                           title="Check In to Queue"
                           onClick={async () => {
-                            if(window.confirm(`Check in ${apt.patient_name} to the active queue?`)) {
+                            if (
+                              window.confirm(
+                                `Check in ${apt.patient_name} to the active queue?`,
+                              )
+                            ) {
                               try {
-                                await axios.post("http://localhost:3007/nurses/check-in", {
-                                  student_id: apt.patientid, 
-                                  chief_complaint: "APPOINTMENT: " + (apt.notes || apt.problem || "Scheduled Visit"),
-                                  priority: "Normal",
-                                  doctor_id: apt.doctorid
-                                });
+                                await axios.post(
+                                  "https://aastu-shms.onrender.com/nurses/check-in",
+                                  {
+                                    student_id: apt.patientid,
+                                    chief_complaint:
+                                      "APPOINTMENT: " +
+                                      (apt.notes ||
+                                        apt.problem ||
+                                        "Scheduled Visit"),
+                                    priority: "Normal",
+                                    doctor_id: apt.doctorid,
+                                  },
+                                );
                                 notify("Patient checked in and sent to Queue!");
                               } catch (err) {
                                 notify("Error checking in patient");
@@ -167,13 +197,15 @@ const Appointments = () => {
                           onClick={() => {
                             setFormData({
                               id: apt.id,
-                              studentID: apt.student_id || "", 
+                              studentID: apt.student_id || "",
                               patientName: apt.patient_name,
                               patientID: apt.patientid,
                               doctorID: apt.doctorid,
-                              date: new Date(apt.date).toISOString().split('T')[0],
+                              date: new Date(apt.date)
+                                .toISOString()
+                                .split("T")[0],
                               time: apt.time,
-                              notes: apt.notes || apt.problem || ""
+                              notes: apt.notes || apt.problem || "",
                             });
                             setShowForm(true);
                           }}
@@ -183,12 +215,18 @@ const Appointments = () => {
                         <button
                           className="action-btn delete-btn"
                           onClick={async () => {
-                            if(window.confirm("Are you sure you want to delete this appointment?")) {
+                            if (
+                              window.confirm(
+                                "Are you sure you want to delete this appointment?",
+                              )
+                            ) {
                               try {
-                                await axios.delete(`http://localhost:3007/nurses/appointments/${apt.id}`);
+                                await axios.delete(
+                                  `https://aastu-shms.onrender.com/nurses/appointments/${apt.id}`,
+                                );
                                 notify("Appointment deleted");
                                 fetchAppointments();
-                              } catch(err) {
+                              } catch (err) {
                                 notify("Error deleting appointment");
                               }
                             }
@@ -217,7 +255,12 @@ const Appointments = () => {
                       <input
                         placeholder="e.g. ETS0217/15"
                         value={formData.studentID}
-                        onChange={(e) => setFormData({ ...formData, studentID: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            studentID: e.target.value,
+                          })
+                        }
                       />
                       <button type="button" onClick={handleSearchPatient}>
                         Search
@@ -235,7 +278,9 @@ const Appointments = () => {
                   <label>Select Doctor *</label>
                   <select
                     value={formData.doctorID}
-                    onChange={(e) => setFormData({ ...formData, doctorID: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, doctorID: e.target.value })
+                    }
                     required
                   >
                     <option value="">-- Choose Doctor --</option>
@@ -253,7 +298,9 @@ const Appointments = () => {
                     <input
                       type="date"
                       value={formData.date}
-                      onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, date: e.target.value })
+                      }
                       required
                     />
                   </div>
@@ -262,7 +309,9 @@ const Appointments = () => {
                     <input
                       type="time"
                       value={formData.time}
-                      onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, time: e.target.value })
+                      }
                       required
                     />
                   </div>
@@ -273,7 +322,9 @@ const Appointments = () => {
                   <textarea
                     placeholder="Additional notes..."
                     value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, notes: e.target.value })
+                    }
                   />
                 </div>
 

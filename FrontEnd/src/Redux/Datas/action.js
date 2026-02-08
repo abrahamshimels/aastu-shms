@@ -1,15 +1,19 @@
 import * as types from "./types";
 import axios from "axios";
 
-const baseURL = "http://localhost:3007";
+const baseURL = "https://aastu-shms.onrender.com";
 
 // CreateReport
 export const CreateReport = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.CREATE_REPORT_REQUEST });
-    const res = await axios.post("http://localhost:3007/reports", data, {
-      headers: { Authorization: localStorage.getItem("token") },
-    });
+    const res = await axios.post(
+      "https://aastu-shms.onrender.com/reports",
+      data,
+      {
+        headers: { Authorization: localStorage.getItem("token") },
+      },
+    );
     console.log(res);
     return res.data;
   } catch (error) {
@@ -28,7 +32,7 @@ export const CreateReport = (data) => async (dispatch) => {
 export const updateReport = (reportId, data) => async (dispatch) => {
   try {
     const res = await axios.patch(
-      `http://localhost:3007/reports/${reportId}`,
+      `https://aastu-shms.onrender.com/reports/${reportId}`,
       data,
       {
         headers: { Authorization: localStorage.getItem("token") },
@@ -45,7 +49,7 @@ export const GetDoctorDetails = () => async (dispatch) => {
   try {
     dispatch({ type: types.GET_DOCTOR_REQUEST });
     dispatch({ type: types.GET_DOCTOR_REQUEST });
-    const res = await axios.get("http://localhost:3007/doctors", {
+    const res = await axios.get("https://aastu-shms.onrender.com/doctors", {
       headers: { Authorization: localStorage.getItem("token") },
     });
     console.log("this", res);
@@ -67,7 +71,7 @@ export const GetDoctorDetails = () => async (dispatch) => {
 export const GetAdminDetails = () => async (dispatch) => {
   try {
     dispatch({ type: types.GET_ADMIN_REQUEST });
-    const res = await axios.get("http://localhost:3007/admin/staff", {
+    const res = await axios.get("https://aastu-shms.onrender.com/admin/staff", {
       headers: { Authorization: localStorage.getItem("token") },
     });
     console.log(res.data);
@@ -90,7 +94,7 @@ export const GetMedicineDetails = (patientid) => async (dispatch) => {
   try {
     dispatch({ type: types.GET_MEDICINE_REQUEST });
     const res = await axios.post(
-      `http://localhost:3007/prescriptions/${patientid}`,
+      `https://aastu-shms.onrender.com/prescriptions/${patientid}`,
     );
     //axios.post
     console.log(res.data);
@@ -109,7 +113,7 @@ export const CreateBooking = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.CREATE_BOOKING_REQUEST });
     const res = await axios.post(
-      `http://localhost:3007/appointments/create`,
+      `https://aastu-shms.onrender.com/appointments/create`,
       data,
     );
     console.log(res);
@@ -123,7 +127,7 @@ export const CreateBooking = (data) => async (dispatch) => {
 export const GetPatients = () => async (dispatch) => {
   try {
     dispatch({ type: types.GET_PATIENT_REQUEST });
-    const res = await axios.get(`http://localhost:3007/patients`);
+    const res = await axios.get(`https://aastu-shms.onrender.com/patients`);
     console.log("pats", res);
     const patients = { patients: res.data };
     dispatch({
@@ -144,9 +148,12 @@ export const GetPatients = () => async (dispatch) => {
 export const GetAllData = () => async (dispatch) => {
   try {
     dispatch({ type: types.GET_ALLDATA_REQUEST });
-    const res = await axios.get("http://localhost:3007/admin/dashboard", {
-      headers: { Authorization: localStorage.getItem("token") },
-    });
+    const res = await axios.get(
+      "https://aastu-shms.onrender.com/admin/dashboard",
+      {
+        headers: { Authorization: localStorage.getItem("token") },
+      },
+    );
     console.log(res.data);
     dispatch({
       type: types.GET_ALLDATA_SUCCESS,
@@ -163,7 +170,7 @@ export const GetAppointments = (userType, id) => async (dispatch) => {
   try {
     dispatch({ type: types.GET_APPOINTMENT_DETAILS_REQUEST });
     const res = await axios.get(
-      `http://localhost:3007/appointments/${userType}/${id}`,
+      `https://aastu-shms.onrender.com/appointments/${userType}/${id}`,
     );
     console.log("res", res.data);
     // return res.data;
@@ -181,7 +188,9 @@ export const GetAppointments = (userType, id) => async (dispatch) => {
 export const DeleteAppointment = (id) => async (dispatch) => {
   try {
     dispatch({ type: types.DELETE_APPOINTMENT_REQUEST });
-    const res = await axios.delete(`http://localhost:3007/appointments/${id}`);
+    const res = await axios.delete(
+      `https://aastu-shms.onrender.com/appointments/${id}`,
+    );
     console.log(res.data);
     // return res.data;
     dispatch({
@@ -199,7 +208,7 @@ export const GetAllReports = (userType, id) => async (dispatch) => {
   try {
     dispatch({ type: types.GET_REPORTS_REQUEST });
     const res = await axios.get(
-      `http://localhost:3007/reports/${userType}/${id}`,
+      `https://aastu-shms.onrender.com/reports/${userType}/${id}`,
       { headers: { Authorization: localStorage.getItem("token") } },
     );
     console.log("res", res.data);
@@ -218,7 +227,7 @@ export const CreateCertificate = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.GET_CERTIFICATES_REQUEST }); // Reusing request type for simplicity or define CREATE_CERTIFICATE_REQUEST
     const res = await axios.post(
-      "http://localhost:3007/certificates/create",
+      "https://aastu-shms.onrender.com/certificates/create",
       data,
       { headers: { Authorization: localStorage.getItem("token") } },
     );
@@ -237,7 +246,7 @@ export const GetAllCertificates = (userType, id) => async (dispatch) => {
   try {
     dispatch({ type: types.GET_CERTIFICATES_REQUEST });
     const res = await axios.get(
-      `http://localhost:3007/certificates/${userType}/${id}`,
+      `https://aastu-shms.onrender.com/certificates/${userType}/${id}`,
     );
     console.log("res", res.data);
     const certificates = { certificates: res.data.data };

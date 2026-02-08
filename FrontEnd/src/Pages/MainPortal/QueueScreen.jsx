@@ -12,7 +12,9 @@ const QueueScreen = () => {
   React.useEffect(() => {
     const fetchQueue = async () => {
       try {
-        const response = await fetch("http://localhost:3007/public/queue");
+        const response = await fetch(
+          "https://aastu-shms.onrender.com/public/queue",
+        );
         const data = await response.json();
         setQueueData(data);
         setLoading(false);
@@ -69,10 +71,13 @@ const QueueScreen = () => {
         <span className="doctor-info">
           {text ? (
             <>
-              <FaUserMd style={{ marginRight: "5px", color: "#1677ff" }} /> {text}
+              <FaUserMd style={{ marginRight: "5px", color: "#1677ff" }} />{" "}
+              {text}
             </>
           ) : (
-            <span style={{ color: "#999", fontStyle: "italic" }}>Waiting for assignment...</span>
+            <span style={{ color: "#999", fontStyle: "italic" }}>
+              Waiting for assignment...
+            </span>
           )}
         </span>
       ),
@@ -100,8 +105,8 @@ const QueueScreen = () => {
   return (
     <div className="queue-container">
       <div className="queue-nav">
-        <Button 
-          icon={<FaArrowLeft />} 
+        <Button
+          icon={<FaArrowLeft />}
           onClick={() => navigate("/")}
           className="back-btn"
         >
@@ -112,13 +117,16 @@ const QueueScreen = () => {
       <div className="queue-content">
         <div className="queue-header">
           <h1>AASTU SHMS - Live Patient Queue</h1>
-          <p>Real-time status of current consultations. Priority cases are handled first.</p>
+          <p>
+            Real-time status of current consultations. Priority cases are
+            handled first.
+          </p>
         </div>
 
         <div className="queue-table-card">
-          <Table 
-            dataSource={queueData} 
-            columns={columns} 
+          <Table
+            dataSource={queueData}
+            columns={columns}
             pagination={false}
             loading={loading}
             rowKey="id"

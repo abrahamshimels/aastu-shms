@@ -27,7 +27,9 @@ const Registration = () => {
 
   const handleSearch = async () => {
     try {
-      const res = await axios.get(`http://localhost:3007/nurses/patient?studentID=${encodeURIComponent(searchID.trim())}`);
+      const res = await axios.get(
+        `https://aastu-shms.onrender.com/nurses/patient?studentID=${encodeURIComponent(searchID.trim())}`,
+      );
       setPatient(res.data);
       setIsNew(false);
       notify("Patient found");
@@ -45,9 +47,13 @@ const Registration = () => {
     e.preventDefault();
     const token = localStorage.getItem("token");
     try {
-      const res = await axios.post("http://localhost:3007/nurses/register-patient", formData, {
-        headers: { Authorization: token }
-      });
+      const res = await axios.post(
+        "https://aastu-shms.onrender.com/nurses/register-patient",
+        formData,
+        {
+          headers: { Authorization: token },
+        },
+      );
       if (res.data.message === "Registered") {
         notify("Patient registered successfully");
         setFormData({
@@ -75,10 +81,13 @@ const Registration = () => {
 
   const handleUpdatePhone = async () => {
     try {
-      await axios.patch(`http://localhost:3007/nurses/patient/phone`, {
-        studentID: patient.studentid,
-        phoneNum: patient.phonenum,
-      });
+      await axios.patch(
+        `https://aastu-shms.onrender.com/nurses/patient/phone`,
+        {
+          studentID: patient.studentid,
+          phoneNum: patient.phonenum,
+        },
+      );
       notify("Phone number updated");
     } catch (error) {
       notify("Error updating phone number");
@@ -91,28 +100,103 @@ const Registration = () => {
       <div className="AfterSideBar">
         <ToastContainer />
         <h1>Patient Registration</h1>
-        
+
         <div className="registration-actions">
-          <button onClick={() => { setIsNew(true); setPatient(null); }}>New Patient</button>
-          <button onClick={() => { setIsNew(false); setPatient(null); }}>Existing Patient</button>
+          <button
+            onClick={() => {
+              setIsNew(true);
+              setPatient(null);
+            }}
+          >
+            New Patient
+          </button>
+          <button
+            onClick={() => {
+              setIsNew(false);
+              setPatient(null);
+            }}
+          >
+            Existing Patient
+          </button>
         </div>
 
         {isNew ? (
           <form className="registration-form" onSubmit={handleRegister}>
             <h3>New Patient Registration</h3>
             <div className="form-grid">
-              <input name="studentID" placeholder="AASTU Student ID" onChange={handleInputChange} required />
-              <input name="name" placeholder="Full Name" onChange={handleInputChange} required />
-              <input name="department" placeholder="Department" onChange={handleInputChange} required />
-              <input name="year" type="number" placeholder="Year" onChange={handleInputChange} required />
-              <input name="phoneNum" placeholder="Phone Number" onChange={handleInputChange} required />
-              <input name="emergencyContact" placeholder="Emergency Contact" onChange={handleInputChange} required />
-              <input name="bloodGroup" placeholder="Blood Group" onChange={handleInputChange} />
-              <input name="allergies" placeholder="Allergies" onChange={handleInputChange} />
-              <input name="age" type="number" placeholder="Age" onChange={handleInputChange} required />
-              <input name="gender" placeholder="Gender (M/F)" onChange={handleInputChange} required />
-              <input name="email" type="email" placeholder="Email" onChange={handleInputChange} required />
-              <input name="address" placeholder="Address" onChange={handleInputChange} required />
+              <input
+                name="studentID"
+                placeholder="AASTU Student ID"
+                onChange={handleInputChange}
+                required
+              />
+              <input
+                name="name"
+                placeholder="Full Name"
+                onChange={handleInputChange}
+                required
+              />
+              <input
+                name="department"
+                placeholder="Department"
+                onChange={handleInputChange}
+                required
+              />
+              <input
+                name="year"
+                type="number"
+                placeholder="Year"
+                onChange={handleInputChange}
+                required
+              />
+              <input
+                name="phoneNum"
+                placeholder="Phone Number"
+                onChange={handleInputChange}
+                required
+              />
+              <input
+                name="emergencyContact"
+                placeholder="Emergency Contact"
+                onChange={handleInputChange}
+                required
+              />
+              <input
+                name="bloodGroup"
+                placeholder="Blood Group"
+                onChange={handleInputChange}
+              />
+              <input
+                name="allergies"
+                placeholder="Allergies"
+                onChange={handleInputChange}
+              />
+              <input
+                name="age"
+                type="number"
+                placeholder="Age"
+                onChange={handleInputChange}
+                required
+              />
+              <input
+                name="gender"
+                placeholder="Gender (M/F)"
+                onChange={handleInputChange}
+                required
+              />
+              <input
+                name="email"
+                type="email"
+                placeholder="Email"
+                onChange={handleInputChange}
+                required
+              />
+              <input
+                name="address"
+                placeholder="Address"
+                onChange={handleInputChange}
+                required
+              />
             </div>
             <button type="submit">Register Patient</button>
           </form>
@@ -120,10 +204,10 @@ const Registration = () => {
           <div className="search-section">
             <h3>Search Patient</h3>
             <div className="search-bar">
-              <input 
-                placeholder="Enter Student ID" 
-                value={searchID} 
-                onChange={(e) => setSearchID(e.target.value)} 
+              <input
+                placeholder="Enter Student ID"
+                value={searchID}
+                onChange={(e) => setSearchID(e.target.value)}
               />
               <button onClick={handleSearch}>Search</button>
             </div>
@@ -131,13 +215,19 @@ const Registration = () => {
             {patient && (
               <div className="student-details-card">
                 <h3>Patient Found: {patient.name}</h3>
-                <p><strong>Department:</strong> {patient.department}</p>
-                <p><strong>Year:</strong> {patient.year}</p>
+                <p>
+                  <strong>Department:</strong> {patient.department}
+                </p>
+                <p>
+                  <strong>Year:</strong> {patient.year}
+                </p>
                 <div className="update-phone">
                   <label>Update Phone:</label>
-                  <input 
-                    value={patient.phonenum} 
-                    onChange={(e) => setPatient({...patient, phonenum: e.target.value})} 
+                  <input
+                    value={patient.phonenum}
+                    onChange={(e) =>
+                      setPatient({ ...patient, phonenum: e.target.value })
+                    }
                   />
                   <button onClick={handleUpdatePhone}>Update</button>
                 </div>

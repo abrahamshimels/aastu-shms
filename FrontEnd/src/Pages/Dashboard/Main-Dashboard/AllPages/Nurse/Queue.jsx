@@ -29,7 +29,9 @@ const Queue = () => {
 
   const fetchQueue = async () => {
     try {
-      const res = await axios.get("http://localhost:3007/nurses/queue");
+      const res = await axios.get(
+        "https://aastu-shms.onrender.com/nurses/queue",
+      );
       setQueue(res.data);
     } catch (error) {
       console.log("Error fetching queue");
@@ -38,7 +40,9 @@ const Queue = () => {
 
   const fetchDoctors = async () => {
     try {
-      const res = await axios.get("http://localhost:3007/nurses/doctors");
+      const res = await axios.get(
+        "https://aastu-shms.onrender.com/nurses/doctors",
+      );
       setDoctors(res.data);
     } catch (error) {
       notify("Error fetching doctors");
@@ -51,33 +55,49 @@ const Queue = () => {
     try {
       if (editingItem) {
         // Update existing queue item
-        await axios.patch(`http://localhost:3007/nurses/queue/${editingItem.id}`, {
-          chief_complaint: checkInData.chief_complaint,
-          priority: checkInData.priority,
-        });
+        await axios.patch(
+          `https://aastu-shms.onrender.com/nurses/queue/${editingItem.id}`,
+          {
+            chief_complaint: checkInData.chief_complaint,
+            priority: checkInData.priority,
+          },
+        );
         notify("Queue updated successfully");
       } else {
         // Create new check-in
-        const patientRes = await axios.get(`http://localhost:3007/nurses/patient?studentID=${encodeURIComponent(checkInData.studentID.trim())}`);
+        const patientRes = await axios.get(
+          `https://aastu-shms.onrender.com/nurses/patient?studentID=${encodeURIComponent(checkInData.studentID.trim())}`,
+        );
         const patient = patientRes.data;
 
-        const res = await axios.post("http://localhost:3007/nurses/check-in", {
-          student_id: patient.id,
-          chief_complaint: checkInData.chief_complaint,
-          priority: checkInData.priority,
-        });
+        const res = await axios.post(
+          "https://aastu-shms.onrender.com/nurses/check-in",
+          {
+            student_id: patient.id,
+            chief_complaint: checkInData.chief_complaint,
+            priority: checkInData.priority,
+          },
+        );
 
         if (res.data.message === "Checked-in") {
           notify("Patient added to queue");
         }
       }
-      
+
       fetchQueue();
       setShowCheckIn(false);
       setEditingItem(null);
-      setCheckInData({ studentID: "", chief_complaint: "", priority: "Normal" });
+      setCheckInData({
+        studentID: "",
+        chief_complaint: "",
+        priority: "Normal",
+      });
     } catch (error) {
-      const errorMsg = error.response?.data?.message || (editingItem ? "Error updating queue" : "Error: Patient not found or system error");
+      const errorMsg =
+        error.response?.data?.message ||
+        (editingItem
+          ? "Error updating queue"
+          : "Error: Patient not found or system error");
       notify(errorMsg);
     } finally {
       setLoading(false);
@@ -95,9 +115,11 @@ const Queue = () => {
   };
 
   const handleRemove = async (queueId) => {
-    if(window.confirm("Remove this patient from the queue completely?")) {
+    if (window.confirm("Remove this patient from the queue completely?")) {
       try {
-        await axios.delete(`http://localhost:3007/nurses/queue/${queueId}`);
+        await axios.delete(
+          `https://aastu-shms.onrender.com/nurses/queue/${queueId}`,
+        );
         notify("Patient removed from queue");
         fetchQueue();
       } catch (error) {
@@ -119,19 +141,22 @@ const Queue = () => {
   const onDrop = async (e, doctorId) => {
     e.preventDefault();
     const queueId = e.dataTransfer.getData("queueId");
-    
+
     // Check if already assigned
-    const item = queue.find(q => q.id.toString() === queueId);
+    const item = queue.find((q) => q.id.toString() === queueId);
     if (item && item.doctor_id) {
-       notify("⚠️ Patient already assigned! Remove manually if needed.");
-       return;
+      notify("⚠️ Patient already assigned! Remove manually if needed.");
+      return;
     }
 
     try {
-      await axios.patch("http://localhost:3007/nurses/assign-doctor", {
-        queue_id: queueId,
-        doctor_id: doctorId,
-      });
+      await axios.patch(
+        "https://aastu-shms.onrender.com/nurses/assign-doctor",
+        {
+          queue_id: queueId,
+          doctor_id: doctorId,
+        },
+      );
       notify("Doctor assigned successfully");
       fetchQueue();
       setDraggingItem(null);
@@ -147,7 +172,9 @@ const Queue = () => {
         <ToastContainer />
         <div className="queue-header-new">
           <h1>Queue Management</h1>
-          <button className="checkin-btn" onClick={() => setShowCheckIn(true)}>+ New Check-In</button>
+          <button className="checkin-btn" onClick={() => setShowCheckIn(true)}>
+            + New Check-In
+          </button>
         </div>
 
         <div className="queue-layout">
@@ -155,56 +182,87 @@ const Queue = () => {
           <div className="queue-section">
             <h3>Active Queue (Drag patient to doctor)</h3>
             <div className="queue-list">
-              {queue.filter(q => q.status === 'Checked-In').length === 0 && <p className="empty-msg">No patients waiting</p>}
-              {queue.filter(q => q.status === 'Checked-In').map((item) => (
-                <div 
-                  key={item.id} 
-                  className={`queue-card priority-${item.priority.toLowerCase()}`}
-                  draggable
-                  onDragStart={(e) => onDragStart(e, item)}
-                >
-                  <div className="card-header">
-                    <span className="student-name">{item.patient_name}</span>
-                    <div className="card-actions">
-                      <button className="edit-btn" onClick={() => handleEdit(item)} title="Edit">
+              {queue.filter((q) => q.status === "Checked-In").length === 0 && (
+                <p className="empty-msg">No patients waiting</p>
+              )}
+              {queue
+                .filter((q) => q.status === "Checked-In")
+                .map((item) => (
+                  <div
+                    key={item.id}
+                    className={`queue-card priority-${item.priority.toLowerCase()}`}
+                    draggable
+                    onDragStart={(e) => onDragStart(e, item)}
+                  >
+                    <div className="card-header">
+                      <span className="student-name">{item.patient_name}</span>
+                      <div className="card-actions">
+                        <button
+                          className="edit-btn"
+                          onClick={() => handleEdit(item)}
+                          title="Edit"
+                        >
                           <FaEdit />
-                      </button>
-                      <button className="remove-btn" onClick={() => handleRemove(item.id)} title="Remove">
+                        </button>
+                        <button
+                          className="remove-btn"
+                          onClick={() => handleRemove(item.id)}
+                          title="Remove"
+                        >
                           <FaTrash />
-                      </button>
+                        </button>
+                      </div>
+                    </div>
+                    <div className="card-body">
+                      <span
+                        className={`priority-badge ${item.priority.toLowerCase()}`}
+                      >
+                        {item.priority}
+                      </span>
+                      <p style={{ marginTop: "5px" }}>
+                        <strong>ID:</strong> {item.studentid}
+                      </p>
+                      <p>
+                        <strong>Complaint:</strong> {item.chief_complaint}
+                      </p>
+                      <p className="card-meta">
+                        {item.patient_dept} | Year {item.patient_year}
+                      </p>
                     </div>
                   </div>
-                  <div className="card-body">
-                    <span className={`priority-badge ${item.priority.toLowerCase()}`}>{item.priority}</span>
-                    <p style={{marginTop:'5px'}}><strong>ID:</strong> {item.studentid}</p>
-                    <p><strong>Complaint:</strong> {item.chief_complaint}</p>
-                    <p className="card-meta">{item.patient_dept} | Year {item.patient_year}</p>
-                  </div>
-                </div>
-              ))}
+                ))}
             </div>
 
             {/* In-Consultation / Assigned Section */}
-            <h3 style={{marginTop: '30px'}}>In-Consultation</h3>
+            <h3 style={{ marginTop: "30px" }}>In-Consultation</h3>
             <div className="queue-list">
-               {queue.filter(q => q.status === 'Assigned').length === 0 && <p className="empty-msg">No patients in consultation</p>}
-               {queue.filter(q => q.status === 'Assigned').map((item) => (
-                <div 
-                  key={item.id} 
-                  className="queue-card assigned"
-                >
-                  <div className="card-header">
-                    <span className="student-name">{item.patient_name}</span>
-                    <button className="remove-btn" onClick={() => handleRemove(item.id)} title="Remove">
+              {queue.filter((q) => q.status === "Assigned").length === 0 && (
+                <p className="empty-msg">No patients in consultation</p>
+              )}
+              {queue
+                .filter((q) => q.status === "Assigned")
+                .map((item) => (
+                  <div key={item.id} className="queue-card assigned">
+                    <div className="card-header">
+                      <span className="student-name">{item.patient_name}</span>
+                      <button
+                        className="remove-btn"
+                        onClick={() => handleRemove(item.id)}
+                        title="Remove"
+                      >
                         <FaTrash />
-                    </button>
+                      </button>
+                    </div>
+                    <div className="card-body">
+                      <p>
+                        <strong>Doctor:</strong> {item.doctor_name}
+                      </p>
+                      <p>
+                        <strong>Complaint:</strong> {item.chief_complaint}
+                      </p>
+                    </div>
                   </div>
-                  <div className="card-body">
-                    <p><strong>Doctor:</strong> {item.doctor_name}</p>
-                    <p><strong>Complaint:</strong> {item.chief_complaint}</p>
-                  </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
 
@@ -213,13 +271,15 @@ const Queue = () => {
             <h3>Available Doctors (Drop here)</h3>
             <div className="doctor-grid">
               {doctors.map((doc) => (
-                <div 
-                  key={doc.id} 
+                <div
+                  key={doc.id}
                   className="doctor-target-card"
                   onDragOver={onDragOver}
                   onDrop={(e) => onDrop(e, doc.id)}
                 >
-                  <div className="doc-icon"><FaUserMd size={28} color="#1677ff"/></div>
+                  <div className="doc-icon">
+                    <FaUserMd size={28} color="#1677ff" />
+                  </div>
                   <div className="doc-info">
                     <h4>{doc.name}</h4>
                     <p>{doc.department}</p>
@@ -237,48 +297,95 @@ const Queue = () => {
               <form onSubmit={handleCheckIn}>
                 <div className="input-group">
                   <label>AASTU Student ID</label>
-                  <input 
-                    placeholder="e.g. ETS0217/15" 
+                  <input
+                    placeholder="e.g. ETS0217/15"
                     value={checkInData.studentID}
-                    onChange={(e) => setCheckInData({...checkInData, studentID: e.target.value})}
+                    onChange={(e) =>
+                      setCheckInData({
+                        ...checkInData,
+                        studentID: e.target.value,
+                      })
+                    }
                     disabled={!!editingItem}
-                    required 
+                    required
                   />
                 </div>
                 <div className="input-group">
                   <label>Chief Complaint</label>
-                  <textarea 
-                    placeholder="Explain the patient's symptoms..." 
+                  <textarea
+                    placeholder="Explain the patient's symptoms..."
                     value={checkInData.chief_complaint}
-                    onChange={(e) => setCheckInData({...checkInData, chief_complaint: e.target.value})}
-                    required 
+                    onChange={(e) =>
+                      setCheckInData({
+                        ...checkInData,
+                        chief_complaint: e.target.value,
+                      })
+                    }
+                    required
                   />
                 </div>
                 <div className="priority-selection">
                   <label>Priority Level</label>
                   <div className="priority-btns">
-                    <button 
+                    <button
                       type="button"
-                      className={`p-btn normal ${checkInData.priority === 'Normal' ? 'active' : ''}`}
-                      onClick={() => setCheckInData({...checkInData, priority: 'Normal'})}
-                    >🟢 Normal</button>
-                    <button 
+                      className={`p-btn normal ${checkInData.priority === "Normal" ? "active" : ""}`}
+                      onClick={() =>
+                        setCheckInData({ ...checkInData, priority: "Normal" })
+                      }
+                    >
+                      🟢 Normal
+                    </button>
+                    <button
                       type="button"
-                      className={`p-btn urgent ${checkInData.priority === 'Urgent' ? 'active' : ''}`}
-                      onClick={() => setCheckInData({...checkInData, priority: 'Urgent'})}
-                    >🟡 Urgent</button>
-                    <button 
+                      className={`p-btn urgent ${checkInData.priority === "Urgent" ? "active" : ""}`}
+                      onClick={() =>
+                        setCheckInData({ ...checkInData, priority: "Urgent" })
+                      }
+                    >
+                      🟡 Urgent
+                    </button>
+                    <button
                       type="button"
-                      className={`p-btn emergency ${checkInData.priority === 'Emergency' ? 'active' : ''}`}
-                      onClick={() => setCheckInData({...checkInData, priority: 'Emergency'})}
-                    >🔴 Emergency</button>
+                      className={`p-btn emergency ${checkInData.priority === "Emergency" ? "active" : ""}`}
+                      onClick={() =>
+                        setCheckInData({
+                          ...checkInData,
+                          priority: "Emergency",
+                        })
+                      }
+                    >
+                      🔴 Emergency
+                    </button>
                   </div>
                 </div>
                 <div className="modal-actions">
-                  <button type="submit" className="submit-btn" disabled={loading}>
-                    {loading ? "Processing..." : (editingItem ? "Update Item" : "Check-In Patient")}
+                  <button
+                    type="submit"
+                    className="submit-btn"
+                    disabled={loading}
+                  >
+                    {loading
+                      ? "Processing..."
+                      : editingItem
+                        ? "Update Item"
+                        : "Check-In Patient"}
                   </button>
-                  <button type="button" className="cancel-btn" onClick={() => { setShowCheckIn(false); setEditingItem(null); setCheckInData({studentID:"", chief_complaint:"", priority:"Normal"}); }}>Cancel</button>
+                  <button
+                    type="button"
+                    className="cancel-btn"
+                    onClick={() => {
+                      setShowCheckIn(false);
+                      setEditingItem(null);
+                      setCheckInData({
+                        studentID: "",
+                        chief_complaint: "",
+                        priority: "Normal",
+                      });
+                    }}
+                  >
+                    Cancel
+                  </button>
                 </div>
               </form>
             </div>

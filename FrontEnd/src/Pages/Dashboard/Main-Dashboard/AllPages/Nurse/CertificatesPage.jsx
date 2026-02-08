@@ -36,7 +36,9 @@ const CertificatesPage = () => {
     // Fetch certificate template config
     const fetchConfig = async () => {
       try {
-        const response = await fetch("http://localhost:3007/nurses/config/certificate_settings");
+        const response = await fetch(
+          "https://aastu-shms.onrender.com/nurses/config/certificate_settings",
+        );
         const data = await response.json();
         setConfig(data);
       } catch (error) {
@@ -61,10 +63,10 @@ const CertificatesPage = () => {
 
   const handlePrint = (record) => {
     console.log("Printing record:", record);
-    
+
     // Default fallback if no config
     const templateName = config?.template || "Standard Medical Certificate";
-    const logoUrl = config?.logo_url || ""; 
+    const logoUrl = config?.logo_url || "";
     const fields = config?.fields || ["student_id", "diagnosis", "rest_period"];
 
     const printWindow = window.open("", "_blank");
@@ -86,7 +88,7 @@ const CertificatesPage = () => {
         </head>
         <body>
           <div class="header">
-            ${logoUrl ? `<img src="${logoUrl}" alt="Logo" />` : ''}
+            ${logoUrl ? `<img src="${logoUrl}" alt="Logo" />` : ""}
             <h1>AASTU PATIENT HEALTH CENTER</h1>
             <p>${templateName}</p>
           </div>
@@ -98,7 +100,7 @@ const CertificatesPage = () => {
               <p><strong>Patient Name:</strong> ${record.patient_name || record.student_name}</p>
               <p><strong>Patient ID:</strong> ${record.patient_display_id || record.student_id}</p>
               <p><strong>Doctor:</strong> ${record.doctor_name}</p>
-              ${fields.includes("department") ? `<p><strong>Department:</strong> ${record.department || 'N/A'}</p>` : ''}
+              ${fields.includes("department") ? `<p><strong>Department:</strong> ${record.department || "N/A"}</p>` : ""}
             </div>
             <div style="border: 1px dashed #ccc; padding: 20px; background: #fafafa;">
               <p><strong>Medical Justification:</strong></p>
