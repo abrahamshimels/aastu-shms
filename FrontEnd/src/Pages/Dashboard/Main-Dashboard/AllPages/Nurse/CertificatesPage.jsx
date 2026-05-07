@@ -37,7 +37,7 @@ const CertificatesPage = () => {
     const fetchConfig = async () => {
       try {
         const response = await fetch(
-          "http://localhost:3007/nurses/config/certificate_settings",
+          "https://aastu-shms.onrender.com/nurses/config/certificate_settings",
         );
         const data = await response.json();
         setConfig(data);
