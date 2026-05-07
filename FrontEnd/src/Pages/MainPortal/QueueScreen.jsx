@@ -13,7 +13,7 @@ const QueueScreen = () => {
     const fetchQueue = async () => {
       try {
         const response = await fetch(
-          "https://aastu-shms.onrender.com/public/queue",
+          "http://localhost:3007/public/queue",
         );
         const data = await response.json();
         setQueueData(data);

@@ -27,7 +27,7 @@ const Appointments = () => {
   const fetchAppointments = async () => {
     try {
       const res = await axios.get(
-        "https://aastu-shms.onrender.com/nurses/appointments",
+        "http://localhost:3007/nurses/appointments",
       );
       setAppointments(res.data);
     } catch (error) {
@@ -38,7 +38,7 @@ const Appointments = () => {
   const fetchDoctors = async () => {
     try {
       const res = await axios.get(
-        "https://aastu-shms.onrender.com/nurses/doctors",
+        "http://localhost:3007/nurses/doctors",
       );
       setDoctors(res.data);
     } catch (error) {
@@ -53,7 +53,7 @@ const Appointments = () => {
     }
     try {
       const res = await axios.get(
-        `https://aastu-shms.onrender.com/nurses/patient?studentID=${encodeURIComponent(formData.studentID.trim())}`,
+        `http://localhost:3007/nurses/patient?studentID=${encodeURIComponent(formData.studentID.trim())}`,
       );
       setFormData({
         ...formData,
@@ -91,14 +91,14 @@ const Appointments = () => {
       if (formData.id) {
         // Update existing
         await axios.patch(
-          `https://aastu-shms.onrender.com/nurses/appointments/${formData.id}`,
+          `http://localhost:3007/nurses/appointments/${formData.id}`,
           appointmentData,
         );
         notify("Appointment updated successfully");
       } else {
         // Create new
         await axios.post(
-          "https://aastu-shms.onrender.com/nurses/appointments",
+          "http://localhost:3007/nurses/appointments",
           appointmentData,
         );
         notify("Appointment scheduled successfully");
@@ -170,7 +170,7 @@ const Appointments = () => {
                             ) {
                               try {
                                 await axios.post(
-                                  "https://aastu-shms.onrender.com/nurses/check-in",
+                                  "http://localhost:3007/nurses/check-in",
                                   {
                                     student_id: apt.patientid,
                                     chief_complaint:
@@ -222,7 +222,7 @@ const Appointments = () => {
                             ) {
                               try {
                                 await axios.delete(
-                                  `https://aastu-shms.onrender.com/nurses/appointments/${apt.id}`,
+                                  `http://localhost:3007/nurses/appointments/${apt.id}`,
                                 );
                                 notify("Appointment deleted");
                                 fetchAppointments();

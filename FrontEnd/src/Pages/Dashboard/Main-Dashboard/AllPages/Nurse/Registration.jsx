@@ -28,7 +28,7 @@ const Registration = () => {
   const handleSearch = async () => {
     try {
       const res = await axios.get(
-        `https://aastu-shms.onrender.com/nurses/patient?studentID=${encodeURIComponent(searchID.trim())}`,
+        `http://localhost:3007/nurses/patient?studentID=${encodeURIComponent(searchID.trim())}`,
       );
       setPatient(res.data);
       setIsNew(false);
@@ -48,7 +48,7 @@ const Registration = () => {
     const token = localStorage.getItem("token");
     try {
       const res = await axios.post(
-        "https://aastu-shms.onrender.com/nurses/register-patient",
+        "http://localhost:3007/nurses/register-patient",
         formData,
         {
           headers: { Authorization: token },
@@ -82,7 +82,7 @@ const Registration = () => {
   const handleUpdatePhone = async () => {
     try {
       await axios.patch(
-        `https://aastu-shms.onrender.com/nurses/patient/phone`,
+        `http://localhost:3007/nurses/patient/phone`,
         {
           studentID: patient.studentid,
           phoneNum: patient.phonenum,

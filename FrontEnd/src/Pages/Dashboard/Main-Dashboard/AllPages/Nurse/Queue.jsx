@@ -30,7 +30,7 @@ const Queue = () => {
   const fetchQueue = async () => {
     try {
       const res = await axios.get(
-        "https://aastu-shms.onrender.com/nurses/queue",
+        "http://localhost:3007/nurses/queue",
       );
       setQueue(res.data);
     } catch (error) {
@@ -41,7 +41,7 @@ const Queue = () => {
   const fetchDoctors = async () => {
     try {
       const res = await axios.get(
-        "https://aastu-shms.onrender.com/nurses/doctors",
+        "http://localhost:3007/nurses/doctors",
       );
       setDoctors(res.data);
     } catch (error) {
@@ -56,7 +56,7 @@ const Queue = () => {
       if (editingItem) {
         // Update existing queue item
         await axios.patch(
-          `https://aastu-shms.onrender.com/nurses/queue/${editingItem.id}`,
+          `http://localhost:3007/nurses/queue/${editingItem.id}`,
           {
             chief_complaint: checkInData.chief_complaint,
             priority: checkInData.priority,
@@ -66,12 +66,12 @@ const Queue = () => {
       } else {
         // Create new check-in
         const patientRes = await axios.get(
-          `https://aastu-shms.onrender.com/nurses/patient?studentID=${encodeURIComponent(checkInData.studentID.trim())}`,
+          `http://localhost:3007/nurses/patient?studentID=${encodeURIComponent(checkInData.studentID.trim())}`,
         );
         const patient = patientRes.data;
 
         const res = await axios.post(
-          "https://aastu-shms.onrender.com/nurses/check-in",
+          "http://localhost:3007/nurses/check-in",
           {
             student_id: patient.id,
             chief_complaint: checkInData.chief_complaint,
@@ -118,7 +118,7 @@ const Queue = () => {
     if (window.confirm("Remove this patient from the queue completely?")) {
       try {
         await axios.delete(
-          `https://aastu-shms.onrender.com/nurses/queue/${queueId}`,
+          `http://localhost:3007/nurses/queue/${queueId}`,
         );
         notify("Patient removed from queue");
         fetchQueue();
@@ -151,7 +151,7 @@ const Queue = () => {
 
     try {
       await axios.patch(
-        "https://aastu-shms.onrender.com/nurses/assign-doctor",
+        "http://localhost:3007/nurses/assign-doctor",
         {
           queue_id: queueId,
           doctor_id: doctorId,
