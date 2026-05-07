@@ -24,6 +24,22 @@ const buildSystemPrompt = ({ userRole, userId }) => {
   ].join(" ");
 };
 
+const buildDashboardHelpPrompt = ({ userRole, userId, pageName, actionName, contextSummary }) => {
+  return [
+    "You are SHMS AI Assistant helping the user complete a dashboard action safely and quickly.",
+    "Give concise, practical guidance that fits the current dashboard page and role.",
+    "Do not invent any data, records, IDs, or results.",
+    "Prefer short step-by-step instructions or the next best action.",
+    `Current user role: ${userRole || "guest"}`,
+    `Current user id: ${userId || "anonymous"}`,
+    `Current page: ${pageName || "unknown"}`,
+    `Current action: ${actionName || "unknown"}`,
+    `Context: ${contextSummary || "none provided"}`,
+    "If the action is not supported, explain the limitation and suggest the closest supported workflow.",
+  ].join(" ");
+};
+
 module.exports = {
   buildSystemPrompt,
+  buildDashboardHelpPrompt,
 };

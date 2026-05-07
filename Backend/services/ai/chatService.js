@@ -9,7 +9,7 @@ const {
   insertResponse,
 } = require("../../models/AIChat.model");
 const { createChatCompletion } = require("./providers/openrouterClient");
-const { buildSystemPrompt } = require("./platformContextBuilder");
+const { buildSystemPrompt, buildDashboardHelpPrompt } = require("./platformContextBuilder");
 
 const DEFAULT_MODEL = "openrouter/owl-alpha";
 
@@ -147,8 +147,48 @@ const getConversationMessages = async (conversationId) => {
   return listMessages(conversationId, 100);
 };
 
+const getDashboardHelp = async ({ user, pageName, actionName, contextSummary }) => {
+  const userId = user?.id || null;
+  const userRole = user?.userType || user?.role || "guest";
+
+  const systemPrompt = buildDashboardHelpPrompt({
+    userRole,
+    userId,
+    pageName,
+    actionName,
+    contextSummary,
+  });
+
+  const completion = await createChatCompletion({
+    apiKey: process.env.OPENROUTER_API_KEY,
+    model: process.env.OPENROUTER_MODEL || DEFAULT_MODEL,
+    messages: [
+      { role: "system", content: systemPrompt },
+      {
+        role: "user",
+        content: JSON.stringify(
+          {
+            pageName: pageName || "unknown",
+            actionName: actionName || "unknown",
+            contextSummary: contextSummary || "none provided",
+          },
+          null,
+          2,
+        ),
+      },
+    ],
+  });
+
+  return {
+    model: completion?.model || process.env.OPENROUTER_MODEL || DEFAULT_MODEL,
+    message: completion?.choices?.[0]?.message?.content || "I could not generate dashboard help.",
+    usage: completion?.usage || {},
+  };
+};
+
 module.exports = {
   sendMessage,
   listUserConversations,
   getConversationMessages,
+  getDashboardHelp,
 };

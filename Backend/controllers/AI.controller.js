@@ -3,6 +3,7 @@ const {
   sendMessage,
   listUserConversations,
   getConversationMessages,
+  getDashboardHelp,
 } = require("../services/ai/chatService");
 
 const attachOptionalUser = (req) => {
@@ -60,8 +61,28 @@ const getMessages = async (req, res) => {
   }
 };
 
+const getDashboardAssist = async (req, res) => {
+  try {
+    const user = attachOptionalUser(req);
+    const { pageName, actionName, contextSummary } = req.body;
+
+    const response = await getDashboardHelp({
+      user,
+      pageName,
+      actionName,
+      contextSummary,
+    });
+
+    res.status(200).json(response);
+  } catch (error) {
+    console.error("AI dashboard help error:", error.message);
+    res.status(400).json({ message: error.message || "Failed to process dashboard AI help" });
+  }
+};
+
 module.exports = {
   postChat,
   getConversations,
   getMessages,
+  getDashboardAssist,
 };

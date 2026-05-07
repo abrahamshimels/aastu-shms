@@ -33,3 +33,12 @@ export const getConversationMessages = async (conversationId, token) => {
   );
   return response.data;
 };
+
+export const getDashboardAiHelp = async ({ pageName, actionName, contextSummary, token }) => {
+  const response = await axios.post(
+    `${baseURL}/ai/dashboard-help`,
+    { pageName, actionName, contextSummary },
+    { headers: buildHeaders(token) },
+  );
+  return response.data;
+};

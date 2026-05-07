@@ -1,104 +1,115 @@
 .portal-container {
   display: flex;
-  height: 100vh;
-  background-color: rgba(255, 243, 243, 0.874);
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(19, 166, 181, 0.16), transparent 32rem),
+    linear-gradient(135deg, #f7fbfd 0%, #eef7fb 100%);
   font-family: "Poppins", sans-serif;
 }
 
 .portal-left {
-  width: 50%;
+  width: 46%;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: white;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(244, 250, 252, 0.92));
+  border-right: 1px solid var(--shms-border);
+  padding: 3rem;
 }
 
 .portal-left img {
-  width: 80%;
+  width: min(88%, 42rem);
+  filter: drop-shadow(0 24px 40px rgba(15, 75, 105, 0.16));
 }
 
 .portal-right {
-  width: 50%;
+  width: 54%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 3rem;
+  padding: clamp(1.5rem, 4vw, 3rem);
 }
 
 .portal-header {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 2.5rem;
 }
 
 .portal-header h1 {
-  font-size: 2.8rem;
-  color: #333;
+  font-size: clamp(2.1rem, 4vw, 3.2rem);
+  color: var(--shms-text);
   font-weight: 700;
+  letter-spacing: 0;
 }
 
 .portal-header p {
-  color: #666;
-  font-size: 1.1rem;
+  color: var(--shms-text-muted);
+  font-size: 1.05rem;
+  margin-top: 0.5rem;
 }
 
 .portal-options {
-  display: flex;
-  gap: 2rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
   width: 100%;
-  max-width: 800px;
+  max-width: 960px;
 }
 
 .option-card {
-  flex: 1;
-  background-color: white;
-  border-radius: 15px;
-  padding: 2.5rem 1.5rem;
+  background: var(--shms-surface-glass);
+  border-radius: var(--shms-radius-lg);
+  padding: 1.5rem;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shms-shadow-sm);
+  border: 1px solid rgba(216, 230, 239, 0.9);
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform var(--shms-transition), box-shadow var(--shms-transition), border-color var(--shms-transition);
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-height: 19rem;
 }
 
 .option-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  box-shadow: var(--shms-shadow-md);
+  border-color: var(--shms-border-strong);
 }
 
 .icon-wrapper {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 2.5rem;
-  margin-bottom: 1.5rem;
+  font-size: 2.25rem;
+  margin-bottom: 1.25rem;
 }
 
 .queue-icon {
-  background-color: #e3f2fd;
-  color: #2196f3;
+  background-color: var(--shms-primary-soft);
+  color: var(--shms-primary);
 }
 
 .login-icon {
-  background-color: #fce4ec;
-  color: #e91e63;
+  background-color: #e9fbf3;
+  color: var(--shms-emerald);
 }
 
 .option-card h2 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  color: #333;
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+  color: var(--shms-text);
 }
 
 .option-card p {
-  color: #777;
-  font-size: 0.95rem;
-  line-height: 1.4;
+  color: var(--shms-text-muted);
+  font-size: 0.94rem;
+  line-height: 1.55;
   margin-bottom: 1.5rem;
   flex-grow: 1;
 }
@@ -106,23 +117,23 @@
 .portal-btn {
   width: 100%;
   padding: 0.8rem;
-  border-radius: 2rem;
+  border-radius: 999px;
   border: none;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 0.96rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.3s ease;
-  background-color: #2196f3;
+  background: linear-gradient(135deg, var(--shms-primary), var(--shms-cyan));
   color: white;
+  box-shadow: 0 12px 22px rgba(15, 107, 143, 0.18);
 }
 
 .login-btn {
-  background-color: #e91e63;
+  background: linear-gradient(135deg, var(--shms-emerald), #0f9f8f);
 }
 
 .portal-footer {
-  margin-top: 4rem;
-  color: #aaa;
+  margin-top: 3rem;
+  color: var(--shms-text-muted);
   font-size: 0.9rem;
 }
 
@@ -130,16 +141,18 @@
   .portal-left {
     display: none;
   }
+
   .portal-right {
     width: 100%;
   }
 }
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 760px) {
   .portal-options {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
-  .portal-header h1 {
-    font-size: 2rem;
+
+  .option-card {
+    min-height: auto;
   }
 }

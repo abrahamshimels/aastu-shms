@@ -149,7 +149,9 @@ const DLogin = () => {
                 onChange={Handlechange}
                 required
               />
-              <button type="submit">{Loading ? "Loading..." : "Submit"}</button>
+              <button type="submit" disabled={Loading}>
+                {Loading ? "Loading..." : "Submit"}
+              </button>
 
               {/* ********************************************************* */}
               <Drawer
@@ -198,6 +200,7 @@ const DLogin = () => {
                 </div>
 
                 <button
+                  disabled={forgetLoading}
                   style={{
                     width: "50%",
                     margin: " 20px auto",

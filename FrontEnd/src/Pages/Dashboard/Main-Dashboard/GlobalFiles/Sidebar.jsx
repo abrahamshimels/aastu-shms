@@ -33,13 +33,25 @@ const Sidebar = () => {
         <div style={{ width: isOpen ? "200px" : "70px" }} className={`sidebar`}>
           <div className="top_section">
             <h1 style={{ display: isOpen ? "block" : "none" }} className="logo">
-              HMS
+              AASTU SHMS
             </h1>
             <div
-              style={{ marginLeft: isOpen ? "50px" : "0px" }}
+              style={{ marginLeft: isOpen ? "12px" : "0px" }}
               className="bars"
             >
-              <ImMenu onClick={toggle} style={{ cursor: "pointer" }} />
+              <ImMenu
+                onClick={toggle}
+                style={{ cursor: "pointer" }}
+                role="button"
+                tabIndex={0}
+                aria-label={isOpen ? "Collapse navigation" : "Expand navigation"}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    toggle();
+                  }
+                }}
+              />
             </div>
           </div>
           <div className="bottomSection">
