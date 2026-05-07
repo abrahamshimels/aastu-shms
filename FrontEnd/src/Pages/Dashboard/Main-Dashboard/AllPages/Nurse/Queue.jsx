@@ -5,13 +5,15 @@ import axios from "axios";
 import "./CSS/Queue.css";
 import { FaUserMd, FaTrash, FaEdit } from "react-icons/fa";
 
+const baseURL = process.env.REACT_APP_BASE_URL;
+if (!baseURL) throw new Error("REACT_APP_BASE_URL is not defined in .env");
+
 const Queue = () => {
   const [queue, setQueue] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showCheckIn, setShowCheckIn] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
-  const [draggingItem, setDraggingItem] = useState(null);
   const [checkInData, setCheckInData] = useState({
     studentID: "",
     chief_complaint: "",
@@ -20,6 +22,7 @@ const Queue = () => {
 
   const notify = (text) => toast(text);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchQueue();
     fetchDoctors();
@@ -30,7 +33,7 @@ const Queue = () => {
   const fetchQueue = async () => {
     try {
       const res = await axios.get(
-        "https://aastu-shms.onrender.com/nurses/queue",
+        `${baseURL}/nurses/queue`,
       );
       setQueue(res.data);
     } catch (error) {
@@ -41,7 +44,7 @@ const Queue = () => {
   const fetchDoctors = async () => {
     try {
       const res = await axios.get(
-        "https://aastu-shms.onrender.com/nurses/doctors",
+        `${baseURL}/nurses/doctors`,
       );
       setDoctors(res.data);
     } catch (error) {
@@ -56,7 +59,7 @@ const Queue = () => {
       if (editingItem) {
         // Update existing queue item
         await axios.patch(
-          `https://aastu-shms.onrender.com/nurses/queue/${editingItem.id}`,
+          `${baseURL}/nurses/queue/${editingItem.id}`,
           {
             chief_complaint: checkInData.chief_complaint,
             priority: checkInData.priority,
@@ -66,12 +69,12 @@ const Queue = () => {
       } else {
         // Create new check-in
         const patientRes = await axios.get(
-          `https://aastu-shms.onrender.com/nurses/patient?studentID=${encodeURIComponent(checkInData.studentID.trim())}`,
+          `${baseURL}/nurses/patient?studentID=${encodeURIComponent(checkInData.studentID.trim())}`,
         );
         const patient = patientRes.data;
 
         const res = await axios.post(
-          "https://aastu-shms.onrender.com/nurses/check-in",
+          `${baseURL}/nurses/check-in`,
           {
             student_id: patient.id,
             chief_complaint: checkInData.chief_complaint,
@@ -118,7 +121,7 @@ const Queue = () => {
     if (window.confirm("Remove this patient from the queue completely?")) {
       try {
         await axios.delete(
-          `https://aastu-shms.onrender.com/nurses/queue/${queueId}`,
+          `${baseURL}/nurses/queue/${queueId}`,
         );
         notify("Patient removed from queue");
         fetchQueue();
@@ -130,7 +133,6 @@ const Queue = () => {
 
   // Drag and Drop Logic
   const onDragStart = (e, item) => {
-    setDraggingItem(item);
     e.dataTransfer.setData("queueId", item.id);
   };
 
@@ -151,7 +153,7 @@ const Queue = () => {
 
     try {
       await axios.patch(
-        "https://aastu-shms.onrender.com/nurses/assign-doctor",
+        `${baseURL}/nurses/assign-doctor`,
         {
           queue_id: queueId,
           doctor_id: doctorId,
@@ -159,7 +161,6 @@ const Queue = () => {
       );
       notify("Doctor assigned successfully");
       fetchQueue();
-      setDraggingItem(null);
     } catch (error) {
       notify("Error assigning doctor");
     }

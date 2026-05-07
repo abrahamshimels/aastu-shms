@@ -21,11 +21,18 @@ const resolveHost = async () => {
 };
 
 // Defer requires that depend on DB until after resolution
-let authRouter, adminRouter, publicRouter, reportRouter, appointmentRouter, doctorRouter, patientRouter, reportsRouter, nurseRouter, certificateRouter, labTechRouter, labRouter, db;
+let authRouter, adminRouter, publicRouter, reportRouter, appointmentRouter, doctorRouter, patientRouter, reportsRouter, nurseRouter, certificateRouter, labTechRouter, labRouter, aiRouter, db;
 
 const app = express();
 
+const logInitStep = async (label, initializer) => {
+  console.log(`➡️ Initializing ${label}...`);
+  await initializer();
+  console.log(`✅ ${label} initialized successfully.`);
+};
+
 const startServer = async () => {
+  console.log("🚀 Starting SHMS backend initialization...");
   await resolveHost(); // Resolve IP first
 
   // Now load modules that interpret the config
@@ -41,6 +48,7 @@ const startServer = async () => {
   certificateRouter = require("./routes/Certificates.Route");
   labTechRouter = require("./routes/LabTechnologist.Route");
   labRouter = require("./routes/Lab.Route");
+  aiRouter = require("./routes/AI.Route");
 
   db = require("./configs/db");
 
@@ -76,6 +84,7 @@ const { createTables: createReportTable } = require("./models/Report.model");
   const { initialize: initializeQueueTable } = require("./models/Queue.model");
   const { initialize: initializeReportsTable } = require("./models/Report.model");
   const { initialize: initializeCertificateTable } = require("./models/Certificate.model");
+  const { initialize: initializeAIChatTables } = require("./models/AIChat.model");
   // app.use("/ambulances", ambulanceRouter);
   app.use("/appointments", appointmentRouter);
   app.use("/doctors", doctorRouter);
@@ -87,21 +96,24 @@ const { createTables: createReportTable } = require("./models/Report.model");
   app.use("/certificates", certificateRouter);
   app.use("/labtechs", labTechRouter);
   app.use("/lab", labRouter);
+  app.use("/ai", aiRouter);
 
 
   app.listen(process.env.PORT || 3007, async () => {
     try {
+      console.log("📡 Connecting to database...");
       const result = await db.query("SELECT NOW()");
       console.log("Connected to the database at", result.rows[0].now);
       console.log("Connected to DB successfully");
 
       // Initialize only the core tables
-      await initializeStaffTable();
-      await initializeAuditLogsTable();
-      await initializeConfigTable();
-      await initializeQueueTable();
-      await initializeReportsTable();
-      await initializeCertificateTable();
+      await logInitStep("Staff table", initializeStaffTable);
+      await logInitStep("Audit Logs table", initializeAuditLogsTable);
+      await logInitStep("System Config table", initializeConfigTable);
+      await logInitStep("Queue table", initializeQueueTable);
+      await logInitStep("Reports table", initializeReportsTable);
+      await logInitStep("Certificates table", initializeCertificateTable);
+      await logInitStep("AI chat tables", initializeAIChatTables);
 
       // Schema cleanup: Ensure optional fields are nullable
       try {
@@ -113,24 +125,24 @@ const { createTables: createReportTable } = require("./models/Report.model");
         console.log("Note: Schema constraints update skipped or already applied");
       }
 
-      console.log("SHMS tables initialized successfully");
       // Initialize tables
       // await createAdminTables();
-      await createDoctorTables();
-      await createPatientTable();
+      await logInitStep("Doctor tables", createDoctorTables);
+      await logInitStep("Patient table", createPatientTable);
       // await createAmbulanceTable();
-      await createNurseTables();
-      await createQueueTable();
-      await createLabTechTables();
-      await createLabTables();
-      await createAppointmentTable();
-      await createReportTable();
-      console.log("All tables initialized successfully");
+      await logInitStep("Nurses table", createNurseTables);
+      await logInitStep("Queue table", createQueueTable);
+      await logInitStep("Lab technologist tables", createLabTechTables);
+      await logInitStep("Lab tables", createLabTables);
+      await logInitStep("Appointment table", createAppointmentTable);
+      await logInitStep("Report table", createReportTable);
+
+      console.log("🎉 SHMS tables initialized successfully");
 
     } catch (err) {
       console.error("Error connecting to the database:", err);
     }
-    console.log(`Listening at port ${process.env.PORT || 3007}`);
+    console.log(`🟢 Listening at port ${process.env.PORT || 3007}`);
   });
 };
 

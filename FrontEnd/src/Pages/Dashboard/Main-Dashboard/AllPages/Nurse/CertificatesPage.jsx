@@ -9,6 +9,9 @@ import {
 import { AiOutlineEye, AiOutlinePrinter } from "react-icons/ai";
 import CertificateModal from "../Doctor/Certificate_Modal";
 
+const baseURL = process.env.REACT_APP_BASE_URL;
+if (!baseURL) throw new Error("REACT_APP_BASE_URL is not defined in .env");
+
 const CertificatesPage = () => {
   const dispatch = useDispatch();
   const { data } = useSelector((state) => state.auth);
@@ -37,7 +40,7 @@ const CertificatesPage = () => {
     const fetchConfig = async () => {
       try {
         const response = await fetch(
-          "https://aastu-shms.onrender.com/nurses/config/certificate_settings",
+          `${baseURL}/nurses/config/certificate_settings`,
         );
         const data = await response.json();
         setConfig(data);

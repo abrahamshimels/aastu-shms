@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { AiOutlineUserAdd } from "react-icons/ai";
 import { FaUsers } from "react-icons/fa";
+import { FaRobot } from "react-icons/fa";
 import { BsBookmarkPlus, BsFillBookmarkCheckFill } from "react-icons/bs";
 import { CgProfile } from "react-icons/cg";
 import { TbReportMedical } from "react-icons/tb";
@@ -15,7 +16,7 @@ import { authLogout } from "../../../../Redux/auth/action";
 import { HistoryOutlined } from "@ant-design/icons";
 
 const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const dispatch = useDispatch();
 
   const {
@@ -51,6 +52,17 @@ const Sidebar = () => {
                 className="link_text"
               >
                 DashBoard
+              </div>
+            </NavLink>
+            <NavLink className="link" to={"/ai-assistant"}>
+              <div className="icon">
+                <FaRobot className="mainIcon" />
+              </div>
+              <div
+                style={{ display: isOpen ? "block" : "none" }}
+                className="link_text"
+              >
+                AI Assistant
               </div>
             </NavLink>
             {user?.userType === "patient" ? (

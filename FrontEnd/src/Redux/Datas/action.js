@@ -1,14 +1,15 @@
 import * as types from "./types";
 import axios from "axios";
 
-const baseURL = "https://aastu-shms.onrender.com";
+const baseURL = process.env.REACT_APP_BASE_URL;
+if (!baseURL) throw new Error("REACT_APP_BASE_URL is not defined in .env");
 
 // CreateReport
 export const CreateReport = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.CREATE_REPORT_REQUEST });
     const res = await axios.post(
-      "https://aastu-shms.onrender.com/reports",
+      `${baseURL}/reports`,
       data,
       {
         headers: { Authorization: localStorage.getItem("token") },
@@ -32,7 +33,7 @@ export const CreateReport = (data) => async (dispatch) => {
 export const updateReport = (reportId, data) => async (dispatch) => {
   try {
     const res = await axios.patch(
-      `https://aastu-shms.onrender.com/reports/${reportId}`,
+      `${baseURL}/reports/${reportId}`,
       data,
       {
         headers: { Authorization: localStorage.getItem("token") },
@@ -49,7 +50,7 @@ export const GetDoctorDetails = () => async (dispatch) => {
   try {
     dispatch({ type: types.GET_DOCTOR_REQUEST });
     dispatch({ type: types.GET_DOCTOR_REQUEST });
-    const res = await axios.get("https://aastu-shms.onrender.com/doctors", {
+    const res = await axios.get(`${baseURL}/doctors`, {
       headers: { Authorization: localStorage.getItem("token") },
     });
     console.log("this", res);
@@ -71,7 +72,7 @@ export const GetDoctorDetails = () => async (dispatch) => {
 export const GetAdminDetails = () => async (dispatch) => {
   try {
     dispatch({ type: types.GET_ADMIN_REQUEST });
-    const res = await axios.get("https://aastu-shms.onrender.com/admin/staff", {
+    const res = await axios.get(`${baseURL}/admin/staff`, {
       headers: { Authorization: localStorage.getItem("token") },
     });
     console.log(res.data);
@@ -94,7 +95,7 @@ export const GetMedicineDetails = (patientid) => async (dispatch) => {
   try {
     dispatch({ type: types.GET_MEDICINE_REQUEST });
     const res = await axios.post(
-      `https://aastu-shms.onrender.com/prescriptions/${patientid}`,
+      `${baseURL}/prescriptions/${patientid}`,
     );
     //axios.post
     console.log(res.data);
@@ -113,7 +114,7 @@ export const CreateBooking = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.CREATE_BOOKING_REQUEST });
     const res = await axios.post(
-      `https://aastu-shms.onrender.com/appointments/create`,
+      `${baseURL}/appointments/create`,
       data,
     );
     console.log(res);
@@ -127,7 +128,7 @@ export const CreateBooking = (data) => async (dispatch) => {
 export const GetPatients = () => async (dispatch) => {
   try {
     dispatch({ type: types.GET_PATIENT_REQUEST });
-    const res = await axios.get(`https://aastu-shms.onrender.com/patients`);
+    const res = await axios.get(`${baseURL}/patients`);
     console.log("pats", res);
     const patients = { patients: res.data };
     dispatch({
@@ -149,7 +150,7 @@ export const GetAllData = () => async (dispatch) => {
   try {
     dispatch({ type: types.GET_ALLDATA_REQUEST });
     const res = await axios.get(
-      "https://aastu-shms.onrender.com/admin/dashboard",
+      `${baseURL}/admin/dashboard`,
       {
         headers: { Authorization: localStorage.getItem("token") },
       },
@@ -170,7 +171,7 @@ export const GetAppointments = (userType, id) => async (dispatch) => {
   try {
     dispatch({ type: types.GET_APPOINTMENT_DETAILS_REQUEST });
     const res = await axios.get(
-      `https://aastu-shms.onrender.com/appointments/${userType}/${id}`,
+      `${baseURL}/appointments/${userType}/${id}`,
     );
     console.log("res", res.data);
     // return res.data;
@@ -189,7 +190,7 @@ export const DeleteAppointment = (id) => async (dispatch) => {
   try {
     dispatch({ type: types.DELETE_APPOINTMENT_REQUEST });
     const res = await axios.delete(
-      `https://aastu-shms.onrender.com/appointments/${id}`,
+      `${baseURL}/appointments/${id}`,
     );
     console.log(res.data);
     // return res.data;
@@ -208,7 +209,7 @@ export const GetAllReports = (userType, id) => async (dispatch) => {
   try {
     dispatch({ type: types.GET_REPORTS_REQUEST });
     const res = await axios.get(
-      `https://aastu-shms.onrender.com/reports/${userType}/${id}`,
+      `${baseURL}/reports/${userType}/${id}`,
       { headers: { Authorization: localStorage.getItem("token") } },
     );
     console.log("res", res.data);
@@ -227,7 +228,7 @@ export const CreateCertificate = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.GET_CERTIFICATES_REQUEST }); // Reusing request type for simplicity or define CREATE_CERTIFICATE_REQUEST
     const res = await axios.post(
-      "https://aastu-shms.onrender.com/certificates/create",
+      `${baseURL}/certificates/create`,
       data,
       { headers: { Authorization: localStorage.getItem("token") } },
     );
@@ -246,7 +247,7 @@ export const GetAllCertificates = (userType, id) => async (dispatch) => {
   try {
     dispatch({ type: types.GET_CERTIFICATES_REQUEST });
     const res = await axios.get(
-      `https://aastu-shms.onrender.com/certificates/${userType}/${id}`,
+      `${baseURL}/certificates/${userType}/${id}`,
     );
     console.log("res", res.data);
     const certificates = { certificates: res.data.data };

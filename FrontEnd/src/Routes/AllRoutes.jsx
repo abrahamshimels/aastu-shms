@@ -25,6 +25,7 @@ import AdminAnalytics from "../Pages/Dashboard/Main-Dashboard/AllPages/Admin/Adm
 import SignupDetails from "../Pages/Dashboard/Dashboard-Login/Signup/SignupDetails";
 import MainPortal from "../Pages/MainPortal/MainPortal";
 import QueueScreen from "../Pages/MainPortal/QueueScreen";
+import AIAssistant from "../Pages/AI/AIAssistant";
 import Registration from "../Pages/Dashboard/Main-Dashboard/AllPages/Nurse/Registration";
 import Queue from "../Pages/Dashboard/Main-Dashboard/AllPages/Nurse/Queue";
 import CertificatesPage from "../Pages/Dashboard/Main-Dashboard/AllPages/Nurse/CertificatesPage";
@@ -41,6 +42,7 @@ const AllRoutes = () => {
         <Route path="/" element={<MainPortal />} />
         <Route path="/login" element={<DLogin />} />
         <Route path="/queue" element={<QueueScreen />} />
+        <Route path="/ai-assistant" element={<AIAssistant />} />
         <Route path="/signup" element={<DSignup />} />
         <Route path="/adddetails" element={<SignupDetails />} />
         <Route path="/dashboard" element={<FrontPage />} />

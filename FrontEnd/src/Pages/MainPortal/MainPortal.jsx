@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { FaUserShield, FaUsers } from "react-icons/fa";
+import { FaUserShield, FaUsers, FaRobot } from "react-icons/fa";
 import banner from "../../img/banner.png";
 import "./MainPortal.css";
 
@@ -35,6 +35,15 @@ const MainPortal = () => {
             <h2>Staff Login</h2>
             <p>Access the management dashboard (Doctors, Nurses, Admins).</p>
             <button className="portal-btn login-btn">Login Now</button>
+          </div>
+
+          <div className="option-card" onClick={() => navigate("/ai-assistant")}>
+            <div className="icon-wrapper queue-icon">
+              <FaRobot />
+            </div>
+            <h2>AI Assistant</h2>
+            <p>Ask role-aware questions about SHMS workflows and get guided help.</p>
+            <button className="portal-btn">Open Assistant</button>
           </div>
         </div>
         

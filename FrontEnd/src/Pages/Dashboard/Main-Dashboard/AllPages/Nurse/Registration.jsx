@@ -4,6 +4,9 @@ import Sidebar from "../../GlobalFiles/Sidebar";
 import axios from "axios";
 import "./CSS/Registration.css";
 
+const baseURL = process.env.REACT_APP_BASE_URL;
+if (!baseURL) throw new Error("REACT_APP_BASE_URL is not defined in .env");
+
 const Registration = () => {
   const [searchID, setSearchID] = useState("");
   const [patient, setPatient] = useState(null);
@@ -28,7 +31,7 @@ const Registration = () => {
   const handleSearch = async () => {
     try {
       const res = await axios.get(
-        `https://aastu-shms.onrender.com/nurses/patient?studentID=${encodeURIComponent(searchID.trim())}`,
+        `${baseURL}/nurses/patient?studentID=${encodeURIComponent(searchID.trim())}`,
       );
       setPatient(res.data);
       setIsNew(false);
@@ -48,7 +51,7 @@ const Registration = () => {
     const token = localStorage.getItem("token");
     try {
       const res = await axios.post(
-        "https://aastu-shms.onrender.com/nurses/register-patient",
+        `${baseURL}/nurses/register-patient`,
         formData,
         {
           headers: { Authorization: token },
@@ -82,7 +85,7 @@ const Registration = () => {
   const handleUpdatePhone = async () => {
     try {
       await axios.patch(
-        `https://aastu-shms.onrender.com/nurses/patient/phone`,
+        `${baseURL}/nurses/patient/phone`,
         {
           studentID: patient.studentid,
           phoneNum: patient.phonenum,

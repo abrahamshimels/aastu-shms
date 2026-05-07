@@ -17,14 +17,28 @@ const LabTechModel = require("./LabTechnologist.model");
 
 const initialize = async () => {
   try {
+    console.log("➡️ Creating staff core table...");
     await dbhelper.query(createStaffTable);
     console.log("✅ Staff table initialized successfully.");
+
+    console.log("➡️ Initializing dependent doctors table from staff bootstrap...");
     await DoctorsModel.init();
+    console.log("✅ Dependent doctors table initialized.");
+
+    console.log("➡️ Initializing dependent patients table from staff bootstrap...");
     await PatientsModel.init();
+    console.log("✅ Dependent patients table initialized.");
+
+    console.log("➡️ Initializing dependent nurses table from staff bootstrap...");
     await NursesModel.init();
+    console.log("✅ Dependent nurses table initialized.");
+
+    console.log("➡️ Initializing dependent lab technologist table from staff bootstrap...");
     await LabTechModel.createTables();
+    console.log("✅ Dependent lab technologist table initialized.");
 
     // Seed default admin if it doesn't exist
+    console.log("➡️ Checking for default admin seed...");
     const adminExists = await findById("ADM-001");
     if (!adminExists) {
       console.log("Seeding default admin...");
@@ -43,6 +57,8 @@ const initialize = async () => {
         "AASTU Campus"
       ]);
       console.log("✅ Default Admin (ADM-001) created successfully.");
+    } else {
+      console.log("ℹ️ Default admin already exists. Skipping seed.");
     }
   } catch (err) {
     console.error("❌ Failed to initialize database tables:", err.message);

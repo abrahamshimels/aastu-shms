@@ -1,7 +1,7 @@
 import React from "react";
 import { Table, Tag, Button } from "antd";
 import { useNavigate } from "react-router-dom";
-import { FaArrowLeft, FaClock, FaUserMd } from "react-icons/fa";
+import { FaArrowLeft, FaUserMd } from "react-icons/fa";
 import "./QueueScreen.css";
 
 const QueueScreen = () => {
@@ -12,8 +12,10 @@ const QueueScreen = () => {
   React.useEffect(() => {
     const fetchQueue = async () => {
       try {
+          const baseURL = process.env.REACT_APP_BASE_URL;
+          if (!baseURL) throw new Error("REACT_APP_BASE_URL is not defined in .env");
         const response = await fetch(
-          "https://aastu-shms.onrender.com/public/queue",
+          `${baseURL}/public/queue`,
         );
         const data = await response.json();
         setQueueData(data);
