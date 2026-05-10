@@ -36,7 +36,8 @@ const AIAssistant = () => {
   const refreshConversations = async () => {
     try {
       const rows = await getConversations(token);
-      setConversations(rows || []);
+      const list = Array.isArray(rows) ? rows : rows?.data || rows?.conversations || [];
+      setConversations(list);
     } catch (e) {
       // Conversation list is optional for guests.
     }
@@ -53,7 +54,8 @@ const AIAssistant = () => {
       setError("");
       const rows = await getConversationMessages(id, token);
       setConversationId(id);
-      setMessages((rows || []).map((m) => ({ role: m.role, content: m.content })));
+      const list = Array.isArray(rows) ? rows : rows?.data || rows?.messages || [];
+      setMessages((list || []).map((m) => ({ role: m.role, content: m.content })));
     } catch (e) {
       const errorMsg = e?.response?.data?.error || e?.message || "Failed to load conversation";
       setError(errorMsg);
