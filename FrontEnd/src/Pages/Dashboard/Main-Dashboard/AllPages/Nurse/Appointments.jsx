@@ -176,7 +176,7 @@ const Appointments = () => {
                                 await axios.post(
                                   `${baseURL}/nurses/check-in`,
                                   {
-                                    student_id: apt.patientid,
+                                    student_id: apt.patient_db_id,
                                     chief_complaint:
                                       "APPOINTMENT: " +
                                       (apt.notes ||
@@ -187,8 +187,13 @@ const Appointments = () => {
                                   },
                                 );
                                 notify("Patient checked in and sent to Queue!");
+                                fetchAppointments();
                               } catch (err) {
-                                notify("Error checking in patient");
+                                const errorMsg =
+                                  err.response?.data?.message ||
+                                  err.message ||
+                                  "Error checking in patient";
+                                notify(errorMsg);
                                 console.error(err);
                               }
                             }
