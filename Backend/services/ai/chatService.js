@@ -116,21 +116,23 @@ const sendMessage = async ({ message, conversationId, user }) => {
       usage: completion?.usage || {},
     };
   } catch (err) {
-    // record failure response
+    // record failure response with fallback error message (content cannot be null)
+    const errorMessage = `Error: ${err.message || 'Unable to process your request. Please try again.'}`;
     try {
       await insertResponse({
         conversationId: conversation.conversation_id,
         role: "assistant",
-        content: null,
+        content: errorMessage,
         model: process.env.OPENROUTER_MODEL || DEFAULT_MODEL,
         tokenUsage: {},
         status: "error",
-        error: { message: err.message },
-        responsePayload: {},
+        error: { message: err.message, code: err.code || 'UNKNOWN_ERROR' },
+        responsePayload: { error: errorMessage },
         provider: "openrouter",
       });
-    } catch (e) {
-      console.warn("Failed to insert AI error record:", e.message);
+    } catch (dbErr) {
+      console.error("[AI] Failed to insert error record:", dbErr.message);
+      console.error("[AI] Original error was:", err.message);
     }
 
     await touchConversation(conversation.conversation_id);

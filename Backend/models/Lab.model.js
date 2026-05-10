@@ -17,11 +17,67 @@ const {
 const createTables = async () => {
     await dbhelper.query(createLabTestRequestTable);
     await dbhelper.query(createLabRecordTable);
+
+    // Keep existing databases compatible with the staff-based doctor identity model.
+    await dbhelper.query(`ALTER TABLE lab_test_requests DROP CONSTRAINT IF EXISTS lab_test_requests_doctor_id_fkey;`);
+    await dbhelper.query(`
+      ALTER TABLE lab_test_requests
+      ADD CONSTRAINT lab_test_requests_doctor_id_fkey
+      FOREIGN KEY (doctor_id) REFERENCES staff(id)
+      ON UPDATE CASCADE
+      ON DELETE RESTRICT;
+    `);
+
     console.log("Lab tables initialized");
 };
 
-const createRequest = (patientId, doctorId, testType, priority, notes) => {
-    return dbhelper.query(addRequestQuery, [patientId, doctorId, testType, priority, notes]);
+const createRequest = async (patientId, doctorId, testType, priority, notes) => {
+  console.log("[Lab.model.createRequest] Start", {
+    patientId,
+    doctorId,
+    testType,
+    priority,
+    notes,
+  });
+
+  // Ensure the authenticated doctor exists in staff, since login issues staff-based IDs.
+  const doctorRes = await dbhelper.query(
+    "SELECT id, role, name FROM staff WHERE id = $1 AND role = 'DOCTOR'",
+    [doctorId]
+  );
+  console.log("[Lab.model.createRequest] Doctor lookup", {
+    doctorId,
+    found: doctorRes?.length || 0,
+    rows: doctorRes,
+  });
+  if (!doctorRes || doctorRes.length === 0) {
+    throw new Error(`Doctor with id ${doctorId} not found`);
+  }
+
+  // patientId may be a studentid or internal id; resolve to internal patient id
+  const patientRes = await dbhelper.query(
+    "SELECT id FROM patients WHERE id = $1 OR studentid = $1",
+    [patientId]
+  );
+  if (!patientRes || patientRes.length === 0) {
+    throw new Error(`Patient with id/studentid ${patientId} not found`);
+  }
+  const resolvedPatientId = patientRes[0].id;
+  console.log("[Lab.model.createRequest] Patient lookup", {
+    requestedPatientId: patientId,
+    resolvedPatientId,
+    found: patientRes?.length || 0,
+    rows: patientRes,
+  });
+
+  console.log("[Lab.model.createRequest] Inserting request", {
+    resolvedPatientId,
+    doctorId,
+    testType,
+    priority,
+    notes,
+  });
+  return dbhelper.query(addRequestQuery, [resolvedPatientId, doctorId, testType, priority, notes]);
 };
 
 const getPendingRequests = () => {

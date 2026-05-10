@@ -11,7 +11,11 @@ const {
   updateNurseById
 } = require("../models/Nurses.model");
 const bcrypt = require("bcrypt");
-const { updatePassword: updateStaffPassword, updateStaffDetails } = require("../models/Staff.model");
+const {
+  updatePassword: updateStaffPassword,
+  updateStaffDetails,
+  findById: findStaffById,
+} = require("../models/Staff.model");
 const {
   addPatient,
   findByStudentID,
@@ -25,7 +29,7 @@ const {
   updateQueueItem,
   checkActiveInQueue
 } = require("../models/Queue.model");
-const { getAllDoctors } = require("../models/Doctor.model");
+const { getActiveDoctorsForQueue } = require("../models/Staff.model");
 const { logAction } = require("../models/AuditLog.model");
 const { authenticate } = require("../middlewares/authMiddleware");
 
@@ -95,10 +99,25 @@ router.patch("/unassign-doctor", async (req, res) => {
 router.patch("/assign-doctor", async (req, res) => {
   const { doctor_id, queue_id } = req.body;
   try {
+    if (!doctor_id || !queue_id) {
+      return res.status(400).send({ message: "doctor_id and queue_id are required" });
+    }
+
+    const doctor = await findStaffById(doctor_id);
+    if (!doctor || doctor.role !== "DOCTOR" || doctor.is_active === false) {
+      return res.status(400).send({ message: "Selected doctor is invalid or inactive" });
+    }
+
     const result = await assignDoctor(doctor_id, queue_id);
+    if (!result || result.length === 0) {
+      return res.status(404).send({ message: "Queue item not found" });
+    }
     res.send({ message: "Doctor assigned", data: result[0] });
   } catch (error) {
     console.error(error);
+    if (error && error.code === "23503") {
+      return res.status(400).send({ message: "Invalid doctor assignment reference" });
+    }
     res.status(500).send({ message: "Error assigning doctor" });
   }
 });
@@ -277,7 +296,7 @@ router.patch("/queue/:id", async (req, res) => {
 // Available Doctors for Assignment
 router.get("/doctors", async (req, res) => {
   try {
-    const doctors = await getAllDoctors();
+    const doctors = await getActiveDoctorsForQueue();
     res.send(doctors);
   } catch (error) {
     console.error(error);

@@ -22,6 +22,13 @@ const postChat = async (req, res) => {
     const user = attachOptionalUser(req);
     const { message, conversationId } = req.body;
 
+    if (!message || !message.trim()) {
+      return res.status(400).json({ 
+        error: 'Message is required',
+        code: 'EMPTY_MESSAGE' 
+      });
+    }
+
     const response = await sendMessage({
       message,
       conversationId,
@@ -30,8 +37,16 @@ const postChat = async (req, res) => {
 
     res.status(200).json(response);
   } catch (error) {
-    console.error("AI chat error:", error.message);
-    res.status(400).json({ message: error.message || "Failed to process AI chat" });
+    console.error("[AI] Chat error:", {
+      message: error.message,
+      code: error.code,
+      stack: error.stack?.split('\n')[0]
+    });
+    res.status(400).json({ 
+      error: error.message || "Failed to process AI chat",
+      code: error.code || 'CHAT_ERROR',
+      conversationId: req.body?.conversationId
+    });
   }
 };
 
@@ -66,6 +81,13 @@ const getDashboardAssist = async (req, res) => {
     const user = attachOptionalUser(req);
     const { pageName, actionName, contextSummary } = req.body;
 
+    if (!pageName || !actionName) {
+      return res.status(400).json({ 
+        error: 'pageName and actionName are required',
+        code: 'MISSING_PARAMS'
+      });
+    }
+
     const response = await getDashboardHelp({
       user,
       pageName,
@@ -75,8 +97,16 @@ const getDashboardAssist = async (req, res) => {
 
     res.status(200).json(response);
   } catch (error) {
-    console.error("AI dashboard help error:", error.message);
-    res.status(400).json({ message: error.message || "Failed to process dashboard AI help" });
+    console.error("[AI] Dashboard help error:", {
+      message: error.message,
+      code: error.code,
+      pageName: req.body?.pageName,
+      actionName: req.body?.actionName
+    });
+    res.status(400).json({ 
+      error: error.message || "Failed to process dashboard AI help",
+      code: error.code || 'DASHBOARD_HELP_ERROR'
+    });
   }
 };
 

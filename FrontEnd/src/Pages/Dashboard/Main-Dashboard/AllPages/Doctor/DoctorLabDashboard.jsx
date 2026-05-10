@@ -57,19 +57,36 @@ const DoctorLabDashboard = () => {
         try {
             const requestData = {
                 patient_id: values.patient_id,
-                doctor_id: data.user.id,
+                doctorID: data.user.id,
                 test_type: values.test_type,
                 priority: values.priority,
                 notes: values.notes || "",
                 assigned_tech_id: values.lab_tech_id
             };
+            console.log("[DoctorLabDashboard] Submitting lab request", {
+                currentDoctor: data?.user,
+                requestData,
+            });
             await dispatch(createLabRequest(requestData, data.token));
             message.success("Lab request created successfully!");
             setIsCreateModalVisible(false);
             form.resetFields();
             fetchHistory();
         } catch (error) {
-            message.error("Failed to create lab request");
+            const serverMsg = error?.response?.data?.error || error?.message || "Failed to create lab request";
+            console.log("[DoctorLabDashboard] Lab request failed", {
+                serverMsg,
+                error,
+                requestData: {
+                    patient_id: values.patient_id,
+                    doctorID: data?.user?.id,
+                    test_type: values.test_type,
+                    priority: values.priority,
+                    notes: values.notes || "",
+                    assigned_tech_id: values.lab_tech_id,
+                },
+            });
+            message.error(serverMsg);
         } finally {
             setSubmitting(false);
         }

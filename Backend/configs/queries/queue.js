@@ -8,7 +8,7 @@ const createTableQuery = `CREATE TABLE IF NOT EXISTS queue (
   status VARCHAR(20) DEFAULT 'Checked-In', -- Checked-In, In-Consultation, Completed
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (student_id) REFERENCES patients(id), -- Assuming student_id maps to patients.id for now
-  FOREIGN KEY (doctor_id) REFERENCES doctors(id)
+  FOREIGN KEY (doctor_id) REFERENCES staff(id)
 );`;
 
 const addToQueueQuery = `INSERT INTO queue (student_id, chief_complaint, priority, doctor_id, status) VALUES ($1, $2, $3, $4, $5) RETURNING *;`;
@@ -20,10 +20,10 @@ const getActiveQueueQuery = `SELECT q.*,
                              p.name as patient_name, 
                              p.department as patient_dept, 
                              p.year as patient_year, 
-                             d.name as doctor_name
+                             s.name as doctor_name
                              FROM queue q 
                              JOIN patients p ON q.student_id = p.id 
-                             LEFT JOIN doctors d ON q.doctor_id = d.id
+                             LEFT JOIN staff s ON q.doctor_id = s.id AND s.role = 'DOCTOR'
                              WHERE q.status != 'Completed'
                              ORDER BY 
                                 CASE 

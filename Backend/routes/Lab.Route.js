@@ -27,9 +27,33 @@ router.use(async (req, res, next) => {
 router.post("/request", doctorAuth.authenticate, async (req, res) => {
     const { patient_id, test_type, priority, notes, doctorID } = req.body;
     try {
-        const result = await createRequest(patient_id, doctorID, test_type, priority || 'Normal', notes);
+        const authenticatedDoctorId = req.user?.doctorID || req.user?.id || doctorID;
+        console.log("[lab/request] Incoming request", {
+            body: {
+                patient_id,
+                doctorID,
+                test_type,
+                priority,
+                notes,
+            },
+            authenticatedDoctorId,
+            tokenDoctorClaim: req.user?.doctorID,
+            tokenIdClaim: req.user?.id,
+        });
+        const result = await createRequest(patient_id, authenticatedDoctorId, test_type, priority || 'Normal', notes);
+        console.log("[lab/request] Insert success", {
+            requestId: result?.[0]?.id,
+            patient_id,
+            authenticatedDoctorId,
+        });
         res.status(201).send({ message: "Lab request created", requestId: result[0].id });
     } catch (error) {
+        console.error("[lab/request] Insert failed", {
+            message: error.message,
+            stack: error.stack,
+            body: req.body,
+            user: req.user,
+        });
         res.status(400).send({ error: error.message });
     }
 });

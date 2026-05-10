@@ -29,6 +29,20 @@ const findByIdQuery = `SELECT * FROM staff WHERE id = $1;`;
 
 const getAllStaffQuery = `SELECT * FROM staff ORDER BY created_at DESC;`;
 
+const getActiveDoctorsForQueueQuery = `
+    SELECT
+        id,
+        name,
+        email,
+        qualification AS department,
+        qualification,
+        role,
+        is_active
+    FROM staff
+    WHERE role = 'DOCTOR' AND is_active = TRUE
+    ORDER BY created_at DESC;
+`;
+
 const updateStaffQuery = `
     UPDATE staff 
     SET name = $2, email = $3, role = $4, qualification = $5, is_active = $6, phonenum = $7, dob = $8, gender = $9, age = $10, address = $11
@@ -46,6 +60,7 @@ module.exports = {
   findByEmailQuery,
   findByIdQuery,
   getAllStaffQuery,
+    getActiveDoctorsForQueueQuery,
   updateStaffQuery,
   countStaffByRoleQuery,
   updatePasswordQuery,

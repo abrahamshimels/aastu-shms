@@ -6,6 +6,7 @@ const {
   findByEmailQuery,
   findByIdQuery,
   getAllStaffQuery,
+  getActiveDoctorsForQueueQuery,
   updateStaffQuery,
   countStaffByRoleQuery,
   updatePasswordQuery,
@@ -177,6 +178,10 @@ const getAllStaff = async () => {
   return dbhelper.query(getAllStaffQuery);
 };
 
+const getActiveDoctorsForQueue = async () => {
+  return dbhelper.query(getActiveDoctorsForQueueQuery);
+};
+
 const updateStaff = async (id, staff) => {
   const values = [
     id,
@@ -245,6 +250,7 @@ module.exports = {
   findByEmail,
   findById,
   getAllStaff,
+  getActiveDoctorsForQueue,
   updateStaff,
   updatePassword,
   updateLastLogin,

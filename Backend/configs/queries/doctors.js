@@ -18,8 +18,8 @@ CREATE TABLE IF NOT EXISTS doctors (
 `;
 
 const addDoctorQuery = `
-    INSERT INTO doctors (name, phonenum, email, password, age, gender, bloodgroup, dob, address, education, department, fees)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+    INSERT INTO doctors (id, name, phonenum, email, password, age, gender, bloodgroup, dob, address, education, department, fees)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
     RETURNING *;
 `;
 

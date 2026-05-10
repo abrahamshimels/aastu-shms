@@ -116,6 +116,9 @@ export const CreateBooking = (data) => async (dispatch) => {
     const res = await axios.post(
       `${baseURL}/appointments/create`,
       data,
+      {
+        headers: { Authorization: localStorage.getItem("token") },
+      },
     );
     console.log(res);
     return res.data;
@@ -172,6 +175,9 @@ export const GetAppointments = (userType, id) => async (dispatch) => {
     dispatch({ type: types.GET_APPOINTMENT_DETAILS_REQUEST });
     const res = await axios.get(
       `${baseURL}/appointments/${userType}/${id}`,
+      {
+        headers: { Authorization: localStorage.getItem("token") },
+      },
     );
     console.log("res", res.data);
     // return res.data;
@@ -191,6 +197,9 @@ export const DeleteAppointment = (id) => async (dispatch) => {
     dispatch({ type: types.DELETE_APPOINTMENT_REQUEST });
     const res = await axios.delete(
       `${baseURL}/appointments/${id}`,
+      {
+        headers: { Authorization: localStorage.getItem("token") },
+      },
     );
     console.log(res.data);
     // return res.data;
@@ -309,12 +318,24 @@ export const getLabHistory = (patientId) => async (dispatch) => {
 
 export const createLabRequest = (data, token) => async (dispatch) => {
   try {
+    console.log("[createLabRequest] Sending request", {
+      url: `${baseURL}/lab/request`,
+      payload: data,
+      tokenPrefix: token?.slice(0, 18),
+    });
     const res = await axios.post(`${baseURL}/lab/request`, data, {
       headers: { Authorization: token },
     });
+    console.log("[createLabRequest] Success", res.data);
     return res.data;
   } catch (error) {
-    console.log(error);
+    console.log("[createLabRequest] Failed", {
+      message: error.message,
+      status: error?.response?.status,
+      response: error?.response?.data,
+      payload: data,
+    });
+    throw error;
   }
 };
 

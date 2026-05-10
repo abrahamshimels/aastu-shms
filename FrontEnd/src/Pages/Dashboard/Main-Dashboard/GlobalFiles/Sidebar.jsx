@@ -138,7 +138,7 @@ const Sidebar = () => {
                     Profile
                   </div>
                 </NavLink>
-                <NavLink className="link" to={"/systemsetup"}>
+                {/* <NavLink className="link" to={"/systemsetup"}>
                   <div className="icon">
                     <MdSettings className="mainIcon" />
                   </div>
@@ -148,7 +148,7 @@ const Sidebar = () => {
                   >
                     System Settings
                   </div>
-                </NavLink>
+                </NavLink> */}
                 <NavLink className="link" to={"/auditlogs"}>
                   <div className="icon">
                     <HistoryOutlined className="mainIcon" />

@@ -55,7 +55,9 @@ const AIAssistant = () => {
       setConversationId(id);
       setMessages((rows || []).map((m) => ({ role: m.role, content: m.content })));
     } catch (e) {
-      setError(e?.response?.data?.message || "Failed to load conversation");
+      const errorMsg = e?.response?.data?.error || e?.message || "Failed to load conversation";
+      setError(errorMsg);
+      console.error("[AI] Load conversation error:", errorMsg);
     } finally {
       setLoadingHistory(false);
     }
@@ -83,19 +85,22 @@ const AIAssistant = () => {
         setConversationId(response.conversationId);
       }
 
+      const assistantMessage = response?.message || "I could not generate a response. Please try again.";
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: response?.message || "No response received." },
+        { role: "assistant", content: assistantMessage },
       ]);
 
       refreshConversations();
     } catch (e) {
-      setError(e?.response?.data?.message || "Failed to get AI response");
+      const errorMsg = e?.response?.data?.error || e?.message || "Failed to get AI response";
+      setError(`AI Error: ${errorMsg}`);
+      console.error("[AI] Chat error:", errorMsg);
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: "I could not process that right now. Please try again.",
+          content: "I encountered an error processing your request. Please try again or contact support if the problem persists.",
         },
       ]);
     } finally {

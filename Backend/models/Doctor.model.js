@@ -35,21 +35,26 @@ const findIfExists = async (email) => {
 };
 
 const addDoctor = async (doctor) => {
+  // Map input fields flexibly (support different key naming from seeds/clients)
+  // ensure an id exists (generate simple id if not provided)
+  const id = doctor.id || `doc_${Date.now()}`;
+
   const values = [
-    doctor.id,
+    id,
     doctor.name,
-    doctor.phonenum,
+    doctor.phonenum || doctor.phoneNum || doctor.phone || null,
     doctor.email,
     doctor.password || "Doctor@123",
     doctor.age,
     doctor.gender,
-    doctor.bloodgroup,
-    doctor.dob,
+    doctor.bloodgroup || doctor.bloodGroup || null,
+    doctor.dob || doctor.DOB || null,
     doctor.address,
     doctor.education,
     doctor.department,
     doctor.fees,
   ];
+
   const result = await dbhelper.query(addDoctorQuery, values);
   return result[0];
 };

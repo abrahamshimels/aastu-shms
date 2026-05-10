@@ -4,10 +4,15 @@ require("dotenv").config();
 const authenticate = (req, res, next) => {
   const token = req.headers.authorization;
   if (token) {
+    console.log("[doctorAuth] Authorization received", {
+      tokenPrefix: token.slice(0, 18),
+    });
     const decoded = jwt.verify(token, process.env.KEY);
     if (decoded) {
+      console.log("[doctorAuth] Decoded token", decoded);
       req.user = decoded; // Standardize by putting decoded token in req.user
-      req.body.doctorID = decoded.id; // Maintain backward compatibility for some models
+      req.body.doctorID = decoded.doctorID || decoded.id; // Maintain backward compatibility for some models
+      console.log("[doctorAuth] Injected doctorID", req.body.doctorID);
       next();
     } else {
       res.send("You cannot edit this token.");

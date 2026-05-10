@@ -16,37 +16,53 @@ import Sidebar from "../../GlobalFiles/Sidebar";
 const notify = (text) => toast(text);
 
 const Check_Appointment = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { data } = useSelector((store) => store.auth);
   const { patients } = useSelector((store) => store.data.patients);
   const { doctors } = useSelector((store) => store.data.doctors);
   const { appointments } = useSelector((store) => store.data.appointments);
+  const user = data?.user;
+  const userType = data?.user?.userType;
+  const userId = data?.user?.id;
   console.log(appointments);
-  const patient =
-    data.user.userType === "patient"
-      ? patients.find((patient) => patient.id === appointments.patientid)
-      : appointments.map((appointment) => {
-        return patients.find(
-          (patient) => patient.id === appointment.patientid
-        );
-      });
-
-  const doctor =
-    data.user.userType === "patient"
-      ? appointments.map((appointment) => {
-        return doctors.find((doctor) => doctor.id === appointment.doctorid);
-      })
-      : doctors.find((doctor) => doctor.id === data.user.id);
-
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   useEffect(() => {
-    if (data.user?.userType) {
-      dispatch(GetAppointments(data.user.userType, data.user.id));
+    if (userType) {
+      dispatch(GetAppointments(userType, userId));
       dispatch(GetPatients());
       dispatch(GetDoctorDetails());
     }
-  }, [data.user]);
+  }, [dispatch, userType, userId]);
+
+  if (!user) {
+    return (
+      <div className="container">
+        <Sidebar />
+        <div className="AfterSideBar">
+          <h1>Please log in to view appointments.</h1>
+        </div>
+      </div>
+    );
+  }
+
+  if (userType === "admin") {
+    return <Navigate to={"/dashboard"} />;
+  }
+
+  const patient =
+    userType === "patient"
+      ? patients.find((p) => p.id === appointments.patientid)
+      : appointments.map((appointment) => {
+        return patients.find((p) => p.id === appointment.patientid);
+      });
+
+  const doctor =
+    userType === "patient"
+      ? appointments.map((appointment) => {
+        return doctors.find((d) => d.id === appointment.doctorid);
+      })
+      : doctors.find((d) => d.id === userId);
 
   const createData = (
     id,
@@ -72,18 +88,18 @@ const Check_Appointment = () => {
 
   const columns = [
     {
-      userType: data.user?.userType,
-      label: data.user?.userType === "patient" ? "Doctor Name" : "Patient Name",
-      key: data.user?.userType === "patient" ? "doctor_name" : "patient_name",
+      userType: userType,
+      label: userType === "patient" ? "Doctor Name" : "Patient Name",
+      key: userType === "patient" ? "doctor_name" : "patient_name",
       align: "left",
     },
     { label: "Date", key: "date", align: "right" },
     { label: "Time", key: "time", align: "right" },
     {
       label:
-        data.user?.userType === "patient"
+        userType === "patient"
           ? "Cancel Appointment"
-          : data.user?.userType === "nurse"
+          : userType === "nurse"
             ? "Status"
             : "Generate Report",
       align: "right",
@@ -91,26 +107,26 @@ const Check_Appointment = () => {
   ];
 
   const datas = appointments.map((appointment, index) => {
-    return data.user.userType === "patient"
+    return userType === "patient"
       ? createData(
         appointment.id,
-        doctor[index].name,
+        doctor[index]?.name,
         appointment.date,
         appointment.time,
-        doctor[index].phonenum,
-        doctor[index].department,
-        doctor[index].fees,
+        doctor[index]?.phonenum,
+        doctor[index]?.department,
+        doctor[index]?.fees,
         appointment.problem,
         "Cancel"
       )
       : createData(
         appointment.id,
-        patient[index].name,
+        patient[index]?.name,
         appointment.date,
         appointment.time,
-        patient[index].phonenum,
-        doctor.department,
-        doctor.fees,
+        patient[index]?.phonenum,
+        doctor?.department,
+        doctor?.fees,
         appointment.problem,
         "Generate Report"
       );
@@ -118,7 +134,7 @@ const Check_Appointment = () => {
 
   const clicked = (index) => {
     let appointment;
-    data.user.userType === "patient"
+    userType === "patient"
       ? dispatch(DeleteAppointment(index)).then((res) => {
         console.log(res);
         if (res.message === "successful") {
@@ -133,17 +149,6 @@ const Check_Appointment = () => {
       return navigate("/createreport", { state: appointment });
     }
   };
-  useEffect(() => {
-    dispatch(GetAppointments(data.user.userType, data.user.id));
-  }, []);
-
-  if (data?.isAuthenticated === false) {
-    return <Navigate to={"/"} />;
-  }
-
-  if (data?.user.userType === "admin") {
-    return <Navigate to={"/dashboard"} />;
-  }
 
   return (
     <>

@@ -11,7 +11,13 @@ if (!baseURL) throw new Error("REACT_APP_BASE_URL is not defined in .env");
 const Queue = () => {
   const [queue, setQueue] = useState([]);
   const [doctors, setDoctors] = useState([]);
+  const [patients, setPatients] = useState([]);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [filteredPatients, setFilteredPatients] = useState([]);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const [selectedPatient, setSelectedPatient] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [selectedDoctors, setSelectedDoctors] = useState({});
   const [showCheckIn, setShowCheckIn] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [checkInData, setCheckInData] = useState({
@@ -26,6 +32,7 @@ const Queue = () => {
   useEffect(() => {
     fetchQueue();
     fetchDoctors();
+    fetchPatients();
     const interval = setInterval(fetchQueue, 10000); // Auto refresh queue
     return () => clearInterval(interval);
   }, []);
@@ -49,6 +56,60 @@ const Queue = () => {
       setDoctors(res.data);
     } catch (error) {
       notify("Error fetching doctors");
+    }
+  };
+
+  const fetchPatients = async () => {
+    try {
+      const res = await axios.get(`${baseURL}/patients`);
+      setPatients(res.data || []);
+    } catch (error) {
+      console.warn("Error fetching patients", error);
+    }
+  };
+
+  // filter patients for autocomplete whenever input changes
+  useEffect(() => {
+    if (editingItem) return;
+    const q = (checkInData.studentID || "").trim().toLowerCase();
+    if (!q) {
+      setFilteredPatients(patients.slice(0, 50));
+      setDropdownOpen(false);
+      setActiveIndex(-1);
+      return;
+    }
+    const filtered = (patients || []).filter((p) => {
+      return (
+        (p.studentid || "").toLowerCase().includes(q) ||
+        (p.name || "").toLowerCase().includes(q)
+      );
+    });
+    setFilteredPatients(filtered.slice(0, 50));
+    setActiveIndex(-1);
+    setDropdownOpen(filtered.length > 0);
+  }, [checkInData.studentID, patients, editingItem]);
+
+  const selectPatient = (p) => {
+    setCheckInData({ ...checkInData, studentID: p.studentid });
+    setSelectedPatient(p);
+    setDropdownOpen(false);
+  };
+
+  const handleInputKeyDown = (e) => {
+    if (!dropdownOpen) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIndex((i) => Math.min(i + 1, filteredPatients.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIndex((i) => Math.max(i - 1, 0));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (activeIndex >= 0 && filteredPatients[activeIndex]) {
+        selectPatient(filteredPatients[activeIndex]);
+      }
+    } else if (e.key === "Escape") {
+      setDropdownOpen(false);
     }
   };
 
@@ -166,6 +227,23 @@ const Queue = () => {
     }
   };
 
+  const handleAssign = async (queueId, doctorId) => {
+    if (!doctorId) return notify("Select a doctor first");
+    try {
+      await axios.patch(
+        `${baseURL}/nurses/assign-doctor`,
+        {
+          queue_id: queueId,
+          doctor_id: doctorId,
+        },
+      );
+      notify("Doctor assigned successfully");
+      fetchQueue();
+    } catch (error) {
+      notify("Error assigning doctor");
+    }
+  };
+
   return (
     <div className="container">
       <Sidebar />
@@ -229,6 +307,24 @@ const Queue = () => {
                       <p className="card-meta">
                         {item.patient_dept} | Year {item.patient_year}
                       </p>
+                    </div>
+                    <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 10 }}>
+                      <select
+                        value={selectedDoctors[item.id] || ""}
+                        onChange={(e) => setSelectedDoctors({ ...selectedDoctors, [item.id]: e.target.value })}
+                        style={{ padding: "6px 8px" }}
+                      >
+                        <option value="">Assign doctor...</option>
+                        {doctors.map((d) => (
+                          <option key={d.id} value={d.id}>{d.name} — {d.department}</option>
+                        ))}
+                      </select>
+                      <button
+                        onClick={() => handleAssign(item.id, selectedDoctors[item.id])}
+                        style={{ padding: "6px 10px" }}
+                      >
+                        Assign
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -296,7 +392,7 @@ const Queue = () => {
             <div className="modal-content-new">
               <h2>{editingItem ? "Edit Queue Item" : "Patient Check-In"}</h2>
               <form onSubmit={handleCheckIn}>
-                <div className="input-group">
+                <div className="input-group" style={{ position: "relative" }}>
                   <label>AASTU Student ID</label>
                   <input
                     placeholder="e.g. ETS0217/15"
@@ -307,9 +403,41 @@ const Queue = () => {
                         studentID: e.target.value,
                       })
                     }
+                    onFocus={() => {
+                      if (filteredPatients.length > 0) setDropdownOpen(true);
+                    }}
+                    onBlur={() => setTimeout(() => setDropdownOpen(false), 150)}
+                    onKeyDown={handleInputKeyDown}
                     disabled={!!editingItem}
                     required
+                    style={{ width: "100%", padding: 8, boxSizing: "border-box" }}
                   />
+
+                  {/* Modern dropdown */}
+                  {!editingItem && dropdownOpen && filteredPatients.length > 0 && (
+                    <div style={{ position: "absolute", left: 0, right: 0, top: "100%", zIndex: 30, background: "#fff", border: "1px solid #e6e6e6", boxShadow: "0 6px 18px rgba(0,0,0,0.08)", maxHeight: 260, overflow: "auto", borderRadius: 6, marginTop: 6 }}>
+                      {filteredPatients.map((p, idx) => (
+                        <div
+                          key={p.id}
+                          onMouseDown={() => selectPatient(p)}
+                          onMouseEnter={() => setActiveIndex(idx)}
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            padding: 10,
+                            background: idx === activeIndex ? "#f5f8ff" : "#fff",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <div>
+                            <div style={{ fontWeight: 600 }}>{p.name}</div>
+                            <div style={{ color: "#666", fontSize: 12 }}>{p.studentid} — {p.department}</div>
+                          </div>
+                          <div style={{ color: "#777", fontSize: 12, alignSelf: "center" }}>{p.year || ""}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div className="input-group">
                   <label>Chief Complaint</label>

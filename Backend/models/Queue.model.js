@@ -14,6 +14,28 @@ const {
 const initialize = async () => {
   try {
     await dbhelper.query(createTableQuery);
+
+    // Keep existing DBs compatible: migrate queue.doctor_id FK from doctors(id) to staff(id)
+    await dbhelper.query(`ALTER TABLE queue DROP CONSTRAINT IF EXISTS queue_doctor_id_fkey;`);
+    await dbhelper.query(`
+      UPDATE queue q
+      SET doctor_id = NULL
+      WHERE doctor_id IS NOT NULL
+        AND NOT EXISTS (
+          SELECT 1
+          FROM staff s
+          WHERE s.id = q.doctor_id
+            AND s.role = 'DOCTOR'
+        );
+    `);
+    await dbhelper.query(`
+      ALTER TABLE queue
+      ADD CONSTRAINT queue_doctor_id_fkey
+      FOREIGN KEY (doctor_id) REFERENCES staff(id)
+      ON UPDATE CASCADE
+      ON DELETE SET NULL;
+    `);
+
     console.log("✅ Queue table initialized successfully.");
   } catch (err) {
     console.error("❌ Failed to initialize Queue table:", err.message);

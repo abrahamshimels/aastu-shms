@@ -8,9 +8,10 @@ const {
   getAllAppointments,
 } = require("../models/Appointment.model");
 const { getDoctorCredFromEmail } = require("../models/Doctor.model");
+const { authenticate } = require("../middlewares/authMiddleware");
 const router = express.Router();
 
-router.get("/:userType/:id", async (req, res) => {
+router.get("/:userType/:id", authenticate, async (req, res) => {
   const id = req.params.id;
   const userType = req.params.userType;
   try {
@@ -27,7 +28,7 @@ router.get("/:userType/:id", async (req, res) => {
   }
 });
 
-router.post("/create", async (req, res) => {
+router.post("/create", authenticate, async (req, res) => {
   const payload = req.body;
 
   try {
@@ -62,7 +63,7 @@ router.post("/create", async (req, res) => {
   }
 });
 
-router.delete("/:appointmentId", async (req, res) => {
+router.delete("/:appointmentId", authenticate, async (req, res) => {
   const id = req.params.appointmentId;
   try {
     const appointment = await findById(id);

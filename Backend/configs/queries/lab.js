@@ -8,7 +8,7 @@ const createLabTestRequestTable = `CREATE TABLE IF NOT EXISTS lab_test_requests 
   notes TEXT,
   request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (patient_id) REFERENCES patients(id),
-  FOREIGN KEY (doctor_id) REFERENCES doctors(id)
+  FOREIGN KEY (doctor_id) REFERENCES staff(id)
 );`;
 
 const createLabRecordTable = `CREATE TABLE IF NOT EXISTS lab_records (
@@ -30,7 +30,7 @@ VALUES ($1, $2, $3, $4, $5) RETURNING id;`;
 const getPendingRequestsQuery = `SELECT lr.*, p.name as patient_name, p.studentid, d.name as doctor_name 
 FROM lab_test_requests lr
 JOIN patients p ON lr.patient_id = p.id
-JOIN doctors d ON lr.doctor_id = d.id
+JOIN staff d ON lr.doctor_id = d.id AND d.role = 'DOCTOR'
 WHERE lr.status = 'Pending';`;
 
 const getRequestByIdQuery = `SELECT * FROM lab_test_requests WHERE id = $1;`;
@@ -73,6 +73,7 @@ FROM lab_test_requests lreq
 JOIN patients p ON lreq.patient_id = p.id
 LEFT JOIN lab_records lrec ON lreq.id = lrec.request_id
 LEFT JOIN laboratory_technologists lt ON lrec.technologist_id = lt.id
+JOIN staff d ON lreq.doctor_id = d.id AND d.role = 'DOCTOR'
 WHERE lreq.doctor_id = $1
 ORDER BY lreq.request_date DESC;
 `;
