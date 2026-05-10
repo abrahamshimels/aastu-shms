@@ -38,9 +38,9 @@ const getAppointmentFromDoctorQuery = `
 const findByIDQuery = `SELECT * FROM appointments WHERE id = $1;`;
 
 const getAllAppointmentsQuery = `
-  SELECT a.*, p.name as patient_name, s.name as doctor_name 
+  SELECT a.*, p.name as patient_name, p.studentid, p.id as patient_db_id, s.name as doctor_name 
   FROM appointments a
-  LEFT JOIN patients p ON a.patientid = p.studentid
+  LEFT JOIN patients p ON a.patientid = p.id
   LEFT JOIN staff s ON a.doctorid = s.id;
 `;
 
